@@ -1,29 +1,31 @@
 {
-    "name": "ruff-tobacco-evb",
-    "version": "0.1.0",
-    "description": "",
-    "author": "",
-    "main": "src/index.js",
-    "ruff": {
-        "dependencies": {
-            "gpio-output": "*",
-            "gpio-input": "*",
-            "tobacco-uart": "*"
-        },
-        "version": 1
-    },
+  "name": "ruff-tobacco-evb",
+  "version": "0.1.0",
+  "description": "",
+  "author": "",
+  "main": "src/index.js",
+  "ruff": {
     "dependencies": {
-        "@types/chai": "^4.0.5",
-        "@types/node": "^8.0.53",
-        "chai": "^4.1.2",
-        "es6-promise": "^4.1.1"
+      "gpio-output": "*",
+      "gpio-input": "*",
+      "tobacco-uart": "*",
+      "promise": "*"
     },
-    "directories": {
-        "test": "test"
-    },
-    "devDependencies": {},
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "license": "ISC"
+    "version": 1
+  },
+  "dependencies": {
+    "@types/chai": "^4.0.5",
+    "@types/node": "^8.0.53",
+    "@types/promise": "^7.1.30",
+    "chai": "^4.1.2",
+    "es6-promise": "^4.1.1"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "ISC"
 }

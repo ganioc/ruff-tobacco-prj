@@ -4,7 +4,7 @@ declare var $: any;
 import Events = require("events");
 import { Tool } from "./utility";
 
-const uartComm = $("#uart-mcu");
+const uartComm = $("#uart1");
 
 const buf = new Buffer(128);
 let indexBuf = 0;
@@ -16,19 +16,19 @@ export interface ICallbackData {
 
 export class ControlMcu {
 
-    // public static turnOnBakingFire() {
-    //     console.log("Turn on Baking Fire");
+    public static turnOnBakingFire() {
+        console.log("Turn on Baking Fire");
 
-    // }
-    // public static turnOffBakingFire() {
-    //     console.log("Turn off Baking Fire");
-    // }
-    // public static turnOnVentingGate() {
-    //     console.log("Turn on Venting");
-    // }
-    // public static turnOffVentingGate() {
-    //     console.log("Turn off Venting");
-    // }
+    }
+    public static turnOffBakingFire() {
+        console.log("Turn off Baking Fire");
+    }
+    public static turnOnVentingGate() {
+        console.log("Turn on Venting");
+    }
+    public static turnOffVentingGate() {
+        console.log("Turn off Venting");
+    }
     private static readonly WIRTE_TIMEOUT = 2000;
     public emitter: Events.EventEmitter;
 

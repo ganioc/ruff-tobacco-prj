@@ -1,6 +1,7 @@
-// import { ControlMcu } from "./ControlMcu";
-import { Promise } from "es6-promise";
+import { ControlMcu } from "./ControlMcu";
+
 import { Tool } from "./utility";
+import { YAsync } from "./yjasync";
 
 export class ControlPeriph {
     public static temp1: number; // to store the test temp values
@@ -35,7 +36,6 @@ export class ControlPeriph {
     public static TurnOffBakingFire() {
         Tool.print("ControlPeriph: Turn off baking fire");
     }
-    /*
     public static fetchParams(commMCU: ControlMcu) {
         YAsync.series(
             [
@@ -46,12 +46,12 @@ export class ControlPeriph {
                             return;
                         }
                         // Tool.print("Temp is:" + parseFloat(data.content.toString()));
-
+                        Tool.print(data.content.toString());
                         // Tool.print("");
-                        ControlPeriph.temp1 = parseFloat(data.content.toString());
-                        ControlPeriph.temp2 = 22.0;
-                        ControlPeriph.temp3 = 23.0;
-                        ControlPeriph.temp4 = 25.0;
+                        // ControlPeriph.temp1 = parseFloat(data.content.toString());
+                        // ControlPeriph.temp2 = 22.0;
+                        // ControlPeriph.temp3 = 23.0;
+                        // ControlPeriph.temp4 = 25.0;
 
                         // It's a proper time to check the temp values
                         // Or let bakingTask to handle it
@@ -65,6 +65,8 @@ export class ControlPeriph {
                             cb(err);
                             return;
                         }
+
+                        Tool.print(data.content.toString());
                         // Tool.print("Volt1 is:" + parseFloat(data.content.toString()));
                         // Tool.print("");
 
@@ -79,6 +81,8 @@ export class ControlPeriph {
                             cb(err);
                             return;
                         }
+                        Tool.print(data.content.toString());
+
                         // Tool.print("Time:" + parseFloat(data.content.toString()));
                         // Tool.print("");
                         cb(null, data);
@@ -94,5 +98,4 @@ export class ControlPeriph {
             },
         );
     }
-    */
 }

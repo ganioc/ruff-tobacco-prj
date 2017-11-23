@@ -11,12 +11,6 @@
         "CodeSwitch-2/gpio-in": "imx6-hzmc/gpio-164",
         "CodeSwitch-3/vcc": "imx6-hzmc/vdd-0",
         "CodeSwitch-3/gnd": "imx6-hzmc/gnd-1",
-        "CodeSwitch-3/gpio-in": "imx6-hzmc/gpio-165",
-        "uart-mcu/vcc": "imx6-hzmc/vdd-0",
-        "uart-mcu/gnd": "imx6-hzmc/gnd-0",
-        "uart-mcu/": "imx6-hzmc/uart-2",
-        "uart-gps/vcc": "imx6-hzmc/vdd-0",
-        "uart-gps/gnd": "imx6-hzmc/gnd-0",
-        "uart-gps/": "imx6-hzmc/uart-4"
+        "CodeSwitch-3/gpio-in": "imx6-hzmc/gpio-165"
     }
 }
