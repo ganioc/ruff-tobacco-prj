@@ -1,0 +1,527 @@
+{
+    "version": "2.1",
+    "id": "imx6-hzmc",
+    "model": "imx6-hzmc",
+    "outputs": {
+        "gnd-0": "ground/gnd-0",
+        "gnd-1": "ground/gnd-1",
+        "vdd-0": "power/vdd-0",
+        "vdd-1": "power/vdd-1",
+        "uart-2": "uart-2/uart",
+        "uart-4": "uart-4/uart",
+        "gpio-164": "gpio-164/gpio",
+        "gpio-165": "gpio-165/gpio",
+        "gpio-196": "gpio-196/gpio",
+        "gpio-80": "gpio-80/gpio",
+        "gpio-197": "gpio-197/gpio",
+        "gpio-198": "gpio-198/gpio",
+        "gpio-192": "gpio-192/gpio",
+        "gpio-177": "gpio-177/gpio",
+        "gpio-82": "gpio-82/gpio",
+        "gpio-81": "gpio-81/gpio",
+        "gpio-83": "gpio-83/gpio",
+        "gpio-146": "gpio-146/gpio",
+        "gpio-158": "gpio-158/gpio",
+        "gpio-159": "gpio-159/gpio",
+        "gpio-161": "gpio-161/gpio",
+        "gpio-163": "gpio-163/gpio"
+    },
+    "devices": [
+        {
+            "id": "gpio-164",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 164
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-165",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 165
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-196",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 196
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-80",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 80
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-197",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 197
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-198",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 198
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-192",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 192
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-177",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 177
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-82",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 82
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-81",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 81
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-83",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 83
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-146",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 146
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-158",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 158
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-159",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 159
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-161",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 161
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-163",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 163
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "ground",
+            "outputs": {
+                "gnd-0": {
+                    "type": "ground"
+                },
+                "gnd-1": {
+                    "type": "ground"
+                }
+            }
+        },
+        {
+            "id": "power",
+            "outputs": {
+                "vdd-0": {
+                    "type": "power",
+                    "args": {
+                        "voltage": "3.3v"
+                    }
+                },
+                "vdd-1": {
+                    "type": "power",
+                    "args": {
+                        "voltage": "5v"
+                    }
+                }
+            }
+        },
+        {
+            "id": "uart-2",
+            "model": "ruff-sys-uart",
+            "driver": "sys-uart",
+            "inputs": {
+                "device": {
+                    "type": "string",
+                    "args": {
+                        "path": "/dev/ttymxc1"
+                    }
+                }
+            },
+            "outputs": {
+                "uart": {
+                    "type": "uart"
+                }
+            }
+        },
+        {
+            "id": "uart-4",
+            "model": "ruff-sys-uart",
+            "driver": "sys-uart",
+            "inputs": {
+                "device": {
+                    "type": "string",
+                    "args": {
+                        "path": "/dev/ttyS0"
+                    }
+                }
+            },
+            "outputs": {
+                "uart": {
+                    "type": "uart"
+                }
+            }
+        }
+    ]
+}

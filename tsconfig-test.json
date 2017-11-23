@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "noImplicitAny": false,
+        "module": "commonjs",
+        "removeComments": false,
+        "sourceMap": false,
+        "rootDir": "test/ts/",
+        "outDir": "test/src/"
+    },
+    "exclude": [
+        "ts",
+        "src",
+        "ruff_modules",
+        "node_modules"
+    ]
+}

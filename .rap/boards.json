@@ -1,0 +1,10 @@
+{
+    "ruff": {
+        "boards": {
+            "imx6-hzmc": {
+                "version": "0.1.2",
+                "isActive": true
+            }
+        }
+    }
+}

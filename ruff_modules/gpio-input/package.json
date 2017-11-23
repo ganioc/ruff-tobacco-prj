@@ -1,0 +1,7 @@
+{
+    "name": "gpio-input",
+    "version": "0.1.0",
+    "description": "",
+    "author": "Yang Jun",
+    "main": "src/index.js"
+}

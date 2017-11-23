@@ -1,0 +1,94 @@
+{
+    "devices": [
+        {
+            "id": "LED-Running",
+            "model": "LED-Running",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "LED-Setting",
+            "model": "LED-Setting",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "CodeSwitch-2",
+            "model": "CodeSwitch-2",
+            "driver": "gpio-input",
+            "inputs": {
+                "gpio-in": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "in",
+                        "edge": "both"
+                    }
+                }
+            }
+        },
+        {
+            "id": "CodeSwitch-3",
+            "model": "CodeSwitch-3",
+            "driver": "gpio-input",
+            "inputs": {
+                "gpio-in": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "in",
+                        "edge": "both"
+                    }
+                }
+            }
+        },
+        {
+            "id": "uart-mcu",
+            "model": "uart-mcu",
+            "driver": "tobacco-uart",
+            "inputs": {
+                "": {
+                    "type": "uart",
+                    "args": {
+                        "baudRate": 115200,
+                        "stopBits": 1,
+                        "dataBits": 8,
+                        "parity": "none",
+                        "flowControl": "none"
+                    }
+                }
+            }
+        },
+        {
+            "id": "uart-gps",
+            "model": "uart-gps",
+            "driver": "tobacco-uart",
+            "inputs": {
+                "": {
+                    "type": "uart",
+                    "args": {
+                        "baudRate": 115200,
+                        "stopBits": 1,
+                        "dataBits": 8,
+                        "parity": "none",
+                        "flowControl": "none"
+                    }
+                }
+            }
+        }
+    ]
+}
