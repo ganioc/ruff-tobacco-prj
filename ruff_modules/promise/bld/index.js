@@ -1,7 +1,5 @@
 "use strict";
-/*
 var State;
-
 (function (State) {
     State[State["pending"] = 0] = "pending";
     State[State["fulfilled"] = 1] = "fulfilled";
@@ -16,12 +14,9 @@ exports.options = {
         error: console.error
     }
 };
-
 function noop() { }
 
 var setImmediate = global.setImmediate || setTimeout;
-
-*/
 
 var Promise = (function () {
     function Promise(resolver) {
@@ -293,8 +288,7 @@ var Promise = (function () {
     return Promise;
 }());
 exports.Promise = Promise;
-
-/*
+/**
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Promise;
 if (typeof global.Promise === 'undefined') {
@@ -302,5 +296,5 @@ if (typeof global.Promise === 'undefined') {
         value: Promise
     });
 }
-*/
+ */
 //# sourceMappingURL=index.js.map

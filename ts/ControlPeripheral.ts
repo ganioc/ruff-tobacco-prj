@@ -1,3 +1,4 @@
+import { Promise } from "promise";
 import { ControlMcu } from "./ControlMcu";
 
 import { Tool } from "./utility";
@@ -8,6 +9,14 @@ export class ControlPeriph {
     public static temp2: number;
     public static temp3: number;
     public static temp4: number;
+
+    public static ADC1: number;
+    public static ADC2: number;
+    public static ADC3: number;
+    public static ADC4: number;
+    public static ADC5: number;
+    public static ADC6: number;
+    public static ADC7: number;
 
     public static gpsLongitude: number;
     public static gpsLatitude: number;
@@ -37,6 +46,7 @@ export class ControlPeriph {
         Tool.print("ControlPeriph: Turn off baking fire");
     }
     public static fetchParams(commMCU: ControlMcu) {
+
         YAsync.series(
             [
                 (cb) => {
@@ -45,13 +55,19 @@ export class ControlPeriph {
                             cb(err);
                             return;
                         }
-                        // Tool.print("Temp is:" + parseFloat(data.content.toString()));
-                        Tool.print(data.content.toString());
-                        // Tool.print("");
-                        // ControlPeriph.temp1 = parseFloat(data.content.toString());
-                        // ControlPeriph.temp2 = 22.0;
-                        // ControlPeriph.temp3 = 23.0;
-                        // ControlPeriph.temp4 = 25.0;
+
+                        // Tool.printGreen("GetTemp");
+                        // Tool.print(data.content.toString());
+
+                        ControlPeriph.temp1 = parseFloat(data.content.slice(0, 8).toString());
+                        ControlPeriph.temp2 = parseFloat(data.content.slice(8, 16).toString());
+                        ControlPeriph.temp3 = parseFloat(data.content.slice(16, 24).toString());
+                        ControlPeriph.temp4 = parseFloat(data.content.slice(24, 32).toString());
+
+                        // Tool.printYellow(ControlPeriph.temp1);
+                        // Tool.printYellow(ControlPeriph.temp2);
+                        // Tool.printYellow(ControlPeriph.temp3);
+                        // Tool.printYellow(ControlPeriph.temp4);
 
                         // It's a proper time to check the temp values
                         // Or let bakingTask to handle it
@@ -65,10 +81,24 @@ export class ControlPeriph {
                             cb(err);
                             return;
                         }
+                        // Tool.printGreen("GetADC");
+                        // Tool.print(data.content.toString());
 
-                        Tool.print(data.content.toString());
-                        // Tool.print("Volt1 is:" + parseFloat(data.content.toString()));
-                        // Tool.print("");
+                        ControlPeriph.ADC1 = parseFloat(data.content.slice(0, 8).toString());
+                        ControlPeriph.ADC2 = parseFloat(data.content.slice(8, 16).toString());
+                        ControlPeriph.ADC3 = parseFloat(data.content.slice(16, 24).toString());
+                        ControlPeriph.ADC4 = parseFloat(data.content.slice(24, 32).toString());
+                        ControlPeriph.ADC5 = parseFloat(data.content.slice(32, 40).toString());
+                        ControlPeriph.ADC6 = parseFloat(data.content.slice(40, 48).toString());
+                        ControlPeriph.ADC7 = parseFloat(data.content.slice(48, 56).toString());
+
+                        // Tool.printYellow(ControlPeriph.ADC1);
+                        // Tool.printYellow(ControlPeriph.ADC2);
+                        // Tool.printYellow(ControlPeriph.ADC3);
+                        // Tool.printYellow(ControlPeriph.ADC4);
+                        // Tool.printYellow(ControlPeriph.ADC5);
+                        // Tool.printYellow(ControlPeriph.ADC6);
+                        // Tool.printYellow(ControlPeriph.ADC7);
 
                         // It's a proper time to check if the voltage is out of limit
 
@@ -81,10 +111,10 @@ export class ControlPeriph {
                             cb(err);
                             return;
                         }
-                        Tool.print(data.content.toString());
 
-                        // Tool.print("Time:" + parseFloat(data.content.toString()));
-                        // Tool.print("");
+                        // Tool.printGreen("GetTime");
+                        // Tool.print(data.content.toString());
+
                         cb(null, data);
                     });
                 },
@@ -97,5 +127,6 @@ export class ControlPeriph {
                 }
             },
         );
+
     }
 }

@@ -1,0 +1,102 @@
+// awesome.proto
+package awesomepackage;
+syntax = "proto3";
+
+message AwesomeMessage{
+    required bool sex = 0;
+    required string name = 1;
+    required uint32 age = 2;
+}
+message RegisterResponse {
+	string imei = 1;
+	string dyId = 2;
+	string dypassword = 3;
+	string mqttTcpEndpoint = 4;
+	string mqttSslEndpoint = 5;
+	string mqttWssEndpoint = 6;
+	string mqttUsername = 7;
+	string mqttKey = 8;
+}
+
+message RecoProfileRequest {
+    int64 batchId = 1;
+    string deviceId = 2;
+    string variety = 9;
+    string barn_airflow_direction = 10;
+    string barn_wall_texture = 11;
+    double load_weather_temperature = 12;
+    double load_top_weight = 13;
+    double load_weather_humidity = 14;
+    double load_middle_weight = 15;
+    double load_bottom_weight = 16;
+    string load_tool = 17;
+    int64 loading_tool_count = 18;
+    string load_tool_weight = 19;
+    string load_quality = 20;
+    double load_maturity_lv_0_percentage = 21;
+    double load_maturity_lv_1_percentage = 22;
+    double load_maturity_lv_2_percentage = 23;
+    double load_maturity_lv_3_percentage = 24;
+    double load_maturity_lv_4_percentage = 25;
+}
+
+message ProfileItem {
+    enum Mode {
+        KEEP = 0;
+        HEAT_UP = 1;
+    }
+    Mode mode = 1;
+    double targetDryBulbTemp = 2;
+    double targetWetBulbTemp = 3;
+    int64 minutes = 4;
+}
+
+message Profile {
+    repeated ProfileItem items = 1;
+}
+
+message BatchProfile {
+    int64 batchId = 1;
+    string deviceId = 2;
+    Profile profile = 3;
+}
+
+message BatchRating {
+    string rating = 1;
+    double weight = 2;
+}
+
+message BatchDetail {
+    int64 batchId = 1;
+    string deviceId = 2;
+    repeated BatchRating ratings = 3;
+    int64 start_time = 4;
+    int64 end_time = 5;
+    double after_top_weight = 6;
+    double after_middle_weight = 7;
+    double after_bottom_weight = 8;
+    string variety = 9;
+    string barn_airflow_direction = 10;
+    string barn_wall_texture = 11;
+    double load_weather_temperature = 12;
+    double load_top_weight = 13;
+    double load_weather_humidity = 14;
+    double load_middle_weight = 15;
+    double load_bottom_weight = 16;
+    string load_tool = 17;
+    string load_tool_count = 18;
+    string load_tool_weight = 19;
+    string load_quality = 20;
+    double load_maturity_lv_0_percentage = 21;
+    double load_maturity_lv_1_percentage = 22;
+    double load_maturity_lv_2_percentage = 23;
+    double load_maturity_lv_3_percentage = 24;
+    double load_maturity_lv_4_percentage = 25;
+}
+
+message BatchSummary {
+    int64 batchId = 1;
+    string deviceId = 2;
+    int64 start_time = 3;
+    int64 end_time = 4;
+}

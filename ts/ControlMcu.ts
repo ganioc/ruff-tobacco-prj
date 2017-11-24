@@ -4,7 +4,8 @@ declare var $: any;
 import Events = require("events");
 import { Tool } from "./utility";
 
-const uartComm = $("#uart1");
+// const uartComm = $("#uart1");
+const uartComm = $("#uart-mcu");
 
 const buf = new Buffer(128);
 let indexBuf = 0;
