@@ -1,6 +1,5 @@
 {
     "models": [
-        "gpio-input"
     ],
     "inputs": {
         "gpio-in": {

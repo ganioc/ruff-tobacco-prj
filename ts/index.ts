@@ -52,8 +52,25 @@ $.ready((error) => {
     Tool.printMagenta("################\n");
 
     Tool.readMachineSN();
-    
 
+    setTimeout(() => {
+        main();
+    }, 2000);
+});
+
+$.end(() => {
+    Tool.printMagenta("################");
+    Tool.print("Ruff App end");
+
+    setTimeout(() => {
+        Tool.print("Quit QT process");
+        commQT.exit();
+    }, 0);
+
+    Tool.printMagenta("################\n");
+});
+
+function main() {
     // This is the mqtt client
     // mqttApp.start();
 
@@ -87,6 +104,9 @@ $.ready((error) => {
 
     commQT.emitter.on("end", () => {
         Tool.printYellow("Link ended");
+
+        commQT.exit();
+
         setTimeout(() => {
             commQT.init();
         }, commQT.DELAY_RECONNECT);
@@ -99,6 +119,11 @@ $.ready((error) => {
                 if (appBaking.runningStatus === RunningStatus.PAUSED) {
                     Tool.print("Start from paused");
                     appBaking.start();
+
+                    ControlPeriph.TurnOnRunningLED(() => {
+                        Tool.print("Turn on LED");
+                    });
+
                 } else if (appBaking.runningStatus === RunningStatus.WAITING) {
                     Tool.print("App start");
                     appBaking.start();
@@ -107,6 +132,10 @@ $.ready((error) => {
                     appBaking.timerTrap = setInterval(() => {
                         commQT.sendTrap(InfoType.Val_TrapBaking, appBaking.getTrapBaking());
                     }, 5000);
+
+                    ControlPeriph.TurnOnRunningLED(() => {
+                        Tool.print("Turn on LED");
+                    });
 
                 } else {
                     Tool.printRed("Should not respond to start, state:" + appBaking.runningStatus);
@@ -122,6 +151,11 @@ $.ready((error) => {
                     clearInterval(appBaking.timerTrap);
 
                     Tool.printBlue("App stopped");
+
+                    ControlPeriph.TurnOffRunningLED(() => {
+                        Tool.print("Turn off LED");
+                    });
+
                 } else if (appBaking.runningStatus === RunningStatus.STOPPED) {
                     clearInterval(appBaking.timerTrap);
                     Tool.printBlue("Clear timerTrap");
@@ -135,6 +169,11 @@ $.ready((error) => {
                 if (appBaking.runningStatus === RunningStatus.RUNNING) {
                     appBaking.pause();
                     Tool.print("App paused");
+
+                    ControlPeriph.TurnOffRunningLED(() => {
+                        Tool.print("Turn off LED");
+                    });
+
                 } else {
                     Tool.printRed("Should not respond to pause, state:" + appBaking.runningStatus);
                 }
@@ -146,6 +185,9 @@ $.ready((error) => {
                     // push status to the cloud
                     appBaking.reset();
                     Tool.print("App reseted");
+
+                    commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
+
                 } else {
                     Tool.printRed("Should not respond to reset, state:" + appBaking.runningStatus);
 
@@ -177,10 +219,11 @@ $.ready((error) => {
                 commQT.sendGetResp(data.PacketId, data.Obj, appBaking.getRunning());
                 break;
             case InfoType.Val_BakingInfo:
-                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadBakingInfo);
+                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadBakingInfo());
                 break;
             case InfoType.Val_BaseSetting:
-                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadBaseSetting);
+                Tool.printBlue("Get BaseSetting received");
+                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadBaseSetting());
                 break;
             default:
                 Tool.print("Wrong Get packet obj type:" + data.Obj);
@@ -224,12 +267,4 @@ $.ready((error) => {
     setInterval(() => {
         ControlPeriph.fetchParams(commMCU);
     }, 5000);
-});
-
-$.end(() => {
-    Tool.printMagenta("################");
-    Tool.print("Ruff App end");
-    Tool.print("Quit QT process");
-    commQT.exit();
-    Tool.printMagenta("################\n");
-});
+}

@@ -72,6 +72,160 @@
                     }
                 }
             }
+        },
+        {
+            "id": "CodeSwitch-4",
+            "model": "CodeSwitch-4",
+            "driver": "gpio-input",
+            "inputs": {
+                "gpio-in": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "in",
+                        "edge": "both"
+                    }
+                }
+            }
+        },
+        {
+            "id": "bPhaseVoltage",
+            "model": "bPhaseVoltage",
+            "driver": "gpio-input",
+            "inputs": {
+                "gpio-in": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "in",
+                        "edge": "both"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outBuzzer",
+            "model": "outBuzzer",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outCtrlWatchDog",
+            "model": "outCtrlWatchDog",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outResetMcu",
+            "model": "outResetMcu",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outWindEngine",
+            "model": "outWindEngine",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outRelayRY4",
+            "model": "outRelayRY4",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outRelayRY2",
+            "model": "outRelayRY2",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outCtrolFire",
+            "model": "outCtrolFire",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outGPSPower",
+            "model": "outGPSPower",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outMiniPCIePower",
+            "model": "outMiniPCIePower",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
         }
     ]
 }

@@ -56,17 +56,19 @@ export class CommQT {
     }
     public exit() {
         // kill the qt process
-        // Tool.printMagenta(inspect(this.subprocess));
-        this.subprocess.kill();
+
+        // this.subprocess.kill("SIGTERM");
     }
     public init() {
-        this.subprocess = Spawn.spawn("/home/root/tabacooui", ["-platform", "eglfs"]);
+        // this.subprocess = Spawn.spawn("/home/root/tabacooui", ["-platform", "eglfs"]);
 
-        // Tool.printMagenta(inspect(this.subprocess));
+        // this.subprocess.on("exit", (code) => {
+        //     Tool.printRed("QT process exit with code: " + code);
+        // });
 
         setTimeout(() => {
             this.start();
-        }, 2000);
+        }, 3000);
     }
     public start() {
 
@@ -121,6 +123,7 @@ export class CommQT {
         tuple.Content = objContent;
         this.write(JSON.stringify(tuple));
     }
+
     public sendGetResp(packetId: number, obj: number, objContent: any) {
         const tuple = {} as any;
 

@@ -13,7 +13,7 @@ export class Tool {
 
             ls.stdout.on("data", (data) => {
                 console.log(data);
-                this.MachineSN = data.toString().slice(2, 10);
+                this.MachineSN = parseInt(data.toString().slice(2, 10), 16).toString();
                 Tool.printYellow("MachineSN:" + this.MachineSN);
             });
             ls.on("exit", (code) => {
@@ -27,10 +27,9 @@ export class Tool {
 
             ls.stdout.on("data", (data) => {
                 console.log(data);
-                this.MachineSN = this.MachineSN + data.toString().slice(2, 10);
+                this.MachineSN = this.MachineSN + parseInt(data.toString().slice(2, 10), 16).toString();
                 Tool.printYellow("MachineSN:" + this.MachineSN);
-                Tool.printGreen(parseInt(this.MachineSN, 16).toString());
-                this.MachineSN = parseInt(this.MachineSN, 16).toString();
+
             });
             ls.on("exit", (code) => {
                 Tool.print("MachineID exit:" + code);

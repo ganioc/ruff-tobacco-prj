@@ -23,6 +23,7 @@
         "gpio-158": "gpio-158/gpio",
         "gpio-159": "gpio-159/gpio",
         "gpio-161": "gpio-161/gpio",
+        "gpio-161": "gpio-162/gpio",
         "gpio-163": "gpio-163/gpio"
     },
     "devices": [
@@ -413,6 +414,33 @@
                     "type": "number",
                     "args": {
                         "pin": 161
+                    }
+                }
+            },
+            "outputs": {
+                "gpio": {
+                    "type": "gpio",
+                    "features": {
+                        "input": [
+                            "read",
+                            "interrupt"
+                        ],
+                        "output": [
+                            "write"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": "gpio-162",
+            "model": "ruff-gpio",
+            "driver": "sys-gpio",
+            "inputs": {
+                "pin": {
+                    "type": "number",
+                    "args": {
+                        "pin": 162
                     }
                 }
             },

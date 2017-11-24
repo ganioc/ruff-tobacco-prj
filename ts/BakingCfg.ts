@@ -28,6 +28,7 @@ export interface ISysInfo {
     Date: number; // Current Time
     bInRunning: number; //
     bTempForUpperRack: boolean; //
+    HistoryCounter: number; // Running Batch ID
     // TobaccoType: string; // 烟叶种类
 }
 export interface IGPSInfo {
@@ -117,8 +118,11 @@ export interface ITrapInfo {
     bWindGateHighSpeed: boolean; // true - hi speed, false - low speed
     bBurningGateOn: boolean;     // true - on, false - off
     bVentOn: boolean;
+
     Voltage: number;  // 电压值
     Date: number;     // 当前时间
+
+    HistoryCounter: number; // Running Batch ID
 }
 // confirmed by XX
 export interface ITrapBaking {

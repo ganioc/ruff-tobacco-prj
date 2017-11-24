@@ -80,6 +80,7 @@ export class LocalStorage {
             Date: new Date().getTime(),
             bInRunning: RunningStatus.WAITING,
             bTempForUpperRack: true,
+            HistoryCounter: 1,
         };
     }
     public static initBaseSetting(): IBaseSetting {

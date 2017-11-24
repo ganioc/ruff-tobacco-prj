@@ -111,7 +111,16 @@ export class RunningHandle {
 
         // check upperRack or lowerRack, GPIO status
         Tool.print("Check upper\/lower rack position");
-        info.SysInfo.bTempForUpperRack = ControlPeriph.CheckUpperRack();
+
+        ControlPeriph.CheckUpperRack((data) => {
+            if (data === 0) {
+                info.SysInfo.bTempForUpperRack = false;
+            } else if (data === 1) {
+                info.SysInfo.bTempForUpperRack = true;
+            } else {
+                Tool.printRed("Wrong result checkupperRack");
+            }
+        });
 
         // check windgate speed
         // this.runningCurveInfo.bWindGateHighSpeed = ControlPeriph.CheckWindGateHighSpeed();
@@ -147,7 +156,7 @@ export class RunningHandle {
             this.bBakingFinished = true;
             return;
         } else if (info.SysInfo.bInRunning === RunningStatus.RUNNING) {
-            this.runningStatus = RunningStatus.RUNNING;
+            this.runningStatus = RunningStatus.PAUSED;
             this.bBakingFinished = false;
             return;
         } else if (info.SysInfo.bInRunning === RunningStatus.WAITING) {
@@ -184,6 +193,7 @@ export class RunningHandle {
         if (this.runningStatus === RunningStatus.STOPPED) {
             this.runningStatus = RunningStatus.WAITING;
             Tool.print("BakingProc: reset to Waiting mode");
+
             const info: IInfoCollect = LocalStorage.loadBakingStatus();
             info.SysInfo.bInRunning = RunningStatus.WAITING;
 
@@ -447,6 +457,8 @@ export class RunningHandle {
         return obj;
     }
     public getTrapInfo() {
+        const info: IInfoCollect = LocalStorage.loadBakingStatus();
+
         const obj: ITrapInfo = {
             WetTempAlarm: 0, // 1 alarm, 0 no alarm;
             DryTempAlarm: 0,
@@ -468,6 +480,8 @@ export class RunningHandle {
             bVentOn: false,
             Voltage: 231,  // 电压值
             Date: new Date().getTime(),  // 当前时间
+
+            HistoryCounter: info.BakingInfo.HistoryCounter,
         };
 
         return obj;
