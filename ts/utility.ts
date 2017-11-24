@@ -1,7 +1,44 @@
-
+import Spawn = require("child_process");
 import * as path from "path";
+import { Promise } from "promise";
 
 export class Tool {
+
+    public static MachineSN: string;
+
+    public static readMachineSN() {
+
+        const proc = new Promise((resolve) => {
+            const ls = Spawn.spawn("cat", ["/sys/fsl_otp/HW_OCOTP_CFG0"]);
+
+            ls.stdout.on("data", (data) => {
+                console.log(data);
+                this.MachineSN = data.toString().slice(2, 10);
+                Tool.printYellow("MachineSN:" + this.MachineSN);
+            });
+            ls.on("exit", (code) => {
+                Tool.print("MachineID exit:" + code);
+                resolve("next SN");
+            });
+        });
+
+        proc.then((msg) => {
+            const ls = Spawn.spawn("cat", ["/sys/fsl_otp/HW_OCOTP_CFG1"]);
+
+            ls.stdout.on("data", (data) => {
+                console.log(data);
+                this.MachineSN = this.MachineSN + data.toString().slice(2, 10);
+                Tool.printYellow("MachineSN:" + this.MachineSN);
+                Tool.printGreen(parseInt(this.MachineSN, 16).toString());
+                this.MachineSN = parseInt(this.MachineSN, 16).toString();
+            });
+            ls.on("exit", (code) => {
+                Tool.print("MachineID exit:" + code);
+            });
+        });
+
+    }
+
     public static printCust(option: string, str: any) {
         console.log(option, str);
     }

@@ -51,6 +51,9 @@ $.ready((error) => {
     Tool.printMagenta("App Begin");
     Tool.printMagenta("################\n");
 
+    Tool.readMachineSN();
+    
+
     // This is the mqtt client
     // mqttApp.start();
 
@@ -119,6 +122,9 @@ $.ready((error) => {
                     clearInterval(appBaking.timerTrap);
 
                     Tool.printBlue("App stopped");
+                } else if (appBaking.runningStatus === RunningStatus.STOPPED) {
+                    clearInterval(appBaking.timerTrap);
+                    Tool.printBlue("Clear timerTrap");
                 } else {
                     Tool.printRed("Should not respond to stop, state:" + appBaking.runningStatus);
                 }
@@ -223,5 +229,7 @@ $.ready((error) => {
 $.end(() => {
     Tool.printMagenta("################");
     Tool.print("Ruff App end");
+    Tool.print("Quit QT process");
+    commQT.exit();
     Tool.printMagenta("################\n");
 });

@@ -3,6 +3,7 @@ const TCP_PORT = 50001; // for QT Server
 import Spawn = require("child_process");
 import Events = require("events");
 import net = require("net");
+import { inspect } from "util";
 import { Tool } from "./utility";
 
 // import spawn = require('child_process').spawn;
@@ -34,6 +35,8 @@ export class CommQT {
     private client: net.Socket;
     private port: number;
     private getPacketId: () => {};
+    private pidQT: number;
+    private subprocess: Spawn.ChildProcess;
 
     constructor(option) {
         this.bConnected = false;
@@ -48,10 +51,18 @@ export class CommQT {
                 }
                 return 0xffff + id++;
             };
+
         })();
     }
+    public exit() {
+        // kill the qt process
+        // Tool.printMagenta(inspect(this.subprocess));
+        this.subprocess.kill();
+    }
     public init() {
-        Spawn.spawn("/home/root/tabacooui", ["-platform", "eglfs"]);
+        this.subprocess = Spawn.spawn("/home/root/tabacooui", ["-platform", "eglfs"]);
+
+        // Tool.printMagenta(inspect(this.subprocess));
 
         setTimeout(() => {
             this.start();

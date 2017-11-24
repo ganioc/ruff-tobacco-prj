@@ -115,9 +115,9 @@ export class LocalStorage {
         return {
             CurrentStage: 0,          // 当前阶段
             CurrentStageRunningTime: 0, // 当前阶段已运行时间
-            TempCurveDryList: [],
-            TempCurveWetList: [],
-            TempDurationList: [],
+            TempCurveDryList: DEFAULT_CURVE.dryList,
+            TempCurveWetList: DEFAULT_CURVE.wetList,
+            TempDurationList: DEFAULT_CURVE.durList,
         };
     }
     public static initResultInfo(): IResultInfo {
