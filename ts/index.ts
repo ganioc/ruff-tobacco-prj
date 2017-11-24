@@ -124,6 +124,8 @@ function main() {
                         Tool.print("Turn on LED");
                     });
 
+                    commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+
                 } else if (appBaking.runningStatus === RunningStatus.WAITING) {
                     Tool.print("App start");
                     appBaking.start();
@@ -137,8 +139,11 @@ function main() {
                         Tool.print("Turn on LED");
                     });
 
+                    commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+
                 } else {
                     Tool.printRed("Should not respond to start, state:" + appBaking.runningStatus);
+                    commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 }
 
                 break;
@@ -156,11 +161,17 @@ function main() {
                         Tool.print("Turn off LED");
                     });
 
+                    commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+
                 } else if (appBaking.runningStatus === RunningStatus.STOPPED) {
                     clearInterval(appBaking.timerTrap);
                     Tool.printBlue("Clear timerTrap");
+
+                    commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 } else {
                     Tool.printRed("Should not respond to stop, state:" + appBaking.runningStatus);
+
+                    commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 }
 
                 break;
@@ -174,8 +185,11 @@ function main() {
                         Tool.print("Turn off LED");
                     });
 
+                    commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+
                 } else {
                     Tool.printRed("Should not respond to pause, state:" + appBaking.runningStatus);
+                    commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 }
 
                 break;
@@ -188,14 +202,20 @@ function main() {
 
                     commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
 
+                    commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+
                 } else {
                     Tool.printRed("Should not respond to reset, state:" + appBaking.runningStatus);
+
+                    commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
 
                 }
 
                 break;
             default:
                 Tool.print("App wrong command");
+                commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
+                break;
         }
     });
     commQT.emitter.on("get", (data: IfPacket) => {
@@ -227,6 +247,8 @@ function main() {
                 break;
             default:
                 Tool.print("Wrong Get packet obj type:" + data.Obj);
+
+                commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 break;
         }
     });
@@ -235,27 +257,35 @@ function main() {
         switch (data.Obj) {
             case InfoType.Val_SysInfo:
                 Tool.printYellow("SysInfo can not be set");
+                commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 break;
             case InfoType.Val_SettingCurveInfo:
                 Tool.printYellow("Default SettingCurveInfo can not be set");
+                commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 break;
             case InfoType.Val_RunningCurveInfo:
                 appBaking.updateRunningCurveInfo(data.Content);
+                commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             case InfoType.Val_ResultInfo:
                 appBaking.updateResult(data.Content);
+                commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             case InfoType.Val_TrapInfo:
                 Tool.printRed("Trap set , impossible");
+                commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 break;
             case InfoType.Val_BakingInfo:
                 appBaking.updateBakingInfo(data.Content);
+                commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             case InfoType.Val_BaseSetting:
                 appBaking.updateBaseSetting(data.Content);
+                commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             default:
                 Tool.print("Wrong Get packet obj type:" + data.Obj);
+                commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 break;
         }
     });

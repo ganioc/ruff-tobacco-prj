@@ -222,6 +222,8 @@ export class RunningHandle {
             RunningHandle.HistoryCounter++;
             Tool.print("BakingProc: Current HistoryCounter + 1 is:" + RunningHandle.HistoryCounter);
 
+            info.BakingInfo.HistoryCounter = RunningHandle.HistoryCounter;
+
             LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
 
             info.RunningCurveInfo.CurrentStage = 0;
