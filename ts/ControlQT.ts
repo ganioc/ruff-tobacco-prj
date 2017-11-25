@@ -161,7 +161,7 @@ export class CommQT {
             throw new Error("Wrong running state cmd:" + data.Content.State);
         }
 
-        this.emitter.emit("cmd", msg);
+        this.emitter.emit("cmd", { message: msg, in: data });
     }
     private parseSet(data: IfPacket) {
         switch (data.Obj) {

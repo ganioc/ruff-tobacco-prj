@@ -112,8 +112,10 @@ function main() {
         }, commQT.DELAY_RECONNECT);
     });
 
-    commQT.emitter.on("cmd", (data) => {
-        switch (data) {
+    commQT.emitter.on("cmd", (dataBig) => {
+        const data = dataBig.in;
+
+        switch (dataBig.message) {
             case "start":
 
                 if (appBaking.runningStatus === RunningStatus.PAUSED) {
