@@ -18,10 +18,11 @@ export enum RunningStatus {
     STOPPED, // finished baking,
     // need to be transfered to waiting
 }
+
 export interface IDefaultCurve {
     dryList: any[];
     wetList: any[];
-    durList: any[];
+    durList: number[];
 }
 // confirmed by XX
 export interface ISysInfo {
@@ -30,6 +31,8 @@ export interface ISysInfo {
     bTempForUpperRack: boolean; //
     HistoryCounter: number; // Running Batch ID
     // TobaccoType: string; // 烟叶种类
+    AppVersion: string;
+    UIVersion: string;
 }
 export interface IGPSInfo {
     Longitude: number;

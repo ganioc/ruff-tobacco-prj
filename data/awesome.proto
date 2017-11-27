@@ -3,9 +3,14 @@ package awesomepackage;
 syntax = "proto3";
 
 message AwesomeMessage{
-    required bool sex = 0;
-    required string name = 1;
-    required uint32 age = 2;
+    bool sexinfo = 0;
+    string name = 1;
+    uint32 age = 2;
+    double length = 4;
+    repeated BatchRating ratings = 5;
+    uint32 weight = 6;
+    int64 susan = 7;
+    int64 john = 8;
 }
 message RegisterResponse {
 	string imei = 1;
@@ -17,7 +22,11 @@ message RegisterResponse {
 	string mqttUsername = 7;
 	string mqttKey = 8;
 }
-
+message YBatchDetail{
+    int64 batchId = 1;
+    string deviceId = 2;
+    int64  start_time = 3;
+}
 message RecoProfileRequest {
     int64 batchId = 1;
     string deviceId = 2;
@@ -30,7 +39,7 @@ message RecoProfileRequest {
     double load_middle_weight = 15;
     double load_bottom_weight = 16;
     string load_tool = 17;
-    int64 loading_tool_count = 18;
+    int64  loading_tool_count = 18;
     string load_tool_weight = 19;
     string load_quality = 20;
     double load_maturity_lv_0_percentage = 21;
@@ -69,9 +78,9 @@ message BatchRating {
 message BatchDetail {
     int64 batchId = 1;
     string deviceId = 2;
-    repeated BatchRating ratings = 3;
-    int64 start_time = 4;
-    int64 end_time = 5;
+    int64 start_time = 3;
+    int64 end_time = 4;
+    repeated BatchRating ratings = 5;
     double after_top_weight = 6;
     double after_middle_weight = 7;
     double after_bottom_weight = 8;

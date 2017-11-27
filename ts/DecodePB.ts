@@ -3,11 +3,66 @@
  */
 
 import * as Protobuf from "protobufjs";
+import { inspect } from "util";
 import { Tool } from "./utility";
 
 export interface IfOptionPB {
     path: string;
     className: string;
+}
+
+export interface IfRecoProfileRequest {
+    batchId: number;
+    deviceId: string;
+    variety: string;
+    barn_airflow_direction: string;
+    barn_wall_texture: string;
+    load_weather_temperature: number;
+    load_top_weight: number;
+    load_weather_humidity: number;
+    load_middle_weight: number;
+    load_bottom_weight: number;
+    load_tool: string;
+    loading_tool_count: number;
+    load_tool_weight: string;
+    load_quality: string;
+    load_maturity_lv_0_percentage: number;
+    load_maturity_lv_1_percentage: number;
+    load_maturity_lv_2_percentage: number;
+    load_maturity_lv_3_percentage: number;
+    load_maturity_lv_4_percentage: number;
+}
+export interface IfBatchRating {
+    rating: string;
+    weight: number;
+}
+
+export interface IfBatchDetail {
+    batchId: number;
+    deviceId: string;
+    startTime: number;
+    endTime: number;
+    ratings: IfBatchRating[];
+    afterTopWeight: number;
+    afterMiddleWeight: number;
+    afterBottomWeight: number;
+    variety: string;
+    barnAirflowDirection: string;
+    barnWallTexture: string;
+    loadWeatherTemperature: number;
+    loadTopWeight: number;
+    loadWeatherHumidity: number;
+    loadMiddleWeight: number;
+    loadBottomWeight: number;
+    loadTool: string;
+    loadToolCount: string;
+    loadToolWeight: string;
+    loadQuality: string;
+    loadMaturityLv_0Percentage: number;
+    loadMaturityLv_1Percentage: number;
+    loadMaturityLv_2Percentage: number;
+    loadMaturityLv_3Percentage: number;
+    loadMaturityLv_4Percentage: number;
 }
 
 export class DecodePB {
@@ -27,7 +82,7 @@ export class DecodePB {
 
     public encode(obj: any): Buffer {
 
-        console.log("encode obj");
+        console.log("encode obj-->");
         console.log(obj);
 
         const errMsg = this.decoder.verify(obj);
@@ -39,6 +94,7 @@ export class DecodePB {
 
         // create a message
         const message = this.decoder.create(obj);
+        Tool.printRed(inspect(message));
 
         const buffer = new Buffer(this.decoder.encode(message).finish());
         console.log(buffer);
@@ -52,9 +108,11 @@ export class DecodePB {
 
         console.log("proto decode buf:");
         console.log(buf);
+        console.log(buf.toString());
+        console.log(buf.length);
 
         try {
-            messageRx = this.decoder.decode(buf);
+            messageRx = this.decoder.decode(new Uint8Array(buf));
             objRx = this.decoder.toObject(messageRx);
         } catch (e) {
             console.log("Proto decode buffer format error");

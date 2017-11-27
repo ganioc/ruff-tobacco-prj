@@ -1,8 +1,8 @@
 {
     "name": "ruff-tobacco-evb",
     "version": "1.0.0",
-    "description": "",
-    "author": "",
+    "description": "For tobacco baking automation",
+    "author": "Yang Jun",
     "main": "src/index.js",
     "ruff": {
         "dependencies": {

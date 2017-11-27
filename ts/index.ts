@@ -10,8 +10,9 @@ import { RunningHandle } from "./BakingProc";
 import { ControlGPS } from "./ControlGPS";
 import { ControlMcu } from "./ControlMcu";
 import { ControlPeriph } from "./ControlPeripheral";
-import { CommQT, IfPacket, InfoType } from "./ControlQT";
+import { CommQT, IfMsgCmd, IfPacket, InfoType } from "./ControlQT";
 import { DecodePB } from "./DecodePB";
+import { HttpsApp, IfHttpsApp } from "./HttpsApp";
 import { LocalStorage } from "./LocalStorage";
 import { MqttApp } from "./MqttApp";
 import { Tool } from "./utility";
@@ -41,6 +42,13 @@ const decoder = new DecodePB({
     className: "awesomepackage.AwesomeMessage",
 });
 
+const option: IfHttpsApp = {
+    hostname: "api.shdingyun.com",
+    port: 443,
+};
+
+const client = new HttpsApp(option);
+
 $.ready((error) => {
     if (error) {
         console.log(error);
@@ -52,10 +60,22 @@ $.ready((error) => {
     Tool.printMagenta("################\n");
 
     Tool.readMachineSN();
+    LocalStorage.loadAppVersion();
+
+    // 读取stackoverflow.com网站是没有问题的
+    // client.post("/login", JSON.stringify({ imei: "3748035460303714772" }), (err, buf) => {
+    //     if (err) {
+    //         console.log(err);
+    //         return;
+    //     }
+    //     console.log(buf.length);
+    //     console.log(buf.toString());
+    // });
 
     setTimeout(() => {
-        main();
-    }, 2000);
+        Tool.printYellow("Go to main()");
+        // main();
+    }, 3000);
 });
 
 $.end(() => {
@@ -112,8 +132,8 @@ function main() {
         }, commQT.DELAY_RECONNECT);
     });
 
-    commQT.emitter.on("cmd", (dataBig) => {
-        const data = dataBig.in;
+    commQT.emitter.on("cmd", (dataBig: IfMsgCmd) => {
+        const data = dataBig.data;
 
         switch (dataBig.message) {
             case "start":

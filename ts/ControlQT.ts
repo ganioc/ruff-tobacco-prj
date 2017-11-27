@@ -27,6 +27,11 @@ export interface IfPacket {
     Content: any;
 }
 
+export interface IfMsgCmd {
+    message: string;
+    data: IfPacket;
+}
+
 // For socket communication with QT Server
 export class CommQT {
     public bConnected: boolean;
@@ -145,23 +150,28 @@ export class CommQT {
 
         this.write(JSON.stringify(tuple));
     }
-    private parseRunningState(data: IfPacket) {
+    private parseRunningState(dataIn: IfPacket) {
 
         let msg = "";
 
-        if (data.Content.State === "run" || data.Content.State === "start") {
+        if (dataIn.Content.State === "run" || dataIn.Content.State === "start") {
             msg = "start";
-        } else if (data.Content.State === "stop") {
+        } else if (dataIn.Content.State === "stop") {
             msg = "stop";
-        } else if (data.Content.State === "pause") {
+        } else if (dataIn.Content.State === "pause") {
             msg = "pause";
-        } else if (data.Content.State === "reset") {
+        } else if (dataIn.Content.State === "reset") {
             msg = "reset";
         } else {
-            throw new Error("Wrong running state cmd:" + data.Content.State);
+            throw new Error("Wrong running state cmd:" + dataIn.Content.State);
         }
 
-        this.emitter.emit("cmd", { message: msg, in: data });
+        const out: IfMsgCmd = {
+            message: msg,
+            data: dataIn,
+        };
+
+        this.emitter.emit("cmd", out);
     }
     private parseSet(data: IfPacket) {
         switch (data.Obj) {

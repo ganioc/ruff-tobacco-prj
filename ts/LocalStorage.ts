@@ -2,6 +2,11 @@ import * as fs from "fs";
 import { IDefaultCurve } from "./BakingCfg";
 import { Tool } from "./utility";
 
+let APP_VERSION = "1.0.0";
+// require("../package.json").version;
+
+const UI_VERSION = "1.0.0";
+
 import {
     IBakingInfo,
     IBaseSetting,
@@ -81,6 +86,8 @@ export class LocalStorage {
             bInRunning: RunningStatus.WAITING,
             bTempForUpperRack: true,
             HistoryCounter: 1,
+            AppVersion: APP_VERSION,
+            UIVersion: UI_VERSION,
         };
     }
     public static initBaseSetting(): IBaseSetting {
@@ -239,6 +246,19 @@ export class LocalStorage {
         Tool.print("saveBakingStatus");
         fs.writeFileSync(LocalStorage.getStatusFileDirec(),
             JSON.stringify(obj));
+    }
+
+    public static loadAppVersion() {
+        const data = fs.readFileSync("../package.json");
+        let obj: any;
+        try {
+            obj = JSON.parse(data.toString());
+        } catch (e) {
+            Tool.printRed("load App version fail");
+            Tool.printRed(e);
+            return undefined;
+        }
+        APP_VERSION = obj.version;
     }
 }
 /*
