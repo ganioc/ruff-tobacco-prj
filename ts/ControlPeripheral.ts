@@ -7,6 +7,12 @@ import { ControlMcu } from "./ControlMcu";
 import { Tool } from "./utility";
 import { YAsync } from "./yjasync";
 
+export interface IfControlPeriphOption {
+    max_angle: number;
+    min_angle: number;
+    speed: number;
+}
+
 export class ControlPeriph {
     public static temp1: number; // to store the test temp values
     public static temp2: number;
@@ -24,9 +30,29 @@ export class ControlPeriph {
     public static gpsLongitude: number;
     public static gpsLatitude: number;
 
-    public static bWindGateHighSpeed: boolean;
+    // public static bWindGateHighSpeed: boolean;
     public static bBurningGateOn: boolean;
-    public static bVentOn: boolean;
+    public static VentAngle: number;
+    public static MAX_VENT_ANGLE: number;
+    public static MIN_VENT_ANGLE: number;
+    public static VENT_SPEED: number;
+
+    // default value when power on
+    public static init(option: IfControlPeriphOption) {
+        ControlPeriph.bBurningGateOn = false;
+        // ControlPeriph.bVentOn = false;
+        ControlPeriph.VentAngle = 0; // default angle is 0
+        ControlPeriph.MAX_VENT_ANGLE = option.max_angle;
+        ControlPeriph.MIN_VENT_ANGLE = option.min_angle;
+        ControlPeriph.VENT_SPEED = option.speed;
+
+        Tool.print("Max angle:" + ControlPeriph.MAX_VENT_ANGLE);
+        Tool.print("Min angle:" + ControlPeriph.MIN_VENT_ANGLE);
+        Tool.print("Vent speed degree/second :" + ControlPeriph.VENT_SPEED);
+        Tool.print("Default angle:" + ControlPeriph.VentAngle);
+
+        ControlPeriph.ResetVent();
+    }
 
     public static CheckUpperRack(callback) {
         $("#CodeSwitch-2").read((err, data) => {
@@ -74,10 +100,10 @@ export class ControlPeriph {
     }
     public static ResetMcu() {
         Tool.printGreen("Reset Mcu");
-        $("#outResetMcu").turnOff();
-        setTimeout(() => {
-            $("#outResetMcu").turnOn();
-        }, 500);
+        // $("#outResetMcu").turnOff();
+        // setTimeout(() => {
+        //     $("#outResetMcu").turnOn();
+        // }, 500);
     }
     public static TurnOnWindEngine(cb) {
         $("#outWindEngine").turnOn(cb);
@@ -91,7 +117,16 @@ export class ControlPeriph {
     }
     public static TurnOffWindVent(cb) {
         $("#outRelayRY4").turnOff();
+        $("#outRelayRY2").turnOn(cb);
+    }
+    public static StopWindVent(cb) {
+        $("#outRelayRY4").turnOff();
         $("#outRelayRY2").turnOff(cb);
+    }
+    public static ResetVent() {
+        ControlPeriph.DecreaseVentAngle(91, () => {
+            Tool.printYellow("Reset Vent angle to 0 degree");
+        });
     }
     // public static TurnOnRelayRY4(cb) {
     //     $("#outRelayRY4").turnOn(cb);
@@ -105,12 +140,6 @@ export class ControlPeriph {
     // public static TurnOffRelayRY2(cb) {
     //     $("#outRelayRY2").turnOff(cb);
     // }
-    public static TurnOnFire(cb) {
-        $("#outCtrolFire").turnOn(cb);
-    }
-    public static TurnOffFire(cb) {
-        $("#outCtrolFire").turnOff(cb);
-    }
     public static TurnOnGPS(cb) {
         $("#outGPSPower").turnOn(cb);
     }
@@ -127,23 +156,65 @@ export class ControlPeriph {
         return false;
     }
     public static CheckBurningGate(): boolean {
-        return false;
+        return ControlPeriph.bBurningGateOn;
     }
-    public static CheckVentOn(): boolean {
-        return false;
+    public static GetVentAngle(): number {
+        return ControlPeriph.VentAngle;
     }
-    public static TurnOnVent() {
-        Tool.print("ControlPeriph: Turn on vent");
+
+    public static IncreaseVentAngle(angle: number, cb) {
+        Tool.print("ControlPeriph: increase vent angle");
+        const delay = angle / ControlPeriph.VENT_SPEED;
+
+        if (angle > 90) {
+            Tool.print("Too big value for vent");
+        }
+        // in seconds
+        ControlPeriph.TurnOnWindVent(() => {
+            Tool.printBlue("Turn on Vent , angle:" + angle);
+            Tool.printBlue("Turn on Vent for :" + delay + " seconds");
+        });
+        setTimeout(() => {
+            ControlPeriph.StopWindVent(cb);
+            ControlPeriph.VentAngle += angle;
+            if (ControlPeriph.VentAngle > 90) {
+                ControlPeriph.VentAngle = 90;
+            }
+        }, delay * 1000);
     }
-    public static TurnOffVent() {
-        Tool.print("ControlPeriph: Turn off vent");
+    public static DecreaseVentAngle(angle: number, cb) {
+        Tool.print("ControlPeriph: decrease vent angle");
+
+        if (angle > 90) {
+            Tool.print("Too big value for vent");
+        }
+
+        const delay = angle / ControlPeriph.VENT_SPEED;
+        // in seconds
+        ControlPeriph.TurnOffWindVent(() => {
+            Tool.printBlue("Turn off Vent , angle:" + angle);
+            Tool.printBlue("Turn off Vent for :" + delay + " seconds");
+        });
+        setTimeout(() => {
+            ControlPeriph.StopWindVent(cb);
+            ControlPeriph.VentAngle -= angle;
+            if (ControlPeriph.VentAngle < 0) {
+                ControlPeriph.VentAngle = 0;
+            }
+        }, delay * 1000);
     }
-    public static TurnOnBakingFire() {
+
+    public static TurnOnBakingFire(cb) {
         Tool.print("ControlPeriph: Turn on baking fire");
+        ControlPeriph.bBurningGateOn = true;
+        $("#outCtrolFire").turnOn(cb);
     }
-    public static TurnOffBakingFire() {
+    public static TurnOffBakingFire(cb) {
         Tool.print("ControlPeriph: Turn off baking fire");
+        ControlPeriph.bBurningGateOn = false;
+        $("#outCtrolFire").turnOff(cb);
     }
+
     public static fetchParams(commMCU: ControlMcu) {
 
         YAsync.series(
@@ -226,6 +297,5 @@ export class ControlPeriph {
                 }
             },
         );
-
     }
 }

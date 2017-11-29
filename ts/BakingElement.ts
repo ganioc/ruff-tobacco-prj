@@ -56,20 +56,22 @@ export class BakingElement {
         Tool.print(this.timeBegin);
         Tool.print(this.timeElapsed);
     }
-    public controlVent(onPeriod: number) {
+    public controlVent(newAngle: number) {
         // how to control the vent?
-        if (onPeriod < 0.01) {
-            ControlPeriph.TurnOffVent();
-        } else if (onPeriod >= 0.99) {
-            ControlPeriph.TurnOnVent();
+        // angle of vent
+        let deltaAngle: number = 0;
+        deltaAngle = newAngle - ControlPeriph.VentAngle;
+
+        if (deltaAngle > 0) {
+            ControlPeriph.IncreaseVentAngle(deltaAngle, () => {
+                Tool.print("Algorithm -> increase: " + deltaAngle);
+            });
+        } else if (deltaAngle < 0) {
+            ControlPeriph.DecreaseVentAngle(-deltaAngle, () => {
+                Tool.print("Algorithm -> decrease: " + -deltaAngle);
+            });
         } else {
-            ControlPeriph.TurnOnVent();
-
-            clearTimeout(BakingElement.timerVent);
-
-            BakingElement.timerVent = setTimeout(() => {
-                ControlPeriph.TurnOffVent();
-            }, this.timeDeltaCheckStatus * onPeriod);
+            Tool.printRed("No need to adjust vent angle");
         }
     }
     public getTimeElapsed() {
@@ -114,16 +116,24 @@ export class BakingElement {
 
     protected controlFire(onPeriod: number) {
         if (onPeriod < 0.01) {
-            ControlPeriph.TurnOffBakingFire();
+            ControlPeriph.TurnOffBakingFire(() => {
+                console.log("off");
+            });
         } else if (onPeriod >= 0.99) {
-            ControlPeriph.TurnOnBakingFire();
+            ControlPeriph.TurnOnBakingFire(() => {
+                console.log("on");
+            });
         } else {
-            ControlPeriph.TurnOnBakingFire();
+            ControlPeriph.TurnOnBakingFire(() => {
+                console.log("on");
+            });
 
             clearTimeout(BakingElement.timer);
 
             BakingElement.timer = setTimeout(() => {
-                ControlPeriph.TurnOffBakingFire();
+                ControlPeriph.TurnOffBakingFire(() => {
+                    console.log("off");
+                });
             }, this.timeDeltaCheckStatus * onPeriod);
         }
     }

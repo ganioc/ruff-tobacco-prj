@@ -13,6 +13,7 @@ import { ControlPeriph } from "./ControlPeripheral";
 import { CommQT, IfMsgCmd, IfPacket, InfoType } from "./ControlQT";
 import { DecodePB } from "./DecodePB";
 import { HttpsApp, IfHttpsApp } from "./HttpsApp";
+import { JustTest } from "./JustTest";
 import { LocalStorage } from "./LocalStorage";
 import { MqttApp } from "./MqttApp";
 import { Tool } from "./utility";
@@ -60,7 +61,13 @@ $.ready((error) => {
     Tool.printMagenta("################\n");
 
     Tool.readMachineSN();
-    // LocalStorage.loadAppVersion();
+    LocalStorage.loadAppVersion();
+
+    ControlPeriph.init({
+        max_angle: 90,
+        min_angle: 0,
+        speed: 10,
+    });
 
     // 读取stackoverflow.com网站是没有问题的
     // client.post("/login", JSON.stringify({ imei: "3748035460303714772" }), (err, buf) => {
@@ -74,8 +81,10 @@ $.ready((error) => {
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        main();
+        // main();
+        JustTest.test();
     }, 3000);
+
 });
 
 $.end(() => {
@@ -84,7 +93,9 @@ $.end(() => {
 
     setTimeout(() => {
         Tool.print("Quit QT process");
-        commQT.exit();
+        if (commQT !== undefined) {
+            commQT.exit();
+        }
     }, 0);
 
     Tool.printMagenta("################\n");
@@ -321,8 +332,8 @@ function main() {
     /***************************************************************
      *
     */
-
     setInterval(() => {
         ControlPeriph.fetchParams(commMCU);
     }, 5000);
+
 }

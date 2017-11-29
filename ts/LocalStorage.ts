@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { IDefaultCurve } from "./BakingCfg";
 import { Tool } from "./utility";
 
-let APP_VERSION = "1.0.0";
+let APP_VERSION = "1.1.0";
 // require("../package.json").version;
 
 const UI_VERSION = "1.0.0";
@@ -249,16 +249,19 @@ export class LocalStorage {
     }
 
     public static loadAppVersion() {
-        const data = fs.readFileSync("../package.json");
-        let obj: any;
-        try {
-            obj = JSON.parse(data.toString());
-        } catch (e) {
-            Tool.printRed("load App version fail");
-            Tool.printRed(e);
-            return undefined;
-        }
-        APP_VERSION = obj.version;
+        // const data = fs.readFileSync("../package.json");
+        // let obj: any;
+        // try {
+        //     obj = JSON.parse(data.toString());
+        // } catch (e) {
+        //     Tool.printRed("load App version fail");
+        //     Tool.printRed(e);
+        //     return undefined;
+        // }
+        // APP_VERSION = obj.version;
+    }
+    public static getAppVersion(): string {
+        return APP_VERSION;
     }
 }
 /*

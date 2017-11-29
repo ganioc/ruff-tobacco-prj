@@ -61,8 +61,9 @@ export class CommQT {
     }
     public exit() {
         // kill the qt process
-
-        this.subprocess.kill("SIGTERM");
+        if (this.subprocess !== undefined) {
+            this.subprocess.kill("SIGTERM");
+        }
     }
     public init() {
         this.subprocess = Spawn.spawn("/home/root/tabacooui", ["-platform", "eglfs"]);

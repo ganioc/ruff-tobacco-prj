@@ -88,7 +88,9 @@ export class TempControl {
             return -deltaTemp / 4.5;
         }
     }
+    // return vent angle, 0 ~ 90 degree
     public static keepWetConstant(params: IBakingControlParams): number {
+
         let tempList: number[] = [];
         let targetTemp: number;
 
@@ -103,13 +105,14 @@ export class TempControl {
         Tool.printMagenta("TempControl:keepWetConstant delta of cur temp:" + deltaTemp.toFixed(3));
 
         if (deltaTemp < -5) {
-            return 1.0;
+            return 90;
         } else if (deltaTemp > 0.5 || (deltaTemp > -0.5 && deltaTemp < 0.5)) {
             return 0.0;
         } else if (deltaTemp > -5 && deltaTemp <= -0.5) {
-            return -deltaTemp / 4.5;
+            return 90 * deltaTemp / 4.5;
         }
     }
+    // return vent angle, 0 ~ 90 degree
     public static keepWetSlope(params: IBakingControlParams): number {
         let tempList: number[] = [];
         let targetTemp: number;
@@ -132,11 +135,11 @@ export class TempControl {
         Tool.printMagenta("TempControl:keepWetSlope delta of cur temp:" + deltaTemp.toFixed(3));
 
         if (deltaTemp < -5) {
-            return 1.0;
+            return 90;
         } else if (deltaTemp > 0.5 || (deltaTemp > -0.5 && deltaTemp < 0.5)) {
-            return 0.0;
+            return 0;
         } else if (deltaTemp > -5 && deltaTemp <= -0.5) {
-            return -deltaTemp / 4.5;
+            return 90 * deltaTemp / 4.5;
         }
     }
 }
