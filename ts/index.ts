@@ -4,6 +4,7 @@ declare var $: any;
 import * as Protobuf from "protobufjs";
 import { clearInterval, setTimeout } from "timers";
 import * as _ from "underscore";
+import { Alarm } from "./Alarm";
 import { IInfoCollect, RunningStatus } from "./BakingCfg";
 import { RunningHandle } from "./BakingProc";
 
@@ -50,6 +51,8 @@ const option: IfHttpsApp = {
 
 const client = new HttpsApp(option);
 
+const test = new JustTest(commMCU);
+
 $.ready((error) => {
     if (error) {
         console.log(error);
@@ -62,6 +65,8 @@ $.ready((error) => {
 
     Tool.readMachineSN();
     LocalStorage.loadAppVersion();
+
+    Alarm.init();
 
     ControlPeriph.init({
         max_angle: 90,
@@ -81,8 +86,8 @@ $.ready((error) => {
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        // main();
-        JustTest.test();
+        main();
+        // test.test();
     }, 3000);
 
 });
@@ -128,7 +133,7 @@ function main() {
         setTimeout(() => {
             setInterval(() => {
                 commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
-            }, 5000);
+            }, Alarm.checkPeriod);
         }, 2000);
 
     });
@@ -333,7 +338,9 @@ function main() {
      *
     */
     setInterval(() => {
-        ControlPeriph.fetchParams(commMCU);
+        ControlPeriph.fetchParams(commMCU, () => {
+            Tool.print("");
+        });
     }, 5000);
 
 }

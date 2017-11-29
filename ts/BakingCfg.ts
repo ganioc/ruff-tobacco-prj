@@ -69,16 +69,16 @@ export interface IBakingInfo {
 }
 // confirmed by XX, default curve
 export interface ISettingCurveInfo {
-    TempCurveDryList: number[];
-    TempCurveWetList: number[]; // 度,23.1, 一位小数点
+    TempCurveDryList: number[][];
+    TempCurveWetList: number[][]; // 度,23.1, 一位小数点
     TempDurationList: number[];  // 分钟单位
 }
 // confirmed by XX
 export interface IRunningCurveInfo {
     CurrentStage: number;
     CurrentStageRunningTime: number; // 分钟
-    TempCurveDryList: number[];
-    TempCurveWetList: number[];
+    TempCurveDryList: number[][];
+    TempCurveWetList: number[][];
     TempDurationList: number[];
     // bWindGateHighSpeed: boolean; // true - hi speed, false - low speed
     // bBurningGateOn: boolean; // true - on, false - off
@@ -126,6 +126,8 @@ export interface ITrapInfo {
     Date: number;     // 当前时间
 
     HistoryCounter: number; // Running Batch ID
+
+    Status: number;
 }
 // confirmed by XX
 export interface ITrapBaking {
@@ -143,6 +145,11 @@ export interface ITrapBaking {
 //     humi1: string;
 //     humi2: string;
 // }
+export interface ITrapUpdateCurve {
+    TempCurveDryList: number[][];
+    TempCurveWetList: number[][];
+    TempDurationList: number[];
+}
 
 export interface IRunningOption {
     curve: number[][];

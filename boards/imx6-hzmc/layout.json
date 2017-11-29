@@ -47,6 +47,9 @@
         "outGPSPower/gpio-out": "imx6-hzmc/gpio-161",
         "outMiniPCIePower/vcc": "imx6-hzmc/vdd-0",
         "outMiniPCIePower/gnd": "imx6-hzmc/gnd-0",
-        "outMiniPCIePower/gpio-out": "imx6-hzmc/gpio-163"
+        "outMiniPCIePower/gpio-out": "imx6-hzmc/gpio-163",
+        "uart-gps/vcc": "imx6-hzmc/vdd-0",
+        "uart-gps/gnd": "imx6-hzmc/gnd-0",
+        "uart-gps/uart": "imx6-hzmc/uart-s0"
     }
 }

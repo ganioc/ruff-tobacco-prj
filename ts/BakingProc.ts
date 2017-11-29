@@ -4,6 +4,7 @@ import fs = require("fs");
 import { clearInterval, setInterval } from "timers";
 import * as _ from "underscore";
 import * as util from "util";
+import { Alarm } from "./Alarm";
 import {
     IBakingInfo, IBaseSetting, IDefaultCurve, IInfoCollect,
     IResultInfo, IRunningCurveInfo, IRunningOption, ISettingCurveInfo,
@@ -122,18 +123,7 @@ export class RunningHandle {
             }
         });
 
-        // check windgate speed
-        // this.runningCurveInfo.bWindGateHighSpeed = ControlPeriph.CheckWindGateHighSpeed();
-
-        // check burninggate on
-        // this.runningCurveInfo.bBurningGateOn = ControlPeriph.CheckBurningGate();
-
-        // check bVentOn state
-        // this.runningCurveInfo.bVentOn = ControlPeriph.CheckVentOn();
-
         Tool.print("Update sys settings");
-        // this.saveStatus();
-        // this.printStatus();
 
         // configure bakingCurve parameters
         this.bakingCurve = new BakingCurve({
@@ -166,28 +156,11 @@ export class RunningHandle {
 
         RunningHandle.HistoryCounter = info.BakingInfo.HistoryCounter;
 
-        // this.setHistoryCounter(this.bakingInfo.HistoryCounter);
-        // Tool.print("BakingProc: Current HistoryCounter is:" + this.bakingInfo.HistoryCounter);
-
-        // if directory not existed , create it
-        // if there is not a subdirectory (Store the log file) , create it
-        // this.createDataDirec();
-
-        // this.runningStatus = RunningStatus.WAITING;
-        // this.runningCurveInfo.CurrentStage = 0;
-        // this.runningCurveInfo.CurrentStageRunningTime = 0;
         LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
 
         LocalStorage.saveBakingStatus(info);
     }
-    // public createDataDirec() {
-    //     if (fs.existsSync(LocalStorage.getDataDirec() + this.bakingInfo.HistoryCounter)) {
-    //         Tool.print("Already exist: " + LocalStorage.getDataDirec() + this.bakingInfo.HistoryCounter);
-    //     } else {
-    //         Tool.print("Not exist: " + LocalStorage.getDataDirec() + this.bakingInfo.HistoryCounter);
-    //         fs.mkdirSync(LocalStorage.getDataDirec() + this.bakingInfo.HistoryCounter);
-    //     }
-    // }
+
     public reset() {
 
         if (this.runningStatus === RunningStatus.STOPPED) {
@@ -484,7 +457,34 @@ export class RunningHandle {
             Date: new Date().getTime(),  // 当前时间
 
             HistoryCounter: info.BakingInfo.HistoryCounter,
+            Status: info.SysInfo.bInRunning,
         };
+
+        // 根据实际的测试情况进行修改
+        if (info.SysInfo.bTempForUpperRack === true) {
+            obj.PrimaryDryTemp = ControlPeriph.temp4;
+            obj.PrimaryWetTemp = ControlPeriph.temp2;
+            obj.SecondaryDryTemp = ControlPeriph.temp1;
+            obj.SecondaryWetTemp = ControlPeriph.temp3;
+
+        } else {
+            obj.PrimaryDryTemp = ControlPeriph.temp1;
+            obj.PrimaryWetTemp = ControlPeriph.temp3;
+            obj.SecondaryDryTemp = ControlPeriph.temp2;
+            obj.SecondaryWetTemp = ControlPeriph.temp4;
+
+        }
+
+        // check dry temp
+        obj.DryTempAlarm = Alarm.checkDryTemp(info, obj.PrimaryDryTemp, obj.PrimaryWetTemp);
+
+        // check wet temp
+        obj.WetTempAlarm = Alarm.checkWetTemp(info, obj.PrimaryWetTemp, obj.PrimaryDryTemp);
+
+        // 燃烧门的状态
+        obj.bBurningGateOn = ControlPeriph.bBurningGateOn;
+        // 风门状态
+        obj.bVentOn = (ControlPeriph.VentAngle > 0.1) ? true : false;
 
         return obj;
     }
