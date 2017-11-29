@@ -1,6 +1,6 @@
+
 import * as https from "https";
 import { open } from "inspector";
-import { Buffer } from "protobufjs";
 import { inspect } from "util";
 import { Tool } from "./utility";
 
@@ -52,7 +52,7 @@ export class HttpsApp {
         Tool.printBlue("https app constructor()");
     }
 
-    public put(inPath: string, objData: Buffer, token: string, callback: (err, buf) => void) {
+    public put(inPath: string, objData: Uint8Array, token: string, callback: (err, buf) => void) {
         // comment
         Tool.printYellow("----- PUT -----");
 
@@ -84,6 +84,7 @@ export class HttpsApp {
             res.on("data", (d) => {
                 Tool.printMagenta("<-- PUT response from https server:");
                 Tool.print(d);
+                Tool.print(d.toString());
                 Tool.printMagenta("----end----");
                 callback(null, d);
             });
@@ -100,12 +101,17 @@ export class HttpsApp {
             callback(e, null);
         });
 
-        Tool.printYellow(inspect(req));
+        // Tool.printYellow(inspect(req));
 
-        req.write(objData);
+        Tool.printGreen("length :" + objData.length);
+        Tool.printMagenta("type :" + typeof objData);
+        Tool.print(objData);
 
-        req.end();
+        const bufObjData = new Buffer(objData);
 
+        console.log(bufObjData);
+
+        req.end(bufObjData.toString());
     }
 
     public post(inPath: string, data: string, callback: (err, buf) => void) {

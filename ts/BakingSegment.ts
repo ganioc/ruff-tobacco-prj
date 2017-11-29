@@ -18,6 +18,8 @@ export class BakingSegment extends BakingElement {
 
         console.log("Run bakingSegment");
 
+        this.counter++;
+
         this.checkTempSensors();
 
         this.keepTempConstant();
@@ -41,7 +43,8 @@ export class BakingSegment extends BakingElement {
 
         if (this.moistureType === MoistureProperty.DRY) {
             this.controlFire(TempControl.keepConstant(param));
-        } else if (this.moistureType === MoistureProperty.WET) {
+        } else if (this.moistureType === MoistureProperty.WET &&
+            (this.counter % BakingElement.COUNTER_FOR_VENT_CHECKING) === 0) {
             this.controlVent(TempControl.keepWetConstant(param));
         }
     }

@@ -60,7 +60,7 @@ $.ready((error) => {
     Tool.printMagenta("################\n");
 
     Tool.readMachineSN();
-    LocalStorage.loadAppVersion();
+    // LocalStorage.loadAppVersion();
 
     // 读取stackoverflow.com网站是没有问题的
     // client.post("/login", JSON.stringify({ imei: "3748035460303714772" }), (err, buf) => {
@@ -74,7 +74,7 @@ $.ready((error) => {
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        // main();
+        main();
     }, 3000);
 });
 
@@ -145,6 +145,12 @@ function main() {
                     ControlPeriph.TurnOnRunningLED(() => {
                         Tool.print("Turn on LED");
                     });
+
+                    clearInterval(appBaking.timerTrap);
+
+                    appBaking.timerTrap = setInterval(() => {
+                        commQT.sendTrap(InfoType.Val_TrapBaking, appBaking.getTrapBaking());
+                    }, 5000);
 
                     commQT.sendSetResp(data.PacketId, data.Obj, "OK");
 

@@ -102,7 +102,7 @@ proc.then((token: string) => {
     // Tool.printBlue("======== Recovered object ========");
     // console.log(objNew);
 
-    client.put("/batch/device/create",
+    client.put("/test/protobuf",
         decodeBatchDetail.encode(mBatchDetail),
         token,
         (err, buf) => {
@@ -113,6 +113,7 @@ proc.then((token: string) => {
             }
             Tool.printYellow("---- got put ----");
             console.log(buf.length);
+            Tool.printYellow(buf.toString());
             Tool.printYellow("---- end of getRecoProfile ----");
         });
 

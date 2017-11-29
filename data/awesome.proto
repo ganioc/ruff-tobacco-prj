@@ -3,9 +3,9 @@ package awesomepackage;
 syntax = "proto3";
 
 message AwesomeMessage{
-    bool sexinfo = 0;
-    string name = 1;
-    uint32 age = 2;
+    bool sexinfo = 1;
+    string name = 2;
+    uint32 age = 3;
     double length = 4;
     repeated BatchRating ratings = 5;
     uint32 weight = 6;

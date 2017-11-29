@@ -23,6 +23,8 @@ export class BakingSlope extends BakingElement {
 
         console.log("Run bakingSlope");
 
+        this.counter++;
+
         this.checkTempSensors();
 
         this.controlTempSlope();
@@ -53,7 +55,8 @@ export class BakingSlope extends BakingElement {
 
         if (this.moistureType === MoistureProperty.DRY) {
             this.controlFire(TempControl.keepSlope(param));
-        } else if (this.moistureType === MoistureProperty.WET) { // MoistureProperty.WET
+        } else if (this.moistureType === MoistureProperty.WET &&
+            (this.counter % BakingElement.COUNTER_FOR_VENT_CHECKING) === 0) { // MoistureProperty.WET
             this.controlVent(TempControl.keepWetSlope(param));
         }
 

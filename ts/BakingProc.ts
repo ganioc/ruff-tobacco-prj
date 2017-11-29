@@ -462,14 +462,14 @@ export class RunningHandle {
         const info: IInfoCollect = LocalStorage.loadBakingStatus();
 
         const obj: ITrapInfo = {
-            WetTempAlarm: 0, // 1 alarm, 0 no alarm;
-            DryTempAlarm: 0,
+            WetTempAlarm: 1, // 1 alarm, 0 no alarm;
+            DryTempAlarm: 1,
             VoltageLowAlarm: 1,
-            ACAlarmPhaseA: 0,
-            ACAlarmPhaseB: 0,
-            ACAlarmPhaseC: 0,
-            GPRSAlarm: 0,
-            GPSAlarm: 0,
+            ACAlarmPhaseA: 1,
+            ACAlarmPhaseB: 1,
+            ACAlarmPhaseC: 1,
+            GPRSAlarm: 1,
+            GPSAlarm: 1,
 
             // temp value
             PrimaryDryTemp: ControlPeriph.temp1,

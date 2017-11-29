@@ -6,6 +6,7 @@ import { Tool } from "./utility";
 export class BakingElement {
     public static timer: NodeJS.Timer; // The only timer for Class member
     public static timerVent: NodeJS.Timer;
+    public static COUNTER_FOR_VENT_CHECKING: number;
 
     public moistureType: MoistureProperty;
     public type: number;
@@ -14,6 +15,7 @@ export class BakingElement {
     public timeBegin: number;
     public timeDeltaCheckStatus: number;
     public tempLogs: ITempLog[];
+    public counter: number;
 
     private timeElapsed: number;
 
@@ -21,6 +23,8 @@ export class BakingElement {
 
         this.tempBegin = options.tempBegin;
         this.timeBegin = 0;
+        this.counter = 0;
+        BakingElement.COUNTER_FOR_VENT_CHECKING = 6;
 
         if (!options.duration) {
             throw new Error("BakingElement duration not defined");
@@ -87,7 +91,7 @@ export class BakingElement {
         Tool.printBlue("this.timeElapsed:   " + this.timeElapsed.toFixed(2) + " seconds");
         Tool.printBlue("this.duration:      " + this.duration.toFixed(2) + " seconds");
 
-        if (this.timeElapsed >= this.duration) {// in seconds
+        if ((this.timeElapsed - this.duration) > -1) {// in seconds
             Tool.printRed("Stage Time over --\n");
             return false;
         } else {

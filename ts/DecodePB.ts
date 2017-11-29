@@ -3,6 +3,7 @@
  */
 
 import * as Protobuf from "protobufjs";
+import { Message } from "protobufjs";
 import { inspect } from "util";
 import { Tool } from "./utility";
 
@@ -36,7 +37,11 @@ export interface IfBatchRating {
     rating: string;
     weight: number;
 }
-
+export interface IfYBatchDetail {
+    batchId: number;
+    deviceId: string;
+    startTime: number;
+}
 export interface IfBatchDetail {
     batchId: number;
     deviceId: string;
@@ -80,12 +85,13 @@ export class DecodePB {
 
     }
 
-    public encode(obj: any): Buffer {
+    public encode(obj: any) {
 
         console.log("encode obj-->");
         console.log(obj);
 
         const errMsg = this.decoder.verify(obj);
+
         if (errMsg) {
             console.log("pb encode verify error");
             console.log(errMsg);
@@ -96,13 +102,15 @@ export class DecodePB {
         const message = this.decoder.create(obj);
         Tool.printRed(inspect(message));
 
-        const buffer = new Buffer(this.decoder.encode(message).finish());
+        Tool.printYellow("====  Encode PB ====");
+        const buffer = this.decoder.encode(message).finish();
         console.log(buffer);
+        Tool.printYellow("==== out of Encode PB ====");
 
         return buffer;
     }
 
-    public decode(buf: Buffer): any {
+    public decode(buf: Uint8Array): any {
         let messageRx;
         let objRx;
 
@@ -112,7 +120,7 @@ export class DecodePB {
         console.log(buf.length);
 
         try {
-            messageRx = this.decoder.decode(new Uint8Array(buf));
+            messageRx = this.decoder.decode(buf);
             objRx = this.decoder.toObject(messageRx);
         } catch (e) {
             console.log("Proto decode buffer format error");
