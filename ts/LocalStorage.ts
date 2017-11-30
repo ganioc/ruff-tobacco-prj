@@ -31,15 +31,16 @@ const DEFAULT_CURVE: IDefaultCurve = {
         [30, 32],
         [32, 32],
         [32, 32],
+        [33, 33],
     ],
-    durList: [1, 1, 1, 1],
     wetList: [
         [28, 28],
         [28, 30],
         [30, 30],
         [30, 30],
+        [30, 30],
     ],
-
+    durList: [1, 1, 1, 1, 1],
 };
 
 export class LocalStorage {
@@ -167,6 +168,9 @@ export class LocalStorage {
             ResultInfo: LocalStorage.initResultInfo(),
         };
         return info;
+    }
+    public static loadDefaultCurve() {
+        return LocalStorage.initDefaultCurve();
     }
     public static initDefaultCurve() {
         return {

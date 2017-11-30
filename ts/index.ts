@@ -271,7 +271,8 @@ function main() {
                 commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSysInfo());
                 break;
             case InfoType.Val_SettingCurveInfo:
-                Tool.printRed("SettingCurve is not able to get");
+                Tool.printRed("SettingCurve is able to get");
+                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo());
                 break;
             case InfoType.Val_RunningCurveInfo:
                 commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadRunningCurveInfo());

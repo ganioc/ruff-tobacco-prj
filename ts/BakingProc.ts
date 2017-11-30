@@ -297,6 +297,9 @@ export class RunningHandle {
         const info: IInfoCollect = LocalStorage.loadBakingStatus();
         return info.RunningCurveInfo;
     }
+    public loadSettingCurveInfo() {
+        return LocalStorage.loadDefaultCurve();
+    }
     public updateRunningCurveInfo(data: any) {
         Tool.printMagenta("update RunningCurveInfo");
         Tool.print(data);
