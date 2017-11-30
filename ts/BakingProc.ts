@@ -168,7 +168,18 @@ export class RunningHandle {
             Tool.print("BakingProc: reset to Waiting mode");
 
             const info: IInfoCollect = LocalStorage.loadBakingStatus();
+
             info.SysInfo.bInRunning = RunningStatus.WAITING;
+
+            // create the data/ new project directory
+            RunningHandle.HistoryCounter++;
+            Tool.print("BakingProc: Current HistoryCounter + 1 is:" + RunningHandle.HistoryCounter);
+
+            info.BakingInfo.HistoryCounter = RunningHandle.HistoryCounter;
+
+            LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
+
+            /// -
 
             LocalStorage.saveBakingStatus(info);
 
@@ -191,13 +202,7 @@ export class RunningHandle {
         if (this.runningStatus === RunningStatus.WAITING) {
             this.runningStatus = RunningStatus.RUNNING;
 
-            // create the data/ new project directory
-            RunningHandle.HistoryCounter++;
-            Tool.print("BakingProc: Current HistoryCounter + 1 is:" + RunningHandle.HistoryCounter);
 
-            info.BakingInfo.HistoryCounter = RunningHandle.HistoryCounter;
-
-            LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
 
             info.RunningCurveInfo.CurrentStage = 0;
             info.RunningCurveInfo.CurrentStageRunningTime = 0;
