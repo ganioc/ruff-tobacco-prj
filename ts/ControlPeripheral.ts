@@ -84,16 +84,17 @@ export class ControlPeriph {
         });
     }
     public static TurnOnRunningLED(cb) {
-        $("#LED-Running").turnOn(cb);
-    }
-    public static TurnOffRunningLED(cb) {
-        $("#LED-Running").turnOff(cb);
-    }
-    public static TurnOnSettingLED(cb) {
+        // Switch LED bewteen Running and Setting, dont be surprised
         $("#LED-Setting").turnOn(cb);
     }
-    public static TurnOffSettingLED(cb) {
+    public static TurnOffRunningLED(cb) {
         $("#LED-Setting").turnOff(cb);
+    }
+    public static TurnOnSettingLED(cb) {
+        $("#LED-Running").turnOn(cb);
+    }
+    public static TurnOffSettingLED(cb) {
+        $("#LED-Running").turnOff(cb);
     }
     public static TurnOnBuzzer(cb) {
         $("#outBuzzer").turnOn(cb);
@@ -229,6 +230,11 @@ export class ControlPeriph {
                 (cb) => {
                     commMCU.GetTemp((err, data) => {
                         if (err !== null) {
+
+                            ControlPeriph.temp1 = 0;
+                            ControlPeriph.temp2 = 0;
+                            ControlPeriph.temp3 = 0;
+                            ControlPeriph.temp4 = 0;
                             cb(err);
                             return;
                         }
@@ -260,6 +266,13 @@ export class ControlPeriph {
                 (cb) => {
                     commMCU.GetADC((err, data) => {
                         if (err !== null) {
+                            ControlPeriph.ADC1 = 0;
+                            ControlPeriph.ADC2 = 0;
+                            ControlPeriph.ADC3 = 0;
+                            ControlPeriph.ADC4 = 0;
+                            ControlPeriph.ADC5 = 0;
+                            ControlPeriph.ADC6 = 0;
+                            ControlPeriph.ADC7 = 0;
                             cb(err);
                             return;
                         }

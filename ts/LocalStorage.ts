@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { IDefaultCurve } from "./BakingCfg";
 import { Tool } from "./utility";
 
-let APP_VERSION = "1.1.0";
+const APP_VERSION = "1.1.0";
 // require("../package.json").version;
 
 const UI_VERSION = "1.0.0";
