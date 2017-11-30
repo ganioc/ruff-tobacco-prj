@@ -74,6 +74,8 @@ $.ready((error) => {
         speed: 10,
     });
 
+    gps.start();
+
     // 读取stackoverflow.com网站是没有问题的
     // client.post("/login", JSON.stringify({ imei: "3748035460303714772" }), (err, buf) => {
     //     if (err) {

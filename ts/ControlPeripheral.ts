@@ -6,6 +6,7 @@ import { ControlMcu } from "./ControlMcu";
 
 import { Tool } from "./utility";
 import { YAsync } from "./yjasync";
+import { ControlGPRS } from "./ControlGPRS";
 
 export interface IfControlPeriphOption {
     max_angle: number;
@@ -56,6 +57,9 @@ export class ControlPeriph {
         ControlPeriph.ResetVent();
 
         ControlPeriph.bToggleWD = true;
+
+        ControlPeriph.gpsLatitude = 0.0;
+        ControlPeriph.gpsLatitude = 0.0;
 
     }
 

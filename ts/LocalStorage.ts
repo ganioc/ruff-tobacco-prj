@@ -94,7 +94,7 @@ export class LocalStorage {
         return {
             AirFlowPattern: "fall",
             ControllerName: "No Name",
-            GPSInfo: { Longitude: 121.45806, Latitude: 31.22222 },
+            GPSInfo: { Longitude: 0, Latitude: 0 },
             InnerHeight: 3,
             WallMaterial: 0,
             LocName: "Some Place",
