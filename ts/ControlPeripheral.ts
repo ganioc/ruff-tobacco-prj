@@ -56,6 +56,7 @@ export class ControlPeriph {
         ControlPeriph.ResetVent();
 
         ControlPeriph.bToggleWD = true;
+
     }
 
     public static CheckUpperRack(callback) {
