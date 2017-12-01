@@ -331,7 +331,7 @@ function main() {
      *
     */
     setInterval(() => {
-        ControlPeriph.fetchParams(commMCU, () => {
+        ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
     }, 5000);

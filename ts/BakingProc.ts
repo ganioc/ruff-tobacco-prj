@@ -471,7 +471,7 @@ export class RunningHandle {
             SecondaryDryTemp: ControlPeriph.temp3,
             SecondaryWetTemp: ControlPeriph.temp4,
 
-            bWindGateHighSpeed: true, // true - hi speed, false - low speed
+            bWindGateHighSpeed: ControlPeriph.bWindGateHighSpeed, // true - hi speed, false - low speed
             bBurningGateOn: false,     // true - on, false - off
             bVentOn: false,
             Voltage: 231,  // 电压值
