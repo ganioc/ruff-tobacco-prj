@@ -96,17 +96,129 @@ export class JustTest {
                 }, 2000);
             });
         }).then((val) => {
-            Tool.printGreen("Test open vent gate ==>");
+            Tool.printGreen("Test open up vent gate ==>");
             return new Promise((resolve, reject) => {
                 ControlPeriph.IncreaseVentAngle(40, () => {
                     Tool.print("on 40 degree");
+                    resolve("OK");
                 });
+            });
+        }).then((val) => {
+            Tool.printGreen("Test open down vent gate ==>");
+            return new Promise((resolve, reject) => {
+
+                ControlPeriph.DecreaseVentAngle(40, () => {
+                    Tool.print("off 40 degree");
+                    resolve("OK");
+                });
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.CheckPhaseVoltageExist((data) => {
+                    Tool.printGreen("\nRead bPhaseVoltage 1:" + data);
+                    resolve("OK");
+                });
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    ControlPeriph.DecreaseVentAngle(40, () => {
-                        Tool.print("off 40 degree");
-                        resolve("OK");
-                    });
-                }, 2000);
+                    Tool.printGreen("\nDelay 100ms");
+                    resolve("OK");
+                }, 100);
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.CheckPhaseVoltageExist((data) => {
+                    Tool.printGreen("\nRead bPhaseVoltage 2:" + data);
+                    resolve("OK");
+                });
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    Tool.printGreen("\nDelay 100ms");
+                    resolve("OK");
+                }, 100);
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.CheckPhaseVoltageExist((data) => {
+                    Tool.printGreen("\nRead bPhaseVoltage 3:" + data);
+                    resolve("OK");
+                });
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    Tool.printGreen("\nDelay 100ms");
+                    resolve("OK");
+                }, 100);
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.CheckPhaseVoltageExist((data) => {
+                    Tool.printGreen("\nRead bPhaseVoltage 4:" + data);
+                    resolve("OK");
+                });
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    Tool.printGreen("\nDelay 100ms");
+                    resolve("OK");
+                }, 100);
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.CheckPhaseVoltageExist((data) => {
+                    Tool.printGreen("\nRead bPhaseVoltage 5:" + data);
+                    resolve("OK");
+                });
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    Tool.printGreen("\nDelay 100ms");
+                    resolve("OK");
+                }, 100);
+            });
+
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.CheckPhaseVoltageExist((data) => {
+                    Tool.printGreen("\nRead bPhaseVoltage 6:" + data);
+                    resolve("OK");
+                });
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    Tool.printGreen("\nDelay 100ms");
+                    resolve("OK");
+                }, 100);
+            });
+
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.CheckPhaseVoltageExist((data) => {
+                    Tool.printGreen("\nRead bPhaseVoltage 7:" + data);
+                    resolve("OK");
+                });
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    Tool.printGreen("\nDelay 100ms");
+                    resolve("OK");
+                }, 100);
+            });
+
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.CheckPhaseVoltageExist((data) => {
+                    Tool.printGreen("\nRead bPhaseVoltage 8:" + data);
+                    resolve("OK");
+                });
             });
         }).then((val) => {
             return new Promise((resolve, reject) => {

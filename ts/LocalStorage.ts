@@ -137,7 +137,7 @@ export class LocalStorage {
     public static initBakingInfo(): IBakingInfo {
         return {
             TobaccoType: 0,
-            HistoryCounter: 0, // default is 0
+            HistoryCounter: 1, // default is 0
             LoadingMethod: 1,
             LowerWeight: 0,
             MaturePercent1: 0,

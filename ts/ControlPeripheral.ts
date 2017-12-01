@@ -61,6 +61,10 @@ export class ControlPeriph {
         ControlPeriph.gpsLatitude = 0.0;
         ControlPeriph.gpsLatitude = 0.0;
 
+        ControlPeriph.StopWindVent(() => {
+            Tool.print("Stop the vent");
+        });
+
     }
 
     public static CheckUpperRack(callback) {

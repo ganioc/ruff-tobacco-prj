@@ -159,6 +159,16 @@ export class RunningHandle {
         LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
 
         LocalStorage.saveBakingStatus(info);
+
+        // reset peripheral stage
+        Tool.printYellow("Init peripheral status:");
+        ControlPeriph.TurnOffBakingFire(() => {
+            Tool.print("Turn off baking fire");
+        });
+        ControlPeriph.StopWindVent(() => {
+            Tool.print("Stop wind vent");
+        });
+
     }
 
     public reset() {
@@ -202,12 +212,15 @@ export class RunningHandle {
         if (this.runningStatus === RunningStatus.WAITING) {
             this.runningStatus = RunningStatus.RUNNING;
 
-
-
             info.RunningCurveInfo.CurrentStage = 0;
             info.RunningCurveInfo.CurrentStageRunningTime = 0;
+
+            info.SysInfo.bInRunning = RunningStatus.RUNNING;
+
         } else if (this.runningStatus === RunningStatus.PAUSED) {
             this.runningStatus = RunningStatus.RUNNING;
+
+            info.SysInfo.bInRunning = RunningStatus.RUNNING;
         } else {
             return;
         }
@@ -582,7 +595,4 @@ export class RunningHandle {
             Tool.printYellow(" ------ BakingCurve is running -----");
         }
     }
-
-
-
 }

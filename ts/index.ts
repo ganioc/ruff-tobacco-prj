@@ -76,20 +76,10 @@ $.ready((error) => {
 
     gps.start();
 
-    // 读取stackoverflow.com网站是没有问题的
-    // client.post("/login", JSON.stringify({ imei: "3748035460303714772" }), (err, buf) => {
-    //     if (err) {
-    //         console.log(err);
-    //         return;
-    //     }
-    //     console.log(buf.length);
-    //     console.log(buf.toString());
-    // });
-
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        // main();
-        test.test();
+        main();
+        // test.test();
     }, 3000);
 
 });
@@ -342,7 +332,7 @@ function main() {
     */
     setInterval(() => {
         ControlPeriph.fetchParams(commMCU, () => {
-            Tool.print("");
+            Tool.print("Fetch Params");
         });
     }, 5000);
 
