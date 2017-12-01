@@ -26,6 +26,14 @@ const decodeBatchDetail = new DecodePB({
     className: "awesomepackage.BatchDetail",
 });
 
+const decodeBatchSummary = new DecodePB({
+    path: protoFile,
+    className: "awesomepackage.BatchSummary",
+});
+const decodeRecoProfile = new DecodePB({
+    path: protoFile,
+    className: "awesomepackage.RecoProfileRequest",
+});
 const option: IfHttpsApp = {
     hostname: "api.shdingyun.com",
     port: 443,
@@ -68,7 +76,7 @@ proc.then((token: string) => {
         deviceId: "2LOPekIWQQ",
         startTime: 12,
         endTime: 12,
-        ratings: [{ rating: "a", weight: 23 }, { rating: "b", weight: 2343 }],
+        ratings: [],
         afterTopWeight: 1,
         afterMiddleWeight: 1,
         afterBottomWeight: 1,
@@ -98,12 +106,53 @@ proc.then((token: string) => {
     Tool.printGreen(bufBatchDetail.length);
     console.log(bufBatchDetail);
 
-    // const objNew = decodeBatchDetail.decode(bufBatchDetail);
-    // Tool.printBlue("======== Recovered object ========");
-    // console.log(objNew);
+    const objNew = decodeBatchDetail.decode(bufBatchDetail);
+    Tool.printBlue("======== Recovered object ========");
+    console.log(objNew);
+
+    // const mBatchSummary = {
+    //     batchId: 1,
+    //     deviceId: "1123",
+    //     startTime: new Date().getTime(),
+    //     endTime: new Date().getTime(),
+    // };
+    // console.log("-----------batchsummary-------------");
+    // const bufBatchSummary = decodeBatchSummary.encode(mBatchSummary);
+    // Tool.printGreen(bufBatchSummary.length);
+    // console.log(bufBatchSummary);
+
+    const mRecoProfile = {
+        batchId: 1,
+        deviceId: "123",
+        variety: "g",
+        barnAirflowDirection: "dsf",
+        barnWallTexture: "sdf",
+        loadWeatherTemperature: 23,
+        loadTopWeight: 2,
+        loadWeatherHumidity: 23,
+        loadMiddleWeight: 23,
+        loadBottomWeight: 65,
+        loadTool: "sd",
+        loadingToolCount: 88,
+        loadToolWeight: "sdf",
+        loadQuality: "sdf",
+        loadMaturityLv_0Percentage: 2,
+        loadMaturityLv_1Percentage: 3,
+        loadMaturityLv_2Percentage: 4,
+        loadMaturityLv_3Percentage: 5,
+        loadMaturityLv_4Percentage: 6,
+    };
+    console.log("------------reco profile--------");
+    const bufRecoProfile = decodeRecoProfile.encode(mRecoProfile);
+    console.log(bufRecoProfile);
+
+    const objRecoProfile = decodeRecoProfile.decode(bufRecoProfile);
+    console.log(objRecoProfile);
+
+    console.log("-------------before send reco profile --------");
 
     client.put("/test/protobuf",
-        decodeBatchDetail.encode(mBatchDetail),
+        decodeRecoProfile.encode(mRecoProfile),
         token,
         (err, buf) => {
             // comments

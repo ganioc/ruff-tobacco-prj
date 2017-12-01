@@ -111,7 +111,7 @@ export class HttpsApp {
 
         console.log(bufObjData);
 
-        req.end(bufObjData.toString());
+        req.end(bufObjData);
     }
 
     public post(inPath: string, data: string, callback: (err, buf) => void) {

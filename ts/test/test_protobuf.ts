@@ -165,3 +165,12 @@ console.log(objNew.startTime);
 
 // const obj = decodeRegisterResponse.decode(buf);
 */
+
+Tool.printRed("---------------- analyze data --------------");
+
+const testDataList = new Uint8Array([
+    8, 1, 18, 4, 49, 49, 50, 51, 24, -83,
+    -118, -47, -120, -127, 44, 32, -83, -118, -47, -120,
+    -127, 44]);
+
+console.log(testDataList);
