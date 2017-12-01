@@ -88,8 +88,8 @@ $.ready((error) => {
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        main();
-        // test.test();
+        // main();
+        test.test();
     }, 3000);
 
 });
