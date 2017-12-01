@@ -146,6 +146,8 @@ function main() {
         switch (dataBig.message) {
             case "start":
 
+                ControlPeriph.Buzzer();
+
                 if (appBaking.runningStatus === RunningStatus.PAUSED) {
                     Tool.print("Start from paused");
                     appBaking.start();
@@ -185,6 +187,7 @@ function main() {
                 break;
             case "stop":
                 Tool.print("App stop");
+                ControlPeriph.Buzzer();
 
                 if (appBaking.runningStatus === RunningStatus.RUNNING) {
                     appBaking.stop();
@@ -213,6 +216,8 @@ function main() {
                 break;
             case "pause":
                 Tool.print("App pause");
+                ControlPeriph.Buzzer();
+
                 if (appBaking.runningStatus === RunningStatus.RUNNING) {
                     appBaking.pause();
                     Tool.print("App paused");
@@ -230,6 +235,9 @@ function main() {
 
                 break;
             case "reset":
+
+                ControlPeriph.Buzzer();
+
                 Tool.print("App reset");
                 if (appBaking.runningStatus === RunningStatus.STOPPED) {
                     // push status to the cloud

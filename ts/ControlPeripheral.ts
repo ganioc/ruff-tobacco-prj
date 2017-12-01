@@ -104,6 +104,16 @@ export class ControlPeriph {
     public static TurnOffSettingLED(cb) {
         $("#LED-Running").turnOff(cb);
     }
+    public static Buzzer() {
+        Tool.printBlue("Buzzer on");
+        ControlPeriph.TurnOnBuzzer(() => {
+            setTimeout(() => {
+                ControlPeriph.TurnOffBuzzer(() => {
+                    Tool.printBlue("Buzzer off");
+                });
+            }, 200);
+        });
+    }
     public static TurnOnBuzzer(cb) {
         $("#outBuzzer").turnOn(cb);
     }
@@ -295,7 +305,7 @@ export class ControlPeriph {
                     ControlPeriph.ADC1 = (ADC1 > 0.01 && ADC1 < 3.4) ? ADC1 : ControlPeriph.ADC1;
                     ControlPeriph.ADC2 = (ADC2 > 0.01 && ADC2 < 3.4) ? ADC2 : ControlPeriph.ADC2;
                     ControlPeriph.ADC3 = (ADC3 > 0.01 && ADC3 < 3.4) ? ADC3 : ControlPeriph.ADC3;
-                    ControlPeriph.ADC4 = (ADC4 > 0.01 && ADC4 < 3.4) ? ADC4 : ControlPeriph.ADC4;
+                    ControlPeriph.ADC4 = (ADC4 > 0.01 && ADC4 < 3.4) ? ADC4 : ControlPeriph.ADC4; // 220V voltage
                     ControlPeriph.ADC5 = (ADC5 > 0.01 && ADC5 < 3.4) ? ADC5 : ControlPeriph.ADC5;
                     ControlPeriph.ADC6 = (ADC6 > 0.01 && ADC6 < 3.4) ? ADC6 : ControlPeriph.ADC6;
                     ControlPeriph.ADC7 = (ADC7 > 0.01 && ADC7 < 3.4) ? ADC7 : ControlPeriph.ADC7;
