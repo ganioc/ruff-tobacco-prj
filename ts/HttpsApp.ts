@@ -66,6 +66,7 @@ export class HttpsApp {
                 "Authorization": "Bearer " + token,
                 "Content-Type": "application/x-protobuf",
                 "Content-Length": objData.length,
+                "Connection": "keep-alive",
             },
             rejectUnauthorized: false,
         };
@@ -93,6 +94,9 @@ export class HttpsApp {
                 Tool.printRed(err);
                 callback(err, null);
             });
+            res.on("end", () => {
+                Tool.print("Put end rx");
+            });
         });
 
         req.on("error", (e) => {
@@ -105,13 +109,13 @@ export class HttpsApp {
 
         Tool.printGreen("length :" + objData.length);
         Tool.printMagenta("type :" + typeof objData);
-        Tool.print(objData);
+        // Tool.print(objData);
 
         const bufObjData = new Buffer(objData);
 
         console.log(bufObjData);
-
-        req.end(bufObjData);
+        req.write(bufObjData);
+        req.end();
     }
 
     public post(inPath: string, data: string, callback: (err, buf) => void) {
@@ -162,6 +166,7 @@ export class HttpsApp {
         req.write(data);
         req.end();
     }
+
     public get(inPath: string, token: string, callback: (err, buf) => void) {
 
         const option: IfHttpsAuth = {

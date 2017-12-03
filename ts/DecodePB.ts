@@ -86,9 +86,14 @@ export class DecodePB {
     }
 
     public encode(obj: any) {
-
+        let lst = [];
         console.log("encode obj-->");
-        console.log(obj);
+        for (const i in obj) {
+            if (obj[i]) {
+                lst.push(obj[i]);
+            }
+        }
+        console.log(lst);
 
         const errMsg = this.decoder.verify(obj);
 
@@ -104,7 +109,13 @@ export class DecodePB {
 
         Tool.printYellow("====  Encode PB ====");
         const buffer = this.decoder.encode(message).finish();
-        console.log(buffer);
+        lst = [];
+        for (const i in buffer) {
+            if (buffer[i]) {
+                lst.push(buffer[i]);
+            }
+        }
+        console.log(lst);
         Tool.printYellow("==== out of Encode PB ====");
 
         return buffer;

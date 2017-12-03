@@ -25,7 +25,10 @@ const decodeBatchDetail = new DecodePB({
     path: protoFile,
     className: "awesomepackage.BatchDetail",
 });
-
+const decodeBatchRating = new DecodePB({
+    path: protoFile,
+    className: "awesomepackage.BatchRating",
+});
 const decodeBatchSummary = new DecodePB({
     path: protoFile,
     className: "awesomepackage.BatchSummary",
@@ -38,22 +41,10 @@ const option: IfHttpsApp = {
     hostname: "api.shdingyun.com",
     port: 443,
 };
-
 const client = new HttpsApp(option);
 let TOKEN: string = "";
-
+/*
 const proc = new Promise((resolve, reject) => {
-    // 读取stackoverflow.com网站是没有问题的
-    // client.post("/login", JSON.stringify({ imei: "3748035460303714772" }), (err, buf) => {
-    //     if (err) {
-    //         console.log(err);
-    //         reject(null);
-    //         return;
-    //     }
-    //     console.log(buf.length);
-    //     TOKEN = buf.toString();
-    //     resolve(TOKEN);
-    // });
     client.login("3748035460303714772", (err, buf) => {
         if (err) {
             console.log(err);
@@ -67,104 +58,141 @@ const proc = new Promise((resolve, reject) => {
     });
 
 });
+proc.then(() => {
+    console.log(TOKEN);
+});
+*/
+// const mBatchYang = {
 
-proc.then((token: string) => {
-    Tool.printGreen("Token got");
+//     batchId: 1,
+//     ratings: [{ rating: "a", weight: 23 }],
+//     name: "yj",
 
-    const mBatchDetail: IfBatchDetail = {
-        batchId: 220,
-        deviceId: "2LOPekIWQQ",
-        startTime: 12,
-        endTime: 12,
-        ratings: [],
-        afterTopWeight: 1,
-        afterMiddleWeight: 1,
-        afterBottomWeight: 1,
-        variety: "as",
-        barnAirflowDirection: "dsf",
-        barnWallTexture: "sdf",
-        loadWeatherTemperature: 23,
-        loadTopWeight: 2,
-        loadWeatherHumidity: 23,
-        loadMiddleWeight: 23,
-        loadBottomWeight: 65,
-        loadTool: "sd",
-        loadToolCount: "sdf",
-        loadToolWeight: "sdf",
-        loadQuality: "sdf",
-        loadMaturityLv_0Percentage: 2,
-        loadMaturityLv_1Percentage: 3,
-        loadMaturityLv_2Percentage: 4,
-        loadMaturityLv_3Percentage: 5,
-        loadMaturityLv_4Percentage: 6,
-    };
+// };
 
-    Tool.printGreen("data to be sent");
-    console.log(mBatchDetail);
+TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJhdXRob3JpdGllcyI6IkFVVEhfREVWSUNFIiwic3ViIjoiMzc0ODAzNTQ2MDMwMzcxNDc3MiIsImV4cCI6MTUxMjU3MDgwNX0.YdxrBDbd3oaS0gCquWHzgDomIitRJhlV61dye0NywZQkHzkL_UcQcCMEdswvTFTgqqm-r4unx0-05gHC1xjYhw";
 
-    const bufBatchDetail = decodeBatchDetail.encode(mBatchDetail);
-    Tool.printGreen(bufBatchDetail.length);
-    console.log(bufBatchDetail);
+// proc.then((token: string) => {
+//     Tool.printGreen("Token got");
 
-    const objNew = decodeBatchDetail.decode(bufBatchDetail);
-    Tool.printBlue("======== Recovered object ========");
-    console.log(objNew);
+const mBatchDetail = {
+    batchId: 220,
+    deviceId: "2LOPekIWQQ",
+    startTime: 1512026685764,
+    endTime: 1512026685764,
+    ratings: [{ rating: "CCC", weight: 122 }, { rating: "AAA", weight: 3444 }],
+    afterTopWeight: 1,
+    afterMiddleWeight: 1,
+    afterBottomWeight: 1,
+    variety: "as",
+    barnAirflowDirection: "dsf",
+    barnWallTexture: "sdf",
+    loadWeatherTemperature: 23,
+    loadTopWeight: 2,
+    loadWeatherHumidity: 23,
+    loadMiddleWeight: 23,
+    loadBottomWeight: 65,
+    loadTool: "sd",
+    loadToolCount: "sdf",
+    loadToolWeight: "sdf",
+    loadQuality: "sdf",
+    loadMaturityLv_0Percentage: 2,
+    loadMaturityLv_1Percentage: 3,
+    loadMaturityLv_2Percentage: 4,
+    loadMaturityLv_3Percentage: 5,
+    loadMaturityLv_4Percentage: 6,
+};
 
-    // const mBatchSummary = {
-    //     batchId: 1,
-    //     deviceId: "1123",
-    //     startTime: new Date().getTime(),
-    //     endTime: new Date().getTime(),
-    // };
-    // console.log("-----------batchsummary-------------");
-    // const bufBatchSummary = decodeBatchSummary.encode(mBatchSummary);
-    // Tool.printGreen(bufBatchSummary.length);
-    // console.log(bufBatchSummary);
+// Tool.printGreen("data to be sent");
+// console.log(mBatchDetail);
 
-    const mRecoProfile = {
-        batchId: 1,
-        deviceId: "123",
-        variety: "g",
-        barnAirflowDirection: "dsf",
-        barnWallTexture: "sdf",
-        loadWeatherTemperature: 23,
-        loadTopWeight: 2,
-        loadWeatherHumidity: 23,
-        loadMiddleWeight: 23,
-        loadBottomWeight: 65,
-        loadTool: "sd",
-        loadingToolCount: 88,
-        loadToolWeight: "sdf",
-        loadQuality: "sdf",
-        loadMaturityLv_0Percentage: 2,
-        loadMaturityLv_1Percentage: 3,
-        loadMaturityLv_2Percentage: 4,
-        loadMaturityLv_3Percentage: 5,
-        loadMaturityLv_4Percentage: 6,
-    };
-    console.log("------------reco profile--------");
-    const bufRecoProfile = decodeRecoProfile.encode(mRecoProfile);
-    console.log(bufRecoProfile);
+// const bufBatchDetail = decodeBatchDetail.encode(mBatchDetail);
+// Tool.printGreen(bufBatchDetail.length);
+// console.log(bufBatchDetail);
 
-    const objRecoProfile = decodeRecoProfile.decode(bufRecoProfile);
-    console.log(objRecoProfile);
+// const objNew = decodeBatchDetail.decode(bufBatchDetail);
+// Tool.printBlue("======== Recovered object ========");
+// console.log(objNew);
 
-    console.log("-------------before send reco profile --------");
+// const mBatchSummary = {
+//     batchId: 1,
+//     deviceId: "1123",
+//     startTime: new Date().getTime(),
+//     endTime: new Date().getTime(),
+// };
+// console.log("-----------batchsummary-------------");
+// const bufBatchSummary = decodeBatchSummary.encode(mBatchSummary);
+// Tool.printGreen(bufBatchSummary.length);
+// console.log(bufBatchSummary);
 
-    client.put("/test/protobuf",
-        decodeRecoProfile.encode(mRecoProfile),
-        token,
-        (err, buf) => {
-            // comments
-            if (err) {
-                console.log(err);
-                return;
-            }
-            Tool.printYellow("---- got put ----");
-            console.log(buf.length);
-            Tool.printYellow(buf.toString());
-            Tool.printYellow("---- end of getRecoProfile ----");
-        });
+// const mRecoProfile = {
+//     batchId: 1,
+//     deviceId: "123",
+//     variety: "g",
+//     barnAirflowDirection: "dsf",
+//     barnWallTexture: "sdf",
+//     loadWeatherTemperature: 23,
+//     loadTopWeight: 2,
+//     loadWeatherHumidity: 23,
+//     loadMiddleWeight: 23,
+//     loadBottomWeight: 65,
+//     loadTool: "sd",
+//     loadingToolCount: 88,
+//     loadToolWeight: "sdf",
+//     loadQuality: "sdf",
+//     loadMaturityLv_0Percentage: 2,
+//     loadMaturityLv_1Percentage: 3,
+//     loadMaturityLv_2Percentage: 4,
+//     loadMaturityLv_3Percentage: 5,
+//     loadMaturityLv_4Percentage: 6,
+// };
+// const mBatchRating = {
+//     rating: "c",
+//     weight: 44,
+// };
+console.log("------------reco profile--------");
+// const bufRecoProfile = decodeRecoProfile.encode(mRecoProfile);
+// console.log(bufRecoProfile);
+
+// const objRecoProfile = decodeRecoProfile.decode(bufRecoProfile);
+// console.log(objRecoProfile);
+
+console.log("-------------before send reco profile --------");
+
+// client.put("/test/protobuf",
+client.put("/batch/device/create",
+    decodeBatchDetail.encode(mBatchDetail),
+    TOKEN,
+    (err, buf) => {
+        // comments
+        if (err) {
+            console.log(err);
+            return;
+        }
+        Tool.printYellow("---- got put ----");
+        console.log(buf.length);
+        // Tool.printYellow(buf.toString());
+        // decode it out
+        // let str = buf.toString();
+        // str = str.replace("[", "");
+        // str = str.replace("]", "");
+        // const strLst = str.split(",");
+        // const lst = [];
+        // for (const i in strLst) {
+        //     if (strLst[i]) {
+        //         lst.push(parseInt(strLst[i], 10));
+        //     }
+        // }
+        // Tool.printRed(buf);
+        // const bufData = new Buffer(buf);
+        // console.log(bufData);
+
+        const objRecoProfile = decodeBatchSummary.decode(new Uint8Array(buf));
+        Tool.printYellow("--------final recovered object");
+        console.log(objRecoProfile);
+
+        Tool.printYellow("---- end of getRecoProfile ----");
+    });
 
     // client.register("3748035460303714772", token, (err, buf) => {
     //     if (err) {
@@ -211,9 +239,10 @@ proc.then((token: string) => {
     //         Tool.printYellow("---- end of getRecoProfile ----");
     //     });
 
-}, (fb) => {
-    Tool.printRed("Token got failure");
-});
+// }, (fb) => {
+//     Tool.printRed("Token got failure");
+// });
+// */
 
 // client.get("/register/" + "3748035460303714772", (err, buf) => {
 //     if (err) {

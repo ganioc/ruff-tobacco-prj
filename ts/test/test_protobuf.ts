@@ -1,7 +1,7 @@
+import { Buffer } from "buffer";
 import { inspect } from "util";
 import { DecodePB, IfBatchDetail, IfYBatchDetail } from "../DecodePB";
 import { Tool } from "../utility";
-import { Buffer } from "buffer";
 
 const protoFile = __dirname + "/../../data/awesome.proto";
 
@@ -9,14 +9,9 @@ const decodeRegisterResponse = new DecodePB({
     path: protoFile,
     className: "awesomepackage.RegisterResponse",
 });
-
-const decodeAwesomeMessage = new DecodePB({
+const decodeBatchSummary = new DecodePB({
     path: protoFile,
-    className: "awesomepackage.AwesomeMessage",
-});
-const decodeYBatchDetail = new DecodePB({
-    path: protoFile,
-    className: "awesomepackage.YBatchDetail",
+    className: "awesomepackage.BatchSummary",
 });
 const decodeBatchDetail = new DecodePB({
     path: protoFile,
@@ -68,34 +63,6 @@ Tool.printRed("Try to encode the object");
 console.log(encodeRegister);
 
 Tool.printYellow("============ Another One ================");
-
-const yBatchDetail: IfYBatchDetail = {
-    batchId: 12,
-    deviceId: "aa",
-    startTime: 23233212,
-};
-const strYBatchDetail = JSON.stringify(yBatchDetail);
-
-Tool.printBlue(strYBatchDetail);
-
-const newYBatchDetail = JSON.parse(strYBatchDetail);
-
-Tool.printRed(inspect(newYBatchDetail));
-
-const encodeYBatch = decodeYBatchDetail.encode(newYBatchDetail);
-Tool.printRed("Try to encode YBatchDetail");
-console.log(encodeYBatch);
-
-Tool.printYellow("----- decode it -----");
-const objYBatch = decodeYBatchDetail.decode(encodeYBatch);
-
-Tool.printYellow("----- check buffer -----");
-const bufYBatch = Buffer.from(encodeYBatch);
-console.log(bufYBatch);
-
-const utfYBatch = bufYBatch.toString("utf8");
-console.log(utfYBatch.length);
-
 /*
 const payloadObj = {
     sexinfo: true,
@@ -168,9 +135,42 @@ console.log(objNew.startTime);
 
 Tool.printRed("---------------- analyze data --------------");
 
-const testDataList = new Uint8Array([
-    8, 1, 18, 4, 49, 49, 50, 51, 24, -83,
-    -118, -47, -120, -127, 44, 32, -83, -118, -47, -120,
-    -127, 44]);
+const testDataList = new Uint8Array([8, -24, 18, 18, 10, 50, 76, 79, 80, 101, 107, 73, 87, 81, 81, 24, -60, -126, -63, -34, -128, 44, 32, -60, -126, -63, -34, -128, 44]);
 
 console.log(testDataList);
+
+const objBatchDetail = decodeBatchSummary.decode(testDataList);
+
+console.log(objBatchDetail);
+
+Tool.printYellow("=============Batchdetail================");
+const mBatchDetail = {
+    batchId: 220,
+    deviceId: "2LOPekIWQQ",
+    startTime: 1512026685764,
+    endTime: 1512026685764,
+    ratings: [{ rating: "CCC", weight: 122 }, { rating: "AAA", weight: 3444 }],
+    afterTopWeight: 1,
+    afterMiddleWeight: 1,
+    afterBottomWeight: 1,
+    variety: "as",
+    barnAirflowDirection: "dsf",
+    barnWallTexture: "sdf",
+    loadWeatherTemperature: 23,
+    loadTopWeight: 2,
+    loadWeatherHumidity: 23,
+    loadMiddleWeight: 23,
+    loadBottomWeight: 65,
+    loadTool: "sd",
+    loadToolCount: "sdf",
+    loadToolWeight: "sdf",
+    loadQuality: "sdf",
+    loadMaturityLv_0Percentage: 2,
+    loadMaturityLv_1Percentage: 3,
+    loadMaturityLv_2Percentage: 4,
+    loadMaturityLv_3Percentage: 5,
+    loadMaturityLv_4Percentage: 6,
+};
+const objNewBatchDetail = decodeBatchDetail.encode(mBatchDetail);
+
+console.log(objNewBatchDetail);
