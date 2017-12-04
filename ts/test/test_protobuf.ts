@@ -17,6 +17,11 @@ const decodeBatchDetail = new DecodePB({
     path: protoFile,
     className: "awesomepackage.BatchDetail",
 });
+const decodeProfile = new DecodePB({
+    path: protoFile,
+    className: "awesomepackage.Profile",
+});
+
 const register = new Buffer([
     10, 19, 51, 55, 52, 56, 48, 51, 53, 52, 54, 48, 51, 48, 51, 55, 49, 52, 55, 55,
     50, 18, 10, 50, 76, 79, 80, 101, 107, 73, 87, 81, 81, 26, 10, 49, 75, 109, 106, 48,
@@ -174,3 +179,20 @@ const mBatchDetail = {
 const objNewBatchDetail = decodeBatchDetail.encode(mBatchDetail);
 
 console.log(objNewBatchDetail);
+
+let resultNor: number = 0;
+for (const i in objNewBatchDetail) {
+    if (objNewBatchDetail[i]) {
+        resultNor = resultNor + objNewBatchDetail[i];
+    }
+}
+Tool.printYellow("resultNor:" + resultNor);
+
+Tool.printYellow("--------- decode Profile ------------");
+
+const dataProfile = new Uint8Array([10, 20, 17, 0, 0, 0, 0, 0, 0, 52, 64, 25, 0, 0, 0, 0, 0, 0, 50, 64, 32, 60, 10, 14, 8, 1, 17, 0, 0, 0, 0, 0, 0, 78, 64, 32, -76, 1]);
+
+const mProfile = decodeProfile.decode(dataProfile);
+Tool.printYellow("--- profile result is ---");
+
+console.log(mProfile);

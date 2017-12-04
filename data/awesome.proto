@@ -1,11 +1,6 @@
 package awesomepackage;
 syntax = "proto3";
 
-message AwesomeMessage{
-    string name = 1;
-    int32 id = 2;
-}
-
 message RegisterResponse {
 	string imei = 1;
 	string dyId = 2;
@@ -64,6 +59,14 @@ message BatchRating {
     string rating = 1;
     double weight = 2;
 }
+// message BatchYDetail{
+//     string rating =1;
+//     double item =2;
+//     int64 batchId = 3;
+//     string deviceId = 4;
+//     repeated BatchRating ratings = 5;
+//     int64 start_time = 6;
+// }
 
 message BatchDetail {
     int64 batchId = 1;

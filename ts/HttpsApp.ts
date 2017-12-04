@@ -52,7 +52,37 @@ export class HttpsApp {
         Tool.printBlue("https app constructor()");
     }
 
-    public put(inPath: string, objData: Uint8Array, token: string, callback: (err, buf) => void) {
+    public login(sn: string, callback: (err, buf) => void) {
+        const data: IfLogin = {
+            imei: sn,
+        };
+        Tool.printYellow(sn);
+        console.log(data);
+        console.log(JSON.stringify(data));
+
+        this.post("/login", JSON.stringify(data), callback);
+    }
+    public register(sn: string, token: string, callback: (err, buf) => void) {
+        this.get("/register/" + sn, token, callback);
+    }
+    public createBatch(arr: Uint8Array, token: string, callback: (err, buf) => void) {
+        // comment
+        this.put("/batch/device/create", arr, token, callback);
+    }
+    public updateBatch(arr: Uint8Array, token: string, callback: (err, buf) => void) {
+        // comment
+        this.put("/batch/device/update", arr, token, callback);
+    }
+    public getRecoProfile(arr: Uint8Array, token: string, callback: (err, buf) => void) {
+        // comment
+        this.put("/getRecoProfile", arr, token, callback);
+    }
+    public updateProfile(arr: Uint8Array, token: string, callback: (err, buf) => void) {
+        // comment
+        this.put("/profile/device", arr, token, callback);
+    }
+
+    private put(inPath: string, objData: Uint8Array, token: string, callback: (err, buf) => void) {
         // comment
         Tool.printYellow("----- PUT -----");
 
@@ -118,7 +148,7 @@ export class HttpsApp {
         req.end();
     }
 
-    public post(inPath: string, data: string, callback: (err, buf) => void) {
+    private post(inPath: string, data: string, callback: (err, buf) => void) {
 
         console.log("into post function");
 
@@ -167,7 +197,7 @@ export class HttpsApp {
         req.end();
     }
 
-    public get(inPath: string, token: string, callback: (err, buf) => void) {
+    private get(inPath: string, token: string, callback: (err, buf) => void) {
 
         const option: IfHttpsAuth = {
             hostname: this.HOSTNAME,
@@ -217,29 +247,4 @@ export class HttpsApp {
         req.end();
     }
 
-    public login(sn: string, callback: (err, buf) => void) {
-        const data: IfLogin = {
-            imei: sn,
-        };
-        Tool.printYellow(sn);
-        console.log(data);
-        console.log(JSON.stringify(data));
-
-        this.post("/login", JSON.stringify(data), callback);
-    }
-    public register(sn: string, token: string, callback: (err, buf) => void) {
-        this.get("/register/" + sn, token, callback);
-    }
-    public createBatch(sn: string, token: string, callback: (err, buf) => void) {
-        // comment
-    }
-    public updateBatch(sn: string, token: string, callback: (err, buf) => void) {
-        // comment
-    }
-    public getRecoProfile(sn: string, token: string, callback: (err, buf) => void) {
-        // comment
-    }
-    public updateProfile(sn: string, token: string, callback: (err, buf) => void) {
-        // comment
-    }
 }
