@@ -58,47 +58,8 @@ export class RunningHandle {
         this.bBakingFinished = false;  // 标志位
 
         this.emitter = new Events.EventEmitter();
-
-        // this.resetStatusEmpty(); // 初始化这些参数
-
-        Tool.print("RunningHandle init() end");
     }
-    // public getBakingStatus(): string {
-    //     // this.resetStatusEmpty();
 
-    //     if (this.getBakingElementList().length > 0) {
-    //         this.runningCurveInfo.CurrentStage = this.bakingCurve.indexBakingElement;
-    //         this.runningCurveInfo.CurrentStageRunningTime =
-    //             this.getBakingElementList()[this.getIndexBakingElement()].getTimeElapsed();
-    //     } else {
-    //         this.runningCurveInfo.CurrentStage = 0;
-    //         this.runningCurveInfo.CurrentStageRunningTime = 0;
-    //     }
-
-    //     const obj: IInfoCollect = {
-    //         BakingInfo: this.bakingInfo,
-    //         BaseSetting: this.baseSetting,
-    //         ResultInfo: this.resultInfo,
-    //         RunningCurveInfo: this.runningCurveInfo,
-    //         SysInfo: this.sysInfo,
-    //     };
-
-    //     return JSON.stringify(obj);
-    // }
-    public printStatus() {
-        // Tool.print("SysInfo:");
-        // Tool.print(this.sysInfo);
-        // Tool.print("BaseSetting:");
-        // Tool.print(this.baseSetting);
-        // Tool.print("BakingInfo:");
-        // Tool.print(this.bakingInfo);
-        // Tool.print("RunningCurveInfo:");
-        // Tool.print(this.runningCurveInfo);
-        // Tool.print("ResultInfo:");
-        // Tool.print(this.resultInfo);
-        // Tool.print("defaultCurve:");
-        // Tool.print(this.defaultCurve);
-    }
     public init(options) {
         Tool.print("AppBaking init({})");
         Tool.print("\nCheck local storage");
@@ -111,7 +72,7 @@ export class RunningHandle {
         const info: IInfoCollect = LocalStorage.loadBakingStatus();
 
         // check upperRack or lowerRack, GPIO status
-        Tool.print("Check upper\/lower rack position");
+        Tool.print("Check upper rack position");
 
         ControlPeriph.CheckUpperRack((data) => {
             if (data === 0) {
@@ -122,9 +83,6 @@ export class RunningHandle {
                 Tool.printRed("Wrong result checkupperRack");
             }
         });
-
-        Tool.print("Update sys settings");
-
         // configure bakingCurve parameters
         this.bakingCurve = new BakingCurve({
             curve: this.getRunningOption(
@@ -139,20 +97,26 @@ export class RunningHandle {
 
         if (info.SysInfo.bInRunning === RunningStatus.PAUSED) {
             this.runningStatus = RunningStatus.PAUSED;
+            info.SysInfo.bInRunning = RunningStatus.PAUSED;
             this.bBakingFinished = false;
-            return;
         } else if (info.SysInfo.bInRunning === RunningStatus.STOPPED) {
             this.runningStatus = RunningStatus.STOPPED;
+            info.SysInfo.bInRunning = RunningStatus.STOPPED;
             this.bBakingFinished = true;
-            return;
+
         } else if (info.SysInfo.bInRunning === RunningStatus.RUNNING) {
             this.runningStatus = RunningStatus.PAUSED;
+            info.SysInfo.bInRunning = RunningStatus.PAUSED;
             this.bBakingFinished = false;
-            return;
+
         } else if (info.SysInfo.bInRunning === RunningStatus.WAITING) {
             this.runningStatus = RunningStatus.WAITING;
+            info.SysInfo.bInRunning = RunningStatus.WAITING;
             this.bBakingFinished = false;
         }
+
+        Tool.printRed("check sysinfo bInrunning " + info.SysInfo.bInRunning + " " + this.runningStatus);
+
 
         RunningHandle.HistoryCounter = info.BakingInfo.HistoryCounter;
 
@@ -162,9 +126,13 @@ export class RunningHandle {
 
         // reset peripheral stage
         Tool.printYellow("Init peripheral status:");
+
+        Tool.printGreen("status:" + this.runningStatus);
+
         ControlPeriph.TurnOffBakingFire(() => {
             Tool.print("Turn off baking fire");
         });
+
         ControlPeriph.StopWindVent(() => {
             Tool.print("Stop wind vent");
         });
@@ -174,11 +142,12 @@ export class RunningHandle {
     public reset() {
 
         if (this.runningStatus === RunningStatus.STOPPED) {
-            this.runningStatus = RunningStatus.WAITING;
-            Tool.print("BakingProc: reset to Waiting mode");
 
             const info: IInfoCollect = LocalStorage.loadBakingStatus();
 
+            this.runningStatus = RunningStatus.WAITING;
+
+            Tool.print("BakingProc: reset to Waiting mode");
             info.SysInfo.bInRunning = RunningStatus.WAITING;
 
             // create the data/ new project directory
@@ -211,11 +180,10 @@ export class RunningHandle {
 
         if (this.runningStatus === RunningStatus.WAITING) {
             this.runningStatus = RunningStatus.RUNNING;
+            info.SysInfo.bInRunning = RunningStatus.RUNNING;
 
             info.RunningCurveInfo.CurrentStage = 0;
             info.RunningCurveInfo.CurrentStageRunningTime = 0;
-
-            info.SysInfo.bInRunning = RunningStatus.RUNNING;
 
         } else if (this.runningStatus === RunningStatus.PAUSED) {
             this.runningStatus = RunningStatus.RUNNING;

@@ -12,7 +12,6 @@ import { ControlGPS } from "./ControlGPS";
 import { ControlMcu } from "./ControlMcu";
 import { ControlPeriph } from "./ControlPeripheral";
 import { CommQT, IfMsgCmd, IfPacket, InfoType } from "./ControlQT";
-import { DecodePB } from "./DecodePB";
 import { HttpsApp, IfHttpsApp } from "./HttpsApp";
 import { JustTest } from "./JustTest";
 import { LocalStorage } from "./LocalStorage";
@@ -37,11 +36,6 @@ const mqttApp = new MqttApp({
     name: "a5de16f68b2d48098d601c885a3aa444/ruff_super_test",
     key: "7KokioMzX17dwj0tkZ2yVJ0GRdt71aAK5bCNCs2Y8Hk=",
     clientId: "curing_device_ruff_test",
-});
-
-const decoder = new DecodePB({
-    path: __dirname + "/../data/awesome.proto",
-    className: "awesomepackage.AwesomeMessage",
 });
 
 const option: IfHttpsApp = {
@@ -126,7 +120,7 @@ function main() {
             setInterval(() => {
                 commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
             }, Alarm.checkPeriod);
-        }, 2000);
+        }, 3000);
 
     });
 
@@ -160,7 +154,7 @@ function main() {
 
                     appBaking.timerTrap = setInterval(() => {
                         commQT.sendTrap(InfoType.Val_TrapBaking, appBaking.getTrapBaking());
-                    }, 5000);
+                    }, 3000);
 
                     commQT.sendSetResp(data.PacketId, data.Obj, "OK");
 
