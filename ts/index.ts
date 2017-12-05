@@ -120,7 +120,7 @@ function main() {
             setInterval(() => {
                 commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
             }, Alarm.checkPeriod);
-        }, 3000);
+        }, 1000);
 
     });
 
@@ -199,8 +199,19 @@ function main() {
                 } else if (appBaking.runningStatus === RunningStatus.STOPPED) {
                     clearInterval(appBaking.timerTrap);
                     Tool.printBlue("Clear timerTrap");
+                    Tool.printBlue("Already stopped");
 
                     commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
+                } else if (appBaking.runningStatus === RunningStatus.PAUSED) {
+                    clearInterval(appBaking.timerTrap);
+                    Tool.printBlue("Clear timerTrap");
+
+                    appBaking.stop();
+
+                    Tool.printBlue("App stopped");
+
+                    commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+
                 } else {
                     Tool.printRed("Should not respond to stop, state:" + appBaking.runningStatus);
 
@@ -336,6 +347,6 @@ function main() {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
-    }, 5000);
+    }, 2500);
 
 }

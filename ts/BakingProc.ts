@@ -244,7 +244,8 @@ export class RunningHandle {
     public stop() {
         const info: IInfoCollect = LocalStorage.loadBakingStatus();
 
-        if (this.runningStatus === RunningStatus.RUNNING) {
+        if (this.runningStatus === RunningStatus.RUNNING ||
+            this.runningStatus === RunningStatus.PAUSED) {
             this.runningStatus = RunningStatus.STOPPED;
 
             info.SysInfo.bInRunning = RunningStatus.STOPPED;
@@ -252,8 +253,6 @@ export class RunningHandle {
             // ????
             info.RunningCurveInfo.CurrentStage = 0;
             info.RunningCurveInfo.CurrentStageRunningTime = 0;
-
-            // this.saveRunningStatus();
 
             LocalStorage.saveBakingStatus(info);
 
