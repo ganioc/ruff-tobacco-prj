@@ -1,4 +1,14 @@
-import { IInfoCollect, RunningStatus } from "./BakingCfg";
+import * as fs from "fs";
+import * as path from "path";
+import { AppConfig } from "./AppConfig";
+
+import {
+    IfConfigFile,
+    IInfoCollect,
+    RunningStatus,
+} from "./BakingCfg";
+
+import { Tool } from "./utility";
 
 export interface IfTargetTemp {
     index: number;
@@ -7,19 +17,32 @@ export interface IfTargetTemp {
     lstDur: number[];
 }
 
-const ALARM_CHECKING_PERIOD: number = 5000;
+const objConfig: IfConfigFile = AppConfig.getAppConfig();
 
-const DRY_TEMP_ALARM_PERIOD: number = 30 * 60 * 1000;
-const DRY_TEMP_ALARM_LIMIT: number = 2;
+const alarmCfg = objConfig.baking_config.alarm_threshold;
 
-const DRY_TEMP_ALARM_PERIOD_2: number = 10 * 60 * 1000;
-const DRY_TEMP_ALARM_LIMIT_2: number = 4;
+const ALARM_CHECKING_PERIOD: number = alarmCfg.alarm_checking_period; // 5000;
 
-const WET_TEMP_ALARM_PERIOD: number = 10 * 60 * 1000;
-const WET_TEMP_ALARM_LIMIT: number = 2;
+const DRY_TEMP_ALARM_PERIOD: number = alarmCfg.dry_temp_alarm_period * 60 * 1000;
+// 30 * 60 * 1000;
 
-const MAX_TEMP: number = 70;
-const MIN_TEMP: number = 0;
+const DRY_TEMP_ALARM_LIMIT: number = alarmCfg.dry_temp_alarm_limit;
+// 2;
+
+const DRY_TEMP_ALARM_PERIOD_2: number = alarmCfg.dry_temp_alarm_period_2 * 60 * 1000;
+// 10 * 60 * 1000;
+const DRY_TEMP_ALARM_LIMIT_2: number = alarmCfg.dry_temp_alarm_limit_2;
+// 4;
+
+const WET_TEMP_ALARM_PERIOD: number = alarmCfg.wet_temp_alarm_period * 60 * 1000;
+// 10 * 60 * 1000;
+const WET_TEMP_ALARM_LIMIT: number = alarmCfg.wet_temp_alarm_limit;
+// 2;
+
+const MAX_TEMP: number = alarmCfg.max_temp;
+// 70;
+const MIN_TEMP: number = alarmCfg.min_temp;
+// 0;
 
 function isRunning(info: IInfoCollect): boolean {
     if (info.SysInfo.bInRunning === RunningStatus.PAUSED ||

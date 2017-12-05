@@ -1,10 +1,21 @@
 # See https://github.com/isaacs/node-glob
-
 test/**
-
 *.tar
 *.zip
-
 .*
-
 .DS_Store
+README.md
+doc/**
+ts/**
+tsconfig-test.json
+tslint.json
+tsconfig.json
+ruff_modules/protobufjs/cli/**
+ruff_modules/protobufjs/config/**
+ruff_modules/protobufjs/dist/**
+ruff_modules/protobufjs/ext/**
+ruff_modules/protobufjs/google/**
+ruff_modules/protobufjs/google/api/**
+ruff_modules/protobufjs/google/protobuf/**
+ruff_modules/protobufjs/node_modules/**
+

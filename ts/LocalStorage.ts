@@ -1,5 +1,6 @@
 import * as fs from "fs";
-import { IDefaultCurve } from "./BakingCfg";
+import * as path from "path";
+import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
 const APP_VERSION = "1.1.0";
@@ -10,12 +11,22 @@ const UI_VERSION = "1.0.0";
 import {
     IBakingInfo,
     IBaseSetting,
+    IDefaultCurve,
+    IfAlarmThreshold,
+    IfConfigFile,
+    IfQualityLevel,
+    IfTobaccoType,
     IInfoCollect,
     IResultInfo,
     IRunningCurveInfo,
     ISysInfo,
     RunningStatus,
 } from "./BakingCfg";
+// export interface IfDefaultCurve {
+//     dryList: number[][];
+//     wetList: number[][];
+//     durList: number[];
+// }
 
 const C_ROOT_DIR = "/home/root/baking";
 const C_DATA_DIR = "/data";
@@ -25,55 +36,14 @@ const C_FILE_LOG = "_baking.log"; // job started, job durationg, job time,
 // tabacco level , history data, at each directory
 const C_MACHINE_ID = "RUFF-0001";
 
+Tool.printGreen(path.dirname(__filename));
+
+const objConfig: IfConfigFile = AppConfig.getAppConfig();
+
 const DEFAULT_CURVE: IDefaultCurve = {
-    dryList: [
-        [36, 36],
-        [36, 38],
-        [38, 38],
-        [38, 40],
-        [40, 40],
-        [40, 42],
-        [42, 42],
-        [42, 46],
-        [46, 46],
-        [46, 48],
-        [48, 48],
-        [48, 50],
-        [50, 50],
-        [50, 54],
-        [54, 54],
-        [54, 60],
-        [60, 60],
-        [60, 68],
-        [68, 68],
-    ],
-    wetList: [
-        [34, 34],
-        [34, 36],
-        [36, 36],
-        [36, 37],
-        [37, 37],
-        [37, 37.5],
-        [37.5, 37.5],
-        [37.5, 38],
-        [38, 38],
-        [38, 38],
-        [38, 38],
-        [38, 38],
-        [39, 39],
-        [39, 39],
-        [39, 39],
-        [39, 40],
-        [40, 40],
-        [40, 42],
-        [42, 42],
-    ],
-    durList: [
-        2, 2, 15, 4, 2,
-        4, 2, 8, 4, 4,
-        2, 4, 2, 5, 5,
-        6, 2, 8, 12,
-    ],
+    dryList: objConfig.baking_config.default_curve.dryList,
+    wetList: objConfig.baking_config.default_curve.wetList,
+    durList: objConfig.baking_config.default_curve.durList,
 };
 
 export class LocalStorage {

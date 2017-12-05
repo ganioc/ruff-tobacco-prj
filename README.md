@@ -73,3 +73,7 @@ RunningHandle.timeDeltaCheckStatus ,  检查温度参数的时间间隔
 
 4)  风门的开合角度控制，也可以做类似的处理
 
+## 使用说明
+
+1. doc/configguide.md  配置文件说明
+2. doc/designguide.md 程序说明

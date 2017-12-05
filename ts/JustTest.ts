@@ -30,7 +30,7 @@ export class JustTest {
         }).then((val) => {
             Tool.printGreen("Test Temp and ADC ==>");
             return new Promise((resolve, reject) => {
-                ControlPeriph.fetchParams(this.comm, () => {
+                ControlPeriph.fetchParamsWithPromise(this.comm, () => {
                     resolve("OK");
                 });
             });

@@ -20,8 +20,8 @@ export enum RunningStatus {
 }
 
 export interface IDefaultCurve {
-    dryList: any[];
-    wetList: any[];
+    dryList: number[][];
+    wetList: number[][];
     durList: number[];
 }
 // confirmed by XX
@@ -187,4 +187,35 @@ export class Baking {
         }
     }
 
+}
+
+// For baing config file, app.json
+export interface IfTobaccoType {
+    name: string;
+    id: number;
+}
+export interface IfQualityLevel {
+    name: string;
+    id: number;
+}
+export interface IfAlarmThreshold {
+    max_temp: number;
+    min_temp: number;
+    alarm_checking_period: number;
+    dry_temp_alarm_period: number;
+    dry_temp_alarm_limit: number;
+    dry_temp_alarm_period_2: number;
+    dry_temp_alarm_limit_2: number;
+    wet_temp_alarm_period: number;
+    wet_temp_alarm_limit: number;
+}
+export interface IfConfigFile {
+    devices: any;
+    baking_config: {
+        default_curve: IDefaultCurve;
+        tobacco_type: IfTobaccoType[];
+        quality_level: IfQualityLevel[];
+        alarm_threshold: IfAlarmThreshold;
+        base_setting: IBaseSetting;
+    };
 }

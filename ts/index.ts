@@ -17,7 +17,6 @@ import { JustTest } from "./JustTest";
 import { LocalStorage } from "./LocalStorage";
 import { MqttApp } from "./MqttApp";
 import { Tool } from "./utility";
-import { YAsync } from "./yjasync";
 
 const appBaking = new RunningHandle(
     {
