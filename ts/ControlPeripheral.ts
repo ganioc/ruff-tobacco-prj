@@ -301,13 +301,13 @@ export class ControlPeriph {
                     const ADC6: number = parseFloat(data.content.slice(40, 48).toString());
                     const ADC7: number = parseFloat(data.content.slice(48, 56).toString());
 
-                    ControlPeriph.ADC1 = (ADC1 > 0.01 && ADC1 < 3.4) ? ADC1 : ControlPeriph.ADC1;
-                    ControlPeriph.ADC2 = (ADC2 > 0.01 && ADC2 < 3.4) ? ADC2 : ControlPeriph.ADC2;
-                    ControlPeriph.ADC3 = (ADC3 > 0.01 && ADC3 < 3.4) ? ADC3 : ControlPeriph.ADC3;
+                    ControlPeriph.ADC1 = (ADC1 >= 0.01 && ADC1 < 3.4) ? ADC1 : ControlPeriph.ADC1; // phaseA
+                    ControlPeriph.ADC2 = (ADC2 >= 0.01 && ADC2 < 3.4) ? ADC2 : ControlPeriph.ADC2; // phaseB
+                    ControlPeriph.ADC3 = (ADC3 >= 0.01 && ADC3 < 3.4) ? ADC3 : ControlPeriph.ADC3; // A+B
                     ControlPeriph.ADC4 = (ADC4 > 0.01 && ADC4 < 3.4) ? ADC4 : ControlPeriph.ADC4; // 220V voltage
-                    ControlPeriph.ADC5 = (ADC5 > 0.01 && ADC5 < 3.4) ? ADC5 : ControlPeriph.ADC5;
-                    ControlPeriph.ADC6 = (ADC6 > 0.01 && ADC6 < 3.4) ? ADC6 : ControlPeriph.ADC6;
-                    ControlPeriph.ADC7 = (ADC7 > 0.01 && ADC7 < 3.4) ? ADC7 : ControlPeriph.ADC7;
+                    ControlPeriph.ADC5 = (ADC5 >= 0.01 && ADC5 < 3.4) ? ADC5 : ControlPeriph.ADC5; // windgate I
+                    ControlPeriph.ADC6 = (ADC6 >= 0.01 && ADC6 < 3.4) ? ADC6 : ControlPeriph.ADC6; // MB 5V
+                    ControlPeriph.ADC7 = (ADC7 >= 0.01 && ADC7 < 3.4) ? ADC7 : ControlPeriph.ADC7; // Batt 4.5V
 
                     // ControlPeriph.ADC1 = ADC1;
                     // ControlPeriph.ADC2 = ADC2;
