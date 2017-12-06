@@ -117,7 +117,6 @@ export class RunningHandle {
 
         Tool.printRed("check sysinfo bInrunning " + info.SysInfo.bInRunning + " " + this.runningStatus);
 
-
         RunningHandle.HistoryCounter = info.BakingInfo.HistoryCounter;
 
         LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
@@ -441,7 +440,7 @@ export class RunningHandle {
             bWindGateHighSpeed: ControlPeriph.bWindGateHighSpeed, // true - hi speed, false - low speed
             bBurningGateOn: ControlPeriph.CheckBurningGate(),     // true - on, false - off
             bVentOn: (ControlPeriph.VentAngle > 0.01) ? true : false,
-            Voltage: ControlPeriph.ADC4 * 150,  // 电压值
+            Voltage: ControlPeriph.ADC4 * 87.2,  // 电压值
             Date: new Date().getTime(),  // 当前时间
 
             HistoryCounter: info.BakingInfo.HistoryCounter,
@@ -469,10 +468,22 @@ export class RunningHandle {
         // check wet temp
         obj.WetTempAlarm = Alarm.checkWetTemp(info, obj.PrimaryWetTemp, obj.PrimaryDryTemp);
 
+        obj.VoltageLowAlarm = Alarm.checkVoltageLow(ControlPeriph.ADC4 * 87.2);
+
+        obj.ACAlarmPhaseA = Alarm.checkPhaseA();  // 缺相告警
+
+        obj.ACAlarmPhaseB = Alarm.checkPhaseB();
+
+        obj.ACAlarmPhaseC = Alarm.checkPhaseC();
+
+        obj.GPRSAlarm = Alarm.checkGPRS();
+
+        obj.GPSAlarm = Alarm.checkGPS();
+
         // 燃烧门的状态
         obj.bBurningGateOn = ControlPeriph.bBurningGateOn;
         // 风门状态
-        obj.bVentOn = (ControlPeriph.VentAngle > 0.1) ? true : false;
+        obj.bVentOn = (ControlPeriph.VentAngle > 0.5) ? true : false;
 
         return obj;
     }

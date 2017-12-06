@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import { AppConfig } from "./AppConfig";
+import { ControlPeriph } from "./ControlPeripheral";
+import { LocalStorage } from "./LocalStorage";
 
 import {
     IfConfigFile,
@@ -16,6 +18,9 @@ export interface IfTargetTemp {
     lstTemp: number[][];
     lstDur: number[];
 }
+
+let gpsLastLatitude: number = 0;
+let gpsLastLongitude: number = 0;
 
 const objConfig: IfConfigFile = AppConfig.getAppConfig();
 
@@ -205,6 +210,50 @@ export class Alarm {
         }
         if (Alarm.dryTempCounter > Alarm.wetTempCounterMax) {
             return 1;
+        }
+
+        return 0;
+    }
+    public static checkVoltageLow(v: number): number {
+        if (v > 220 * 1.1 || v < 220 * 0.9) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    public static checkPhaseA(): number {
+        return 0;
+    }
+    public static checkPhaseB(): number {
+        return 0;
+    }
+    public static checkPhaseC(): number {
+        return 0;
+    }
+    public static checkGPRS(): number {
+        return 0;
+    }
+    public static checkGPS(): number {
+
+        if (ControlPeriph.gpsLatitude < 0.001 &&
+            ControlPeriph.gpsLongitude < 0.001) {
+            return 1;
+        } else if ((ControlPeriph.gpsLatitude - gpsLastLatitude) < 0.001 &&
+            (ControlPeriph.gpsLongitude - gpsLastLongitude) < 0.001) {
+            gpsLastLatitude = ControlPeriph.gpsLatitude;
+            gpsLastLongitude = ControlPeriph.gpsLongitude;
+        } else {
+            // open file, save it into sysinfo
+            gpsLastLatitude = ControlPeriph.gpsLatitude;
+            gpsLastLongitude = ControlPeriph.gpsLongitude;
+            // save it to file
+            const info: IInfoCollect = LocalStorage.loadBakingStatus();
+            info.BaseSetting.GPSInfo = {
+                Longitude: ControlPeriph.gpsLongitude,
+                Latitude: ControlPeriph.gpsLatitude,
+            };
+
+            LocalStorage.saveBakingStatus(info);
         }
 
         return 0;

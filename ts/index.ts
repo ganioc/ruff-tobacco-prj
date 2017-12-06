@@ -73,7 +73,7 @@ $.ready((error) => {
         Tool.printYellow("Go to main()");
         main();
         // test.test();
-    }, 3000);
+    }, 1000);
 
 });
 
@@ -112,14 +112,14 @@ function main() {
 
         setTimeout(() => {
             commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
-        }, 1000);
+        }, 10);
 
         // Housekeeping work, send current temp
         setTimeout(() => {
             setInterval(() => {
                 commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
-            }, Alarm.checkPeriod);
-        }, 1000);
+            }, 1000);
+        }, 10);
 
     });
 
@@ -248,12 +248,47 @@ function main() {
                     appBaking.reset();
                     Tool.print("App reseted");
 
+                    ControlPeriph.TurnOffRunningLED(() => {
+                        Tool.print("Turn off LED");
+                    });
+
                     commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
 
                     commQT.sendSetResp(data.PacketId, data.Obj, "OK");
 
                 } else {
                     Tool.printRed("Should not respond to reset, state:" + appBaking.runningStatus);
+
+                    commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
+
+                }
+
+                break;
+            case "resetdefault":
+                ControlPeriph.Buzzer();
+
+                Tool.print("App reset to default");
+
+                if (appBaking.runningStatus === RunningStatus.WAITING) {
+
+                    appBaking.ResetToDefault();
+
+                    appBaking.init({});
+
+                    Tool.print("App init");
+
+                    ControlPeriph.TurnOffRunningLED(() => {
+                        Tool.print("Turn off LED");
+                    });
+
+                    commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+
+                    commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
+
+
+
+                } else {
+                    Tool.printRed("Should not respond to resetdefault, state:" + appBaking.runningStatus);
 
                     commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
 
@@ -346,6 +381,6 @@ function main() {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
-    }, 2500);
+    }, 2000);
 
 }
