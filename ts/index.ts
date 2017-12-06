@@ -71,8 +71,9 @@ $.ready((error) => {
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        main();
+        // main();
         // test.test();
+        test.testHttps();
     }, 1000);
 
 });
@@ -284,8 +285,6 @@ function main() {
                     commQT.sendSetResp(data.PacketId, data.Obj, "OK");
 
                     commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
-
-
 
                 } else {
                     Tool.printRed("Should not respond to resetdefault, state:" + appBaking.runningStatus);

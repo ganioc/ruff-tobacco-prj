@@ -153,24 +153,24 @@ const mRecoProfile = {
     loadMaturityLv_4Percentage: 6,
 };
 
-// client.getRecoProfile(
-//     decodeRecoProfile.encode(mRecoProfile),
-//     TOKEN,
-//     (err, buf) => {
-//         // comments
-//         if (err) {
-//             console.log(err);
-//             return;
-//         }
-//         Tool.printYellow("---- got put ----");
-//         console.log(buf.length);
+client.getRecoProfile(
+    decodeRecoProfile.encode(mRecoProfile),
+    TOKEN,
+    (err, buf) => {
+        // comments
+        if (err) {
+            console.log(err);
+            return;
+        }
+        Tool.printYellow("---- got put ----");
+        console.log(buf.length);
 
-//         const objProfile = decodeProfile.decode(new Uint8Array(buf));
-//         Tool.printYellow("--------final recovered object");
-//         console.log(objProfile);
+        const objProfile = decodeProfile.decode(new Uint8Array(buf));
+        Tool.printYellow("--------final recovered object");
+        console.log(objProfile);
 
-//         Tool.printYellow("---- end of getRecoProfile ----");
-//     });
+        Tool.printYellow("---- end of getRecoProfile ----");
+    });
 
 const mBatchProfile = {
     batchId: 2419,
@@ -231,21 +231,21 @@ const mUpdateBatchDetail = {
     loadMaturityLv_4Percentage: 6,
 };
 
-client.updateBatch(
-    decodeBatchDetail.encode(mUpdateBatchDetail),
-    TOKEN,
-    (err, buf) => {
-        // comments
-        if (err) {
-            console.log(err);
-            return;
-        }
-        Tool.printYellow("---- got put ----");
-        console.log(buf.length);
+// client.updateBatch(
+//     decodeBatchDetail.encode(mUpdateBatchDetail),
+//     TOKEN,
+//     (err, buf) => {
+//         // comments
+//         if (err) {
+//             console.log(err);
+//             return;
+//         }
+//         Tool.printYellow("---- got put ----");
+//         console.log(buf.length);
 
-        const objProfile = decodeBatchSummary.decode(new Uint8Array(buf));
-        Tool.printYellow("--------final recovered object");
-        console.log(objProfile);
+//         const objProfile = decodeBatchSummary.decode(new Uint8Array(buf));
+//         Tool.printYellow("--------final recovered object");
+//         console.log(objProfile);
 
-        Tool.printYellow("---- end of getRecoProfile ----");
-    });
+//         Tool.printYellow("---- end of getRecoProfile ----");
+//     });

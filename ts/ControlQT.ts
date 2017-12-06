@@ -163,6 +163,8 @@ export class CommQT {
             msg = "pause";
         } else if (dataIn.Content.State === "reset") {
             msg = "reset";
+        } else if (dataIn.Content.State === "resetdefault") {
+            msg = "resetdefault";
         } else {
             throw new Error("Wrong running state cmd:" + dataIn.Content.State);
         }
