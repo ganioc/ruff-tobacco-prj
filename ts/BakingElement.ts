@@ -134,7 +134,7 @@ export class BakingElement {
                 ControlPeriph.TurnOffBakingFire(() => {
                     console.log("off");
                 });
-            }, this.timeDeltaCheckStatus * onPeriod);
+            }, this.timeDeltaCheckStatus * onPeriod + 100);
         }
     }
 

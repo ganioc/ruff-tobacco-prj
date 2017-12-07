@@ -71,9 +71,9 @@ $.ready((error) => {
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        // main();
+        main();
         // test.test();
-        test.testHttps();
+        // test.testHttps();
     }, 1000);
 
 });
@@ -113,14 +113,15 @@ function main() {
 
         setTimeout(() => {
             commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
-        }, 10);
+        }, 500);
 
         // Housekeeping work, send current temp
         setTimeout(() => {
-            setInterval(() => {
+
+            commQT.timer = setInterval(() => {
                 commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
             }, 1000);
-        }, 10);
+        }, 500);
 
     });
 
@@ -266,26 +267,34 @@ function main() {
 
                 break;
             case "resetdefault":
-                ControlPeriph.Buzzer();
+                ControlPeriph.Buzzer2();
 
                 Tool.print("App reset to default");
 
                 if (appBaking.runningStatus === RunningStatus.WAITING) {
 
+                    commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+
+                    // stop timer
+                    clearInterval(commQT.timer);
+
                     appBaking.ResetToDefault();
-
-                    appBaking.init({});
-
-                    Tool.print("App init");
 
                     ControlPeriph.TurnOffRunningLED(() => {
                         Tool.print("Turn off LED");
                     });
 
-                    commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+                    setTimeout(() => {
+                        appBaking.init({});
 
-                    commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
+                        Tool.print("App init");
+                        commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
 
+                        commQT.timer = setInterval(() => {
+                            commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
+                        }, 1000);
+
+                    }, 2000);
                 } else {
                     Tool.printRed("Should not respond to resetdefault, state:" + appBaking.runningStatus);
 

@@ -3,10 +3,10 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.1.2";
 // require("../package.json").version;
 
-const UI_VERSION = "1.0.0";
+const UI_VERSION = "1.0";
 
 import {
     IBakingInfo,
@@ -269,6 +269,9 @@ export class LocalStorage {
     }
     public static getAppVersion(): string {
         return APP_VERSION;
+    }
+    public static getUiVersion(): string {
+        return UI_VERSION;
     }
 }
 /*

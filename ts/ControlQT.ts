@@ -37,6 +37,7 @@ export class CommQT {
     public bConnected: boolean;
     public emitter: Events.EventEmitter;
     public DELAY_RECONNECT: number;
+    public timer: NodeJS.Timer;
     private client: net.Socket;
     private port: number;
     private getPacketId: () => {};

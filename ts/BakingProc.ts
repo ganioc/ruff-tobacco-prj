@@ -1,6 +1,8 @@
 // Baking curves
+import Spawn = require("child_process");
 import Events = require("events");
 import fs = require("fs");
+
 import { clearInterval, setInterval } from "timers";
 import * as _ from "underscore";
 import * as util from "util";
@@ -270,6 +272,8 @@ export class RunningHandle {
     }
     public loadSysInfo(): ISysInfo {
         const info: IInfoCollect = LocalStorage.loadBakingStatus();
+        info.SysInfo.AppVersion = LocalStorage.getAppVersion();
+        info.SysInfo.UIVersion = LocalStorage.getUiVersion();
         return info.SysInfo;
     }
     public loadRunningCurveInfo(): IRunningCurveInfo {
@@ -530,10 +534,27 @@ export class RunningHandle {
         }
 
         // remove baking directory
-        fs.rmdirSync(LocalStorage.getRootDir());
+        // fs.rmdirSync(LocalStorage.getRootDir());
+        const deleteFolderRecursive = (path) => {
+            let files = [];
+            if (fs.existsSync(path)) {
+                files = fs.readdirSync(path);
+                files.forEach((file, index) => {
+                    const curPath = path + "/" + file;
+                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                        deleteFolderRecursive(curPath);
+                    } else { // delete file
+                        fs.unlinkSync(curPath);
+                    }
+                });
+                fs.rmdirSync(path);
+            }
+        };
+        Tool.printRed("Delete:" + LocalStorage.getRootDir());
+        deleteFolderRecursive(LocalStorage.getRootDir());
 
         // Cause it to restart
-        throw new Error("Reset to Default State");
+        // throw new Error("Reset to Default State");
     }
 
     private getBakingElementList() {

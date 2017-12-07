@@ -126,6 +126,17 @@ export class ControlPeriph {
             }, 200);
         });
     }
+    public static Buzzer2() {
+        Tool.printBlue("Buzzer on");
+
+        ControlPeriph.TurnOnBuzzer(() => {
+            setTimeout(() => {
+                ControlPeriph.TurnOffBuzzer(() => {
+                    Tool.printBlue("Buzzer off");
+                });
+            }, 500);
+        });
+    }
     public static TurnOnBuzzer(cb) {
         $("#outBuzzer").turnOn(cb);
     }
