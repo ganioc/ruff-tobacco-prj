@@ -56,7 +56,7 @@ $.ready((error) => {
     Tool.printMagenta("App Begin");
     Tool.printMagenta("################\n");
 
-    Tool.readMachineSN();
+    Tool.readMachineSNFromRuffd();
     LocalStorage.loadAppVersion();
 
     Alarm.init();
@@ -74,6 +74,7 @@ $.ready((error) => {
         main();
         // test.test();
         // test.testHttps();
+        // test.testSN();
     }, 1000);
 
 });

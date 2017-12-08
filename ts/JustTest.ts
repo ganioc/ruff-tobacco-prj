@@ -372,4 +372,7 @@ export class JustTest {
                 Tool.printYellow("---- end of getRecoProfile ----");
             });
     }
+    public testSN() {
+        console.log(process.env.RUFF_SN);
+    }
 }

@@ -6,37 +6,42 @@ export class Tool {
 
     public static MachineSN: string;
 
-    public static readMachineSN() {
-
-        const proc = new Promise((resolve) => {
-            const ls = Spawn.spawn("cat", ["/sys/fsl_otp/HW_OCOTP_CFG0"]);
-
-            ls.stdout.on("data", (data) => {
-                console.log(data);
-                this.MachineSN = parseInt(data.toString().slice(2, 10), 16).toString();
-                Tool.printYellow("MachineSN:" + this.MachineSN);
-            });
-            ls.on("exit", (code) => {
-                Tool.print("MachineID exit:" + code);
-                resolve("next SN");
-            });
-        });
-
-        proc.then((msg) => {
-            const ls = Spawn.spawn("cat", ["/sys/fsl_otp/HW_OCOTP_CFG1"]);
-
-            ls.stdout.on("data", (data) => {
-                console.log(data);
-                this.MachineSN = this.MachineSN + parseInt(data.toString().slice(2, 10), 16).toString();
-                Tool.printYellow("MachineSN:" + this.MachineSN);
-
-            });
-            ls.on("exit", (code) => {
-                Tool.print("MachineID exit:" + code);
-            });
-        });
-
+    public static readMachineSNFromRuffd() {
+        this.MachineSN = process.env.RUFF_SN;
+        Tool.printYellow(this.MachineSN);
     }
+
+    // public static readMachineSN() {
+
+    //     const proc = new Promise((resolve) => {
+    //         const ls = Spawn.spawn("cat", ["/sys/fsl_otp/HW_OCOTP_CFG0"]);
+
+    //         ls.stdout.on("data", (data) => {
+    //             console.log(data);
+    //             this.MachineSN = parseInt(data.toString().slice(2, 10), 16).toString();
+    //             Tool.printYellow("MachineSN:" + this.MachineSN);
+    //         });
+    //         ls.on("exit", (code) => {
+    //             Tool.print("MachineID exit:" + code);
+    //             resolve("next SN");
+    //         });
+    //     });
+
+    //     proc.then((msg) => {
+    //         const ls = Spawn.spawn("cat", ["/sys/fsl_otp/HW_OCOTP_CFG1"]);
+
+    //         ls.stdout.on("data", (data) => {
+    //             console.log(data);
+    //             this.MachineSN = this.MachineSN + parseInt(data.toString().slice(2, 10), 16).toString();
+    //             Tool.printYellow("MachineSN:" + this.MachineSN);
+
+    //         });
+    //         ls.on("exit", (code) => {
+    //             Tool.print("MachineID exit:" + code);
+    //         });
+    //     });
+
+    // }
 
     public static printCust(option: string, str: any) {
         console.log(option, str);

@@ -3,7 +3,7 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.1.2";
+const APP_VERSION = "1.1.3";
 // require("../package.json").version;
 
 const UI_VERSION = "1.0";
