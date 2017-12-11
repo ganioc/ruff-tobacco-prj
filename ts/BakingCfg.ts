@@ -33,6 +33,8 @@ export interface ISysInfo {
     // TobaccoType: string; // 烟叶种类
     AppVersion: string;
     UIVersion: string;
+    TobaccoType: IfTobaccoType[];
+    QualityLevel: IfQualityLevel[];
 }
 export interface IGPSInfo {
     Longitude: number;

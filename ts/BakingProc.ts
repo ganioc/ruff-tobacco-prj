@@ -7,6 +7,7 @@ import { clearInterval, setInterval } from "timers";
 import * as _ from "underscore";
 import * as util from "util";
 import { Alarm } from "./Alarm";
+import { AppConfig } from "./AppConfig";
 import {
     IBakingInfo, IBaseSetting, IDefaultCurve, IInfoCollect,
     IResultInfo, IRunningCurveInfo, IRunningOption, ISettingCurveInfo,
@@ -50,7 +51,7 @@ export class RunningHandle {
 
         this.runningStatus = RunningStatus.WAITING;  // default status is "waiting"
 
-        RunningHandle.HistoryCounter = 0; // default 0
+        RunningHandle.HistoryCounter = 1; // default = 1
 
         this.bakingCurve = new BakingCurve({  // init current baking curve
             curve: [],
@@ -73,6 +74,26 @@ export class RunningHandle {
         // Read IInfo stored on disk
         const info: IInfoCollect = LocalStorage.loadBakingStatus();
 
+        // ----------read from app.json config file ----------
+        // read parameters from App.json, AppConfig
+        const appConfig = AppConfig.getAppConfig();
+
+        info.SysInfo.TobaccoType = appConfig.baking_config.tobacco_type;
+        info.SysInfo.QualityLevel = appConfig.baking_config.quality_level;
+
+        // update version number
+        info.SysInfo.AppVersion = LocalStorage.getAppVersion();
+        info.SysInfo.UIVersion = LocalStorage.getUiVersion();
+
+        info.RunningCurveInfo.TempCurveDryList =
+            appConfig.baking_config.default_curve.dryList;
+        info.RunningCurveInfo.TempCurveWetList =
+            appConfig.baking_config.default_curve.wetList;
+        info.RunningCurveInfo.TempDurationList =
+            appConfig.baking_config.default_curve.durList;
+
+        // ---------- read from app.json End ----------
+
         // check upperRack or lowerRack, GPIO status
         Tool.print("Check upper rack position");
 
@@ -85,6 +106,7 @@ export class RunningHandle {
                 Tool.printRed("Wrong result checkupperRack");
             }
         });
+
         // configure bakingCurve parameters
         this.bakingCurve = new BakingCurve({
             curve: this.getRunningOption(
@@ -272,8 +294,8 @@ export class RunningHandle {
     }
     public loadSysInfo(): ISysInfo {
         const info: IInfoCollect = LocalStorage.loadBakingStatus();
-        info.SysInfo.AppVersion = LocalStorage.getAppVersion();
-        info.SysInfo.UIVersion = LocalStorage.getUiVersion();
+        // info.SysInfo.AppVersion = LocalStorage.getAppVersion();
+        // info.SysInfo.UIVersion = LocalStorage.getUiVersion();
         return info.SysInfo;
     }
     public loadRunningCurveInfo(): IRunningCurveInfo {

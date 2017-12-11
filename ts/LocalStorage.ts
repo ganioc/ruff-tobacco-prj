@@ -85,6 +85,9 @@ export class LocalStorage {
     }
     */
     public static initSysInfo(): ISysInfo {
+        // Get info from app.json file
+        const appConfig = AppConfig.getAppConfig();
+
         return {
             Date: new Date().getTime(),
             bInRunning: RunningStatus.WAITING,
@@ -92,21 +95,24 @@ export class LocalStorage {
             HistoryCounter: 1,
             AppVersion: APP_VERSION,
             UIVersion: UI_VERSION,
+            TobaccoType: appConfig.baking_config.tobacco_type,
+            QualityLevel: appConfig.baking_config.quality_level,
         };
     }
     public static initBaseSetting(): IBaseSetting {
+
         return {
             AirFlowPattern: "fall",
-            ControllerName: "No Name",
+            ControllerName: "No-Name",
             GPSInfo: { Longitude: 0, Latitude: 0 },
             InnerHeight: 3,
             WallMaterial: 0,
-            LocName: "Some Place",
+            LocName: "Some-Place",
         };
     }
     public static initBakingInfo(): IBakingInfo {
         return {
-            TobaccoType: 0,
+            TobaccoType: 1,
             HistoryCounter: 1, // default is 1
             LoadingMethod: 1,
             LowerWeight: 0,
@@ -118,7 +124,7 @@ export class LocalStorage {
             MiddleWeight: 0,
             PieceQuantity: 1,
             PieceWeight: 0,
-            Quality: 3,
+            Quality: 1,
             UpperWeight: 0,
             bTempForUpperRack: false, // 是上棚吗?
         };
@@ -211,7 +217,7 @@ export class LocalStorage {
         if (fs.existsSync(LocalStorage.getDataDirec())) {
             Tool.print("Already exist: ");
         } else {
-            Tool.print("Not exist: ");
+            Tool.print("baking/data/ Not exist, create it: ");
             fs.mkdirSync(LocalStorage.getDataDirec());
         }
 

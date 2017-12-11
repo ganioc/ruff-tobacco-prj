@@ -97,8 +97,6 @@ function main() {
     // This is the mqtt client
     // mqttApp.start();
 
-    gps.start();
-
     // Task init, very important
     appBaking.init({});
 
