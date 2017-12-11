@@ -3,7 +3,9 @@ const TCP_PORT = 50001; // for QT Server
 import Spawn = require("child_process");
 import Events = require("events");
 import net = require("net");
+import { setInterval } from "timers";
 import { inspect } from "util";
+import { ObjType } from "./BakingCfg";
 import { Tool } from "./utility";
 
 // import spawn = require('child_process').spawn;
@@ -32,6 +34,12 @@ export interface IfMsgCmd {
     data: IfPacket;
 }
 
+export interface IfSession {
+    callback: (err, data) => void;
+    packetId: number;
+    timeStamp: number; // ms, 毫秒
+}
+
 // For socket communication with QT Server
 export class CommQT {
     public bConnected: boolean;
@@ -40,9 +48,13 @@ export class CommQT {
     public timer: NodeJS.Timer;
     private client: net.Socket;
     private port: number;
-    private getPacketId: () => {};
+    private getPacketId: () => number;
     private pidQT: number;
     private subprocess: Spawn.ChildProcess;
+
+    // for trapresponse handling
+    private sessionLst: IfSession[];
+    private timerSession: NodeJS.Timer;
 
     constructor(option) {
         this.bConnected = false;
@@ -76,6 +88,10 @@ export class CommQT {
         setTimeout(() => {
             this.start();
         }, 1000);
+
+        // check sessionLst
+        clearInterval(this.timerSession);
+
     }
     public start() {
 
@@ -114,21 +130,62 @@ export class CommQT {
             Tool.print("Disconnected from server");
             this.emitter.emit("end", {});
         });
+
+        // check session list
+        this.timerSession = setInterval(() => {
+            this.checkSession();
+        }, 1000);
+
     }
     public write(data: string) {
         Tool.printMagenta("QT.write:-->");
         Tool.print(data);
         this.client.write(data);
     }
+    public sendQuery(header: string, text: string, type: number, cb: (err, data) => void) {
+        const tuple: IfPacket = this.sendTrap(ObjType.TrapYesNo,
+            {
+                TextHeader: header,
+                Text: text,
+                Type: type,
+                Reply: "",
+            });
+        const session: IfSession = {
+            callback: cb,
+            packetId: tuple.PacketId,
+            timeStamp: new Date().getTime(),
+        };
+        this.pushSession(session);
+    }
+    // 显示yes/no对话框
+    public sendQueryYesNo(header: string, text: string, cb: (err, data) => void) {
+        this.sendQuery(header, text, 1, cb);
+    }
+    // 显示OK确认对话框
+    public sendQueryOk(header: string, text: string, cb: (err, data) => void) {
+        this.sendQuery(header, text, 2, cb);
+    }
+    // 显示对话框
+    public sendQuickDlg(header: string, text: string, cb: (err, data) => void) {
+        this.sendQuery(header, text, 3, cb);
+    }
 
-    public sendTrap(obj: number, objContent: any) {
-        const tuple = {} as any;
+    // 显示对话框
+    public sendSlowDlg(header: string, text: string, cb: (err, data) => void) {
+        this.sendQuery(header, text, 4, cb);
+    }
 
-        tuple.PacketId = this.getPacketId();
-        tuple.PacketType = "Trap";
-        tuple.Obj = obj;
-        tuple.Content = objContent;
+    public sendTrap(obj: number, objContent: any): IfPacket {
+        const tuple: IfPacket = {
+            PacketId: this.getPacketId(),
+            PacketType: "Trap",
+            Obj: obj,
+            Content: objContent,
+        };
+
         this.write(JSON.stringify(tuple));
+
+        return tuple;
     }
 
     public sendGetResp(packetId: number, obj: number, objContent: any) {
@@ -224,8 +281,51 @@ export class CommQT {
             this.parseGet(data);
         } else if (data.PacketType.toLowerCase() === "set") {
             this.parseSet(data);
+        } else if (data.PacketType.toLowerCase() === "trapresp") {
+            this.parseTrapResp(data);
         } else {
             Tool.printRed("Wrong PacketType:" + data.PacketType);
+        }
+    }
+    private parseTrapResp(data: IfPacket) {
+        // Find the task which is waiting ,and response
+        for (const ele of this.sessionLst) {
+            if (ele.packetId === data.PacketId) {
+                ele.callback(null, data);
+                this.popSession(ele);
+                return;
+            }
+        }
+        Tool.printRed("Can not find session for:");
+        console.log(data);
+    }
+    private popSession(ele: IfSession) {
+        let i: number = 0;
+        for (i; i < this.sessionLst.length; i++) {
+            if (this.sessionLst[i].packetId === ele.packetId) {
+                break;
+            }
+        }
+        if (i >= this.sessionLst.length) {
+            Tool.printRed("Can not pop session in sessionLst:");
+            console.log(ele);
+        } else {
+            this.sessionLst.splice(i, 1);
+        }
+    }
+    private pushSession(session: IfSession) {
+        this.sessionLst.push(session);
+    }
+    private checkSession() {
+        // if timeout then remove it from the list
+        const stamp = new Date().getTime();
+
+        for (const ele of this.sessionLst) {
+            if ((stamp - ele.timeStamp) > 3000) {
+                ele.callback("timeout", null);
+                this.popSession(ele);
+                return;
+            }
         }
     }
 }

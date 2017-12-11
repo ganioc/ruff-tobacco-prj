@@ -122,6 +122,20 @@ function main() {
             }, 1000);
         }, 500);
 
+        setTimeout(() => {
+            commQT.sendQuickDlg(
+                "Test",
+                "这是一个对话框的测试",
+                (err, data: IfPacket) => {
+                    if (err) {
+                        Tool.printRed("session timeout");
+                        return;
+                    }
+                    Tool.printBlink(JSON.stringify(data));
+                },
+            );
+        }, 2000);
+
     });
 
     commQT.emitter.on("end", () => {

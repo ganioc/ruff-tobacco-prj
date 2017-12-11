@@ -1,6 +1,20 @@
 /**
  */
 
+export enum ObjType {
+    SysInfo = 10,
+    SettingCurveInfo,
+    RunningCurveInfo,
+    ResultInfo,
+    TrapInfo,
+    RunningState,
+    BakingInfo,
+    BaseSetting,
+    TrapBaking,
+    TrapUpdateCurve,
+    TrapYesNo,  // 20
+}
+
 export enum BakingType {
     SEGMENT = 1,
     SLOPE,
