@@ -496,11 +496,13 @@ export class RunningHandle {
 
         obj.VoltageLowAlarm = Alarm.checkVoltageLow(ControlPeriph.ADC4 * 87.2);
 
-        obj.ACAlarmPhaseA = Alarm.checkPhaseA();  // 缺相告警
+        obj.ACAlarmPhaseA = Alarm.checkPhaseA(ControlPeriph.ADC1,
+            ControlPeriph.ADC2,
+            ControlPeriph.ADC3);  // 缺相告警
 
-        obj.ACAlarmPhaseB = Alarm.checkPhaseB();
+        obj.ACAlarmPhaseB = 0;
 
-        obj.ACAlarmPhaseC = Alarm.checkPhaseC();
+        obj.ACAlarmPhaseC = 0;
 
         obj.GPRSAlarm = Alarm.checkGPRS();
 

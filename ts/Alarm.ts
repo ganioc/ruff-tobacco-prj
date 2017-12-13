@@ -221,7 +221,16 @@ export class Alarm {
             return 0;
         }
     }
-    public static checkPhaseA(): number {
+    public static checkPhaseA(vA: number, vB: number, vAplusB: number): number {
+
+        if (vA < 0.5 || vB < 0.5) {
+            return 1;
+        }
+
+        if (vA > 1.5 || vB > 1.5 || vAplusB > 3) {
+            return 1;
+        }
+
         return 0;
     }
     public static checkPhaseB(): number {
@@ -231,11 +240,16 @@ export class Alarm {
         return 0;
     }
     public static checkGPRS(): number {
+
+        if (ControlPeriph.vGPRSSignal <= 0) {
+            return 1;
+        }
+
         return 0;
     }
     public static checkGPS(): number {
 
-        if (ControlPeriph.gpsLatitude < 0.001 &&
+        if (ControlPeriph.gpsLatitude < 0.001 ||
             ControlPeriph.gpsLongitude < 0.001) {
             return 1;
         } else if ((ControlPeriph.gpsLatitude - gpsLastLatitude) < 0.001 &&

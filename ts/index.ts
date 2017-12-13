@@ -72,13 +72,15 @@ $.ready((error) => {
 
     gps.start();
 
+    gprs.start();
+
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        // main();
+        main();
         // test.test();
         // test.testHttps();
         // test.testSN();
-        test.testGPRS(gprs);
+        // test.testGPRS(gprs);
     }, 1000);
 
 });
@@ -400,7 +402,7 @@ function main() {
     });
 
     /***************************************************************
-     *
+     * Background task
     */
     setInterval(() => {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
