@@ -29,7 +29,7 @@ export class BakingElement {
         if (!options.duration) {
             throw new Error("BakingElement duration not defined");
         }
-        this.duration = options.duration * 60; // in seconds
+        this.duration = options.duration * 60 * 60; // in seconds, Modified to hours by Yang Jun , 2017-12-12
         this.tempLogs = [];
         this.timeDeltaCheckStatus = options.timeDelta;
         this.moistureType = options.moistureType;

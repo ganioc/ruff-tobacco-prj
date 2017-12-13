@@ -9,6 +9,7 @@
         "vdd-1": "power/vdd-1",
         "uart-2": "uart-2/uart",
         "uart-s0": "uart-s0/uart",
+        "uart-mux1": "uart-mux1/uart",
         "gpio-164": "gpio-164/gpio",
         "gpio-165": "gpio-165/gpio",
         "gpio-196": "gpio-196/gpio",
@@ -542,6 +543,24 @@
                     "type": "string",
                     "args": {
                         "path": "/dev/ttyS0"
+                    }
+                }
+            },
+            "outputs": {
+                "uart": {
+                    "type": "uart"
+                }
+            }
+        },
+        {
+            "id": "uart-mux1",
+            "model": "ruff-sys-uart",
+            "driver": "sys-uart",
+            "inputs": {
+                "device": {
+                    "type": "string",
+                    "args": {
+                        "path": "/dev/mux1"
                     }
                 }
             },

@@ -42,6 +42,8 @@ export class ControlPeriph {
     public static vHiLowWindEngine: number;
     public static bWindGateHighSpeed: boolean;
 
+    public static vGPRSSignal: number;
+
     // default value when power on
     public static init(option: IfControlPeriphOption) {
         ControlPeriph.bBurningGateOn = false;
@@ -81,6 +83,8 @@ export class ControlPeriph {
         ControlPeriph.temp2 = 0;
         ControlPeriph.temp3 = 0;
         ControlPeriph.temp4 = 0;
+
+        ControlPeriph.vGPRSSignal = 0;
     }
 
     public static CheckUpperRack(callback) {

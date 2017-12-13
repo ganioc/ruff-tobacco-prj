@@ -7,8 +7,9 @@ import * as _ from "underscore";
 import { Alarm } from "./Alarm";
 import { IInfoCollect, RunningStatus } from "./BakingCfg";
 import { RunningHandle } from "./BakingProc";
-
+import { ControlGPRS } from "./ControlGPRS";
 import { ControlGPS } from "./ControlGPS";
+
 import { ControlMcu } from "./ControlMcu";
 import { ControlPeriph } from "./ControlPeripheral";
 import { CommQT, IfMsgCmd, IfPacket, InfoType } from "./ControlQT";
@@ -26,6 +27,8 @@ const appBaking = new RunningHandle(
 const commQT = new CommQT({});
 
 const gps = new ControlGPS();
+
+const gprs = new ControlGPRS();
 
 const commMCU = new ControlMcu();
 
@@ -71,10 +74,11 @@ $.ready((error) => {
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        main();
+        // main();
         // test.test();
         // test.testHttps();
         // test.testSN();
+        test.testGPRS(gprs);
     }, 1000);
 
 });
@@ -402,6 +406,6 @@ function main() {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
-    }, 2000);
+    }, 2500);
 
 }

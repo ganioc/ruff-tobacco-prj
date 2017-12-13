@@ -3,10 +3,10 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.1.3";
+const APP_VERSION = "1.1.5";
 // require("../package.json").version;
 
-const UI_VERSION = "1.0";
+const UI_VERSION = "1.1";
 
 import {
     IBakingInfo,

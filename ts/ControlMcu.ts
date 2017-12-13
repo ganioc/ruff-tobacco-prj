@@ -149,13 +149,17 @@ export class ControlMcu {
 
                     indexBuf = 0;
                 } else {
-                    Tool.print("MatchHeader fail:");
+                    Tool.printRed("MatchHeader fail:");
+                    Tool.printRed("length:" + indexBuf);
                     for (let j = 0; j < indexBuf; j++) {
                         Tool.print(buf[j]);
                     }
+                    indexBuf = 0;
                 }
-            } else {
+            } else if (indexBuf < 128) {
                 buf[indexBuf++] = data[i];
+            } else {
+                indexBuf = 0;
             }
 
         }

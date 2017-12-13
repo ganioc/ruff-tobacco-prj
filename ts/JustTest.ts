@@ -3,7 +3,9 @@ import * as  https from "https";
 
 import { Promise } from "promise";
 import { inspect } from "util";
+import { ControlGPRS } from "./ControlGPRS";
 import { ControlMcu } from "./ControlMcu";
+
 import { ControlPeriph } from "./ControlPeripheral";
 
 import { DecodePB, IfBatchDetail, IfBatchRating, IfRecoProfileRequest } from "./DecodePB";
@@ -374,5 +376,9 @@ export class JustTest {
     }
     public testSN() {
         console.log(process.env.RUFF_SN);
+    }
+    public testGPRS(gprs: ControlGPRS) {
+
+        gprs.start();
     }
 }

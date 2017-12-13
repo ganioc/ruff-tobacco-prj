@@ -71,6 +71,9 @@ export class CommQT {
             };
 
         })();
+
+        this.sessionLst = [];
+        this.timerSession = undefined;
     }
     public exit() {
         // kill the qt process
@@ -320,6 +323,9 @@ export class CommQT {
         // if timeout then remove it from the list
         const stamp = new Date().getTime();
 
+        if (this.sessionLst.length < 1) {
+            return;
+        }
         for (const ele of this.sessionLst) {
             if ((stamp - ele.timeStamp) > 3000) {
                 ele.callback("timeout", null);
