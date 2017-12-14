@@ -242,6 +242,24 @@ export class LocalStorage {
                 LocalStorage.strInitDefaultCurve());
         }
     }
+    public static loadBakingStatusAsync(callback: (err, o: IInfoCollect) => void) {
+        fs.readFile(LocalStorage.getStatusFileDirec(), (err, data) => {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            let obj: any;
+            try {
+                obj = JSON.parse(data.toString());
+            } catch (e) {
+                Tool.printRed("loadBakingStatus error");
+                Tool.printRed(e);
+                callback(e, null);
+                return;
+            }
+            callback(null, obj);
+        });
+    }
     public static loadBakingStatus(): IInfoCollect {
         // read it from the disk
         const data = fs.readFileSync(LocalStorage.getStatusFileDirec());
@@ -254,6 +272,19 @@ export class LocalStorage {
             return undefined;
         }
         return obj;
+    }
+    public static saveBakingStatusAsync(obj: IInfoCollect, callback: (err, data) => void) {
+        Tool.printYellow("saveBakingStatus");
+
+        fs.writeFile(LocalStorage.getStatusFileDirec(), JSON.stringify(obj), (err) => {
+            if (err) {
+                Tool.printRed("saveBakingStatus error");
+                callback(err, null);
+                return;
+            }
+            Tool.printBlue("saveBakingStatus OK");
+            callback(null, "OK");
+        });
     }
     public static saveBakingStatus(obj: IInfoCollect) {
         Tool.print("saveBakingStatus");

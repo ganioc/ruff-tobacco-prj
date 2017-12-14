@@ -2,8 +2,8 @@
 import Spawn = require("child_process");
 import Events = require("events");
 import fs = require("fs");
-
-import { clearInterval, setInterval } from "timers";
+import { Promise } from "promise";
+import { clearInterval, setInterval, setTimeout } from "timers";
 import * as _ from "underscore";
 import * as util from "util";
 import { Alarm } from "./Alarm";
@@ -196,56 +196,133 @@ export class RunningHandle {
             Tool.print("BakingProc: reset no function in mode - " + this.runningStatus);
         }
     }
+    // public start() {
+    //     Tool.print("BakingProc: Into start()");
+
+    //     let info: IInfoCollect = LocalStorage.loadBakingStatus();
+
+    //     if (this.runningStatus === RunningStatus.WAITING) {
+    //         this.runningStatus = RunningStatus.RUNNING;
+    //         info.SysInfo.bInRunning = RunningStatus.RUNNING;
+
+    //         info.RunningCurveInfo.CurrentStage = 0;
+    //         info.RunningCurveInfo.CurrentStageRunningTime = 0;
+
+    //     } else if (this.runningStatus === RunningStatus.PAUSED) {
+    //         this.runningStatus = RunningStatus.RUNNING;
+
+    //         info.SysInfo.bInRunning = RunningStatus.RUNNING;
+    //     } else {
+    //         return;
+    //     }
+
+    //     Tool.print("BakingProc: resetStage");
+    //     Tool.print("BakingProc: stage " + info.RunningCurveInfo.CurrentStage);
+    //     Tool.print("BakingProc: elapsed time " + info.RunningCurveInfo.CurrentStageRunningTime);
+
+    //     this.bakingCurve.resetStage(
+    //         info.RunningCurveInfo.CurrentStage,
+    //         info.RunningCurveInfo.CurrentStageRunningTime,
+    //     );
+
+    //     this.bBakingFinished = false;
+
+    //     LocalStorage.saveBakingStatus(info);
+
+    //     Tool.print("timeDeltaCheckStatus: " + RunningHandle.timeDeltaCheckStatus + " seconds");
+
+    //     // Added by Yang Jun, 2017-12-14
+    //     clearInterval(this.timerHandler);
+
+    //     this.timerHandler = setInterval(() => {
+
+    //         this.checkStatus();
+
+    //         info = LocalStorage.loadBakingStatus();
+
+    //         info.RunningCurveInfo.CurrentStage = this.bakingCurve.indexBakingElement;
+    //         info.RunningCurveInfo.CurrentStageRunningTime = this.bakingCurve.getCurrentStageElapsedTime();
+
+    //         LocalStorage.saveBakingStatus(info);
+
+    //     }, RunningHandle.timeDeltaCheckStatus);
+    // }
     public start() {
-        Tool.print("BakingProc: Into start()");
+        this.startInAsync();
+    }
 
-        let info: IInfoCollect = LocalStorage.loadBakingStatus();
+    public startInAsync() {
+        let info: IInfoCollect;
 
-        if (this.runningStatus === RunningStatus.WAITING) {
-            this.runningStatus = RunningStatus.RUNNING;
-            info.SysInfo.bInRunning = RunningStatus.RUNNING;
+        const proc = new Promise((resolve, reject) => {
+            Tool.printGreen("Start In Async mode ==>");
+            setTimeout(() => { resolve("OK"); }, 120);
 
-            info.RunningCurveInfo.CurrentStage = 0;
-            info.RunningCurveInfo.CurrentStageRunningTime = 0;
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                info = LocalStorage.loadBakingStatus();
+                resolve("OK");
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                if (this.runningStatus === RunningStatus.WAITING) {
+                    this.runningStatus = RunningStatus.RUNNING;
+                    info.SysInfo.bInRunning = RunningStatus.RUNNING;
 
-        } else if (this.runningStatus === RunningStatus.PAUSED) {
-            this.runningStatus = RunningStatus.RUNNING;
+                    info.RunningCurveInfo.CurrentStage = 0;
+                    info.RunningCurveInfo.CurrentStageRunningTime = 0;
 
-            info.SysInfo.bInRunning = RunningStatus.RUNNING;
-        } else {
-            return;
-        }
+                } else if (this.runningStatus === RunningStatus.PAUSED) {
+                    this.runningStatus = RunningStatus.RUNNING;
 
-        Tool.print("BakingProc: resetStage");
-        Tool.print("BakingProc: stage " + info.RunningCurveInfo.CurrentStage);
-        Tool.print("BakingProc: elapsed time " + info.RunningCurveInfo.CurrentStageRunningTime);
+                    info.SysInfo.bInRunning = RunningStatus.RUNNING;
+                } else {
+                    reject("NOK");
+                }
 
-        this.bakingCurve.resetStage(
-            info.RunningCurveInfo.CurrentStage,
-            info.RunningCurveInfo.CurrentStageRunningTime,
-        );
+                Tool.print("BakingProc: resetStage");
+                Tool.print("BakingProc: stage " + info.RunningCurveInfo.CurrentStage);
+                Tool.print("BakingProc: elapsed time " + info.RunningCurveInfo.CurrentStageRunningTime);
+                resolve("OK");
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                this.bakingCurve.resetStage(
+                    info.RunningCurveInfo.CurrentStage,
+                    info.RunningCurveInfo.CurrentStageRunningTime,
+                );
 
-        this.bBakingFinished = false;
+                this.bBakingFinished = false;
+                resolve("OK");
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                LocalStorage.saveBakingStatus(info);
+                resolve("OK");
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                Tool.print("timeDeltaCheckStatus: " + RunningHandle.timeDeltaCheckStatus + " seconds");
 
-        LocalStorage.saveBakingStatus(info);
+                // Added by Yang Jun, 2017-12-14
+                clearInterval(this.timerHandler);
 
-        Tool.print("timeDeltaCheckStatus: " + RunningHandle.timeDeltaCheckStatus + " seconds");
+                this.timerHandler = setInterval(() => {
 
-        // Added by Yang Jun, 2017-12-14
-        clearInterval(this.timerHandler);
+                    this.checkStatus();
 
-        this.timerHandler = setInterval(() => {
+                    info = LocalStorage.loadBakingStatus();
 
-            this.checkStatus();
+                    info.RunningCurveInfo.CurrentStage = this.bakingCurve.indexBakingElement;
+                    info.RunningCurveInfo.CurrentStageRunningTime = this.bakingCurve.getCurrentStageElapsedTime();
 
-            info = LocalStorage.loadBakingStatus();
+                    LocalStorage.saveBakingStatus(info);
 
-            info.RunningCurveInfo.CurrentStage = this.bakingCurve.indexBakingElement;
-            info.RunningCurveInfo.CurrentStageRunningTime = this.bakingCurve.getCurrentStageElapsedTime();
+                }, RunningHandle.timeDeltaCheckStatus);
+                resolve("OK");
+            });
+        });
 
-            LocalStorage.saveBakingStatus(info);
-
-        }, RunningHandle.timeDeltaCheckStatus);
     }
 
     public pause() {
@@ -446,6 +523,9 @@ export class RunningHandle {
                 break;
         }
         return obj;
+    }
+    public getTrapInfoWithPromise() {
+
     }
     public getTrapInfo() {
         const info: IInfoCollect = LocalStorage.loadBakingStatus();

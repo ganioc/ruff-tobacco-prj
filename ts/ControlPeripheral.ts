@@ -322,7 +322,7 @@ export class ControlPeriph {
                 setTimeout(() => {
                     // Tool.printGreen("\nDelay 100ms");
                     resolve("OK");
-                }, 200);
+                }, 100);
             });
         }).then((val) => {
             Tool.printGreen("Get ADC ==>");
