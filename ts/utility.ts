@@ -70,6 +70,11 @@ export class Tool {
     }
     // File manipulation
 
+    public static clearQTProcess() {
+        // clear QT UI process in time
+        // Spawn.spawn("/ruff/app.data/clearqt");
+    }
+
 }
 
 export interface ILooseObject {

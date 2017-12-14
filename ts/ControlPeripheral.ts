@@ -88,6 +88,7 @@ export class ControlPeriph {
 
         // reset VentGateAngle to default value here?
         ControlPeriph.ResetVent();
+
     }
 
     public static CheckUpperRack(callback) {

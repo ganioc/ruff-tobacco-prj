@@ -61,6 +61,8 @@ $.ready((error) => {
     Tool.printMagenta("App Begin");
     Tool.printMagenta("################\n");
 
+    Tool.clearQTProcess();
+
     Tool.readMachineSNFromRuffd();
     LocalStorage.loadAppVersion();
 
@@ -83,7 +85,7 @@ $.ready((error) => {
         // test.testHttps();
         // test.testSN();
         // test.testGPRS(gprs);
-    }, 1000);
+    }, 2000);
 
 });
 
