@@ -51,12 +51,22 @@ export class TempControl {
 
         Tool.printGreen("TempControl:keepConstant delta of current temp:" + deltaTemp.toFixed(3));
 
-        if (deltaTemp < -5) {
-            return 1.0;
-        } else if (deltaTemp > 0.5 || (deltaTemp > -0.5 && deltaTemp < 0.5)) {
-            return 0.0;
-        } else if (deltaTemp > -5 && deltaTemp <= -0.5) {
-            return -deltaTemp / 4.5;
+        // if (deltaTemp < -5) {
+        //     return 1.0;
+        // } else if (deltaTemp > 0.5 || (deltaTemp > -0.5 && deltaTemp < 0.5)) {
+        //     return 0.0;
+        // } else if (deltaTemp > -5 && deltaTemp <= -0.5) {
+        //     return -deltaTemp / 4.5;
+        // }
+
+        // modified on 2017-12-13
+        if (deltaTemp > 0) {
+            return 0;
+
+        } else if (deltaTemp < -0.5) {
+            return 1;
+        } else {
+            return 0;
         }
     }
     public static keepSlope(params: IBakingControlParams): number {
@@ -80,12 +90,22 @@ export class TempControl {
 
         Tool.printMagenta("TempControl:keepSlope delta of cur temp:" + deltaTemp.toFixed(3));
 
-        if (deltaTemp < -5) {
-            return 1.0;
-        } else if (deltaTemp > 0.5 || (deltaTemp > -0.5 && deltaTemp < 0.5)) {
-            return 0.0;
-        } else if (deltaTemp > -5 && deltaTemp <= -0.5) {
-            return -deltaTemp / 4.5;
+        // if (deltaTemp < -5) {
+        //     return 1.0;
+        // } else if (deltaTemp > 0.5 || (deltaTemp > -0.5 && deltaTemp < 0.5)) {
+        //     return 0.0;
+        // } else if (deltaTemp > -5 && deltaTemp <= -0.5) {
+        //     return -deltaTemp / 4.5;
+        // }
+
+        // modified on 2017-12-13
+        if (deltaTemp > 0) {
+            return 0;
+
+        } else if (deltaTemp < -0.5) {
+            return 1;
+        } else {
+            return 0;
         }
     }
     // return vent angle, 0 ~ 90 degree

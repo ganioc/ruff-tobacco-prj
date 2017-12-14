@@ -231,6 +231,9 @@ export class RunningHandle {
 
         Tool.print("timeDeltaCheckStatus: " + RunningHandle.timeDeltaCheckStatus + " seconds");
 
+        // Added by Yang Jun, 2017-12-14
+        clearInterval(this.timerHandler);
+
         this.timerHandler = setInterval(() => {
 
             this.checkStatus();

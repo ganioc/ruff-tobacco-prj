@@ -73,6 +73,7 @@ export class ControlMcu {
                     clearTimeout(this.timer);
 
                     this.callback(null, { type: mtype, content: mcontent });
+                    this.callback = null;
                 }
             }
         });
@@ -117,9 +118,12 @@ export class ControlMcu {
 
         this.callback = cb;
 
+        clearTimeout(this.timer);
+
         this.timer = setTimeout(() => {
             Tool.print("Write timeout");
-            cb(new Error("Timeout"), { type: "error", content: new Buffer("TimeOut") });
+            this.callback(new Error("Time-is-out"), { type: "error", content: new Buffer("TimeOut") });
+            this.callback = null;
         }, ControlMcu.WIRTE_TIMEOUT);
 
     }

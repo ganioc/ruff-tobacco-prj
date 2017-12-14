@@ -77,16 +77,16 @@ export class CommQT {
     }
     public exit() {
         // kill the qt process
-        if (this.subprocess !== undefined) {
-            this.subprocess.kill("SIGTERM");
-        }
+        // if (this.subprocess !== undefined) {
+        //     this.subprocess.kill("SIGTERM");
+        // }
     }
     public init() {
-        this.subprocess = Spawn.spawn("/ruff/app.data/tabacooui", ["-platform", "eglfs"]);
+        // this.subprocess = Spawn.spawn("/ruff/app.data/tabacooui", ["-platform", "eglfs"]);
 
-        this.subprocess.on("exit", (code) => {
-            Tool.printRed("QT process exit with code: " + code);
-        });
+        // this.subprocess.on("exit", (code) => {
+        //     Tool.printRed("QT process exit with code: " + code);
+        // });
 
         setTimeout(() => {
             this.start();

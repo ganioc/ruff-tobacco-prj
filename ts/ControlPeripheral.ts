@@ -85,6 +85,9 @@ export class ControlPeriph {
         ControlPeriph.temp4 = 0;
 
         ControlPeriph.vGPRSSignal = 0;
+
+        // reset VentGateAngle to default value here?
+        ControlPeriph.ResetVent();
     }
 
     public static CheckUpperRack(callback) {
@@ -121,26 +124,26 @@ export class ControlPeriph {
         $("#LED-Running").turnOff(cb);
     }
     public static Buzzer() {
-        Tool.printBlue("Buzzer on");
         ControlPeriph.TurnOnBuzzer(() => {
-            setTimeout(() => {
-                ControlPeriph.TurnOffBuzzer(() => {
-                    Tool.printBlue("Buzzer off");
-                });
-            }, 200);
+            Tool.printBlue("Buzzer on");
         });
+        setTimeout(() => {
+            ControlPeriph.TurnOffBuzzer(() => {
+                Tool.printBlue("Buzzer off");
+            });
+        }, 100);
     }
-    public static Buzzer2() {
-        Tool.printBlue("Buzzer on");
+    // public static Buzzer2() {
+    //     Tool.printBlue("Buzzer on");
 
-        ControlPeriph.TurnOnBuzzer(() => {
-            setTimeout(() => {
-                ControlPeriph.TurnOffBuzzer(() => {
-                    Tool.printBlue("Buzzer off");
-                });
-            }, 500);
-        });
-    }
+    //     ControlPeriph.TurnOnBuzzer(() => {
+    //         setTimeout(() => {
+    //             ControlPeriph.TurnOffBuzzer(() => {
+    //                 Tool.printBlue("Buzzer off");
+    //             });
+    //         }, 500);
+    //     });
+    // }
     public static TurnOnBuzzer(cb) {
         $("#outBuzzer").turnOn(cb);
     }
@@ -189,7 +192,7 @@ export class ControlPeriph {
         }
     }
     public static ResetVent() {
-        ControlPeriph.DecreaseVentAngle(91, () => {
+        ControlPeriph.DecreaseVentAngle(90, () => {
             Tool.printYellow("Reset Vent angle to 0 degree");
         });
     }
@@ -281,10 +284,13 @@ export class ControlPeriph {
             commMCU.GetTemp((err, data) => {
                 if (err !== null) {
 
-                    ControlPeriph.temp1 = 0;
-                    ControlPeriph.temp2 = 0;
-                    ControlPeriph.temp3 = 0;
-                    ControlPeriph.temp4 = 0;
+                    // ControlPeriph.temp1 = 0;
+                    // ControlPeriph.temp2 = 0;
+                    // ControlPeriph.temp3 = 0;
+                    // ControlPeriph.temp4 = 0;
+
+                    Tool.printRed("GetTempError error");
+                    resolve("OK");
                     return;
                 }
 
@@ -312,17 +318,26 @@ export class ControlPeriph {
                 resolve("OK");
             });
         }).then((val) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    // Tool.printGreen("\nDelay 100ms");
+                    resolve("OK");
+                }, 200);
+            });
+        }).then((val) => {
             Tool.printGreen("Get ADC ==>");
             return new Promise((resolve, reject) => {
                 commMCU.GetADC((err, data) => {
                     if (err !== null) {
-                        ControlPeriph.ADC1 = 0;
-                        ControlPeriph.ADC2 = 0;
-                        ControlPeriph.ADC3 = 0;
-                        ControlPeriph.ADC4 = 0;
-                        ControlPeriph.ADC5 = 0;
-                        ControlPeriph.ADC6 = 0;
-                        ControlPeriph.ADC7 = 0;
+                        // ControlPeriph.ADC1 = 0;
+                        // ControlPeriph.ADC2 = 0;
+                        // ControlPeriph.ADC3 = 0;
+                        // ControlPeriph.ADC4 = 0;
+                        // ControlPeriph.ADC5 = 0;
+                        // ControlPeriph.ADC6 = 0;
+                        // ControlPeriph.ADC7 = 0;
+                        Tool.printRed("GetADC error");
+                        resolve("OK");
                         return;
                     }
                     Tool.printGreen("GetADC");
@@ -366,8 +381,17 @@ export class ControlPeriph {
             });
         }).then((val) => {
             return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    // Tool.printGreen("\nDelay 100ms");
+                    resolve("OK");
+                }, 100);
+            });
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
                 commMCU.GetTime((err, data) => {
                     if (err !== null) {
+                        Tool.printRed("GetTimeError error");
+                        resolve("OK");
                         return;
                     }
 
@@ -376,6 +400,15 @@ export class ControlPeriph {
                     resolve("OK");
                 });
             });
+        });
+
+    }
+
+    public static fetchFastParamsWithPromise(callback) {
+
+        const proc = new Promise((resolve, reject) => {
+            Tool.printGreen("Fetch Fast Params ==>");
+            resolve("OK");
         }).then((val) => {
             return new Promise((resolve, reject) => {
                 ControlPeriph.CheckPhaseVoltageExist((data) => {

@@ -2,7 +2,7 @@
 declare var $: any;
 // import { ControlMcu } from "./ControlMcu";
 import * as Protobuf from "protobufjs";
-import { clearInterval, setTimeout } from "timers";
+import { clearInterval, setInterval, setTimeout } from "timers";
 import * as _ from "underscore";
 import { Alarm } from "./Alarm";
 import { IInfoCollect, RunningStatus } from "./BakingCfg";
@@ -89,12 +89,16 @@ $.end(() => {
     Tool.printMagenta("################");
     Tool.print("Ruff App end");
 
+    if (appBaking.runningStatus === RunningStatus.RUNNING) {
+        appBaking.pause();
+    }
+
     setTimeout(() => {
         Tool.print("Quit QT process");
         if (commQT !== undefined) {
             commQT.exit();
         }
-    }, 0);
+    }, 10);
 
     Tool.printMagenta("################\n");
 });
@@ -128,19 +132,19 @@ function main() {
             }, 1000);
         }, 500);
 
-        setTimeout(() => {
-            commQT.sendQuickDlg(
-                "Test",
-                "这是一个对话框的测试",
-                (err, data: IfPacket) => {
-                    if (err) {
-                        Tool.printRed("session timeout");
-                        return;
-                    }
-                    Tool.printBlink(JSON.stringify(data));
-                },
-            );
-        }, 2000);
+        // setTimeout(() => {
+        //     commQT.sendQuickDlg(
+        //         "Test",
+        //         "这是一个对话框的测试",
+        //         (err, data: IfPacket) => {
+        //             if (err) {
+        //                 Tool.printRed("session timeout");
+        //                 return;
+        //             }
+        //             Tool.printBlink(JSON.stringify(data));
+        //         },
+        //     );
+        // }, 2000);
 
     });
 
@@ -160,15 +164,17 @@ function main() {
         switch (dataBig.message) {
             case "start":
 
+                Tool.printRed("Buzzer on");
                 ControlPeriph.Buzzer();
 
                 if (appBaking.runningStatus === RunningStatus.PAUSED) {
                     Tool.print("Start from paused");
-                    appBaking.start();
 
                     ControlPeriph.TurnOnRunningLED(() => {
                         Tool.print("Turn on LED");
                     });
+
+                    appBaking.start();
 
                     clearInterval(appBaking.timerTrap);
 
@@ -286,7 +292,7 @@ function main() {
 
                 break;
             case "resetdefault":
-                ControlPeriph.Buzzer2();
+                ControlPeriph.Buzzer();
 
                 Tool.print("App reset to default");
 
@@ -408,6 +414,12 @@ function main() {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
-    }, 2500);
+    }, 5000);
+
+    setInterval(() => {
+        ControlPeriph.fetchFastParamsWithPromise(() => {
+            Tool.print("Fetch fast params");
+        });
+    }, 1300);
 
 }
