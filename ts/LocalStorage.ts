@@ -260,7 +260,7 @@ export class LocalStorage {
             callback(null, obj);
         });
     }
-    public static loadBakingStatus(): IInfoCollect {
+    public static loadBakingStatusSync(): IInfoCollect {
         // read it from the disk
         const data = fs.readFileSync(LocalStorage.getStatusFileDirec());
         let obj: any;
@@ -286,7 +286,7 @@ export class LocalStorage {
             callback(null, "OK");
         });
     }
-    public static saveBakingStatus(obj: IInfoCollect) {
+    public static saveBakingStatusSync(obj: IInfoCollect) {
         Tool.print("saveBakingStatus");
         fs.writeFileSync(LocalStorage.getStatusFileDirec(),
             JSON.stringify(obj));

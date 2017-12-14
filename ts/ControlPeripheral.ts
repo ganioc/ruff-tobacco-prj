@@ -32,7 +32,7 @@ export class ControlPeriph {
 
     // public static bWindGateHighSpeed: boolean;
     public static bBurningGateOn: boolean;
-    public static VentAngle: number;
+    public static VentAngle: number;  // 0~ 90 degree
     public static MAX_VENT_ANGLE: number;
     public static MIN_VENT_ANGLE: number;
     public static VENT_SPEED: number;
@@ -133,17 +133,17 @@ export class ControlPeriph {
             });
         }, 100);
     }
-    // public static Buzzer2() {
-    //     Tool.printBlue("Buzzer on");
+    public static Buzzer2() {
+        Tool.printBlue("Buzzer on");
 
-    //     ControlPeriph.TurnOnBuzzer(() => {
-    //         setTimeout(() => {
-    //             ControlPeriph.TurnOffBuzzer(() => {
-    //                 Tool.printBlue("Buzzer off");
-    //             });
-    //         }, 500);
-    //     });
-    // }
+        ControlPeriph.TurnOnBuzzer(() => {
+            setTimeout(() => {
+                ControlPeriph.TurnOffBuzzer(() => {
+                    Tool.printBlue("Buzzer off");
+                });
+            }, 500);
+        });
+    }
     public static TurnOnBuzzer(cb) {
         $("#outBuzzer").turnOn(cb);
     }

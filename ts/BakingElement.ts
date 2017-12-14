@@ -62,6 +62,8 @@ export class BakingElement {
         let deltaAngle: number = 0;
         deltaAngle = newAngle - ControlPeriph.VentAngle;
 
+        // 角度只能在 0~90度之间
+
         if (deltaAngle > 0) {
             ControlPeriph.IncreaseVentAngle(deltaAngle, () => {
                 Tool.print("Algorithm -> increase: " + deltaAngle);

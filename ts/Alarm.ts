@@ -261,13 +261,13 @@ export class Alarm {
             gpsLastLatitude = ControlPeriph.gpsLatitude;
             gpsLastLongitude = ControlPeriph.gpsLongitude;
             // save it to file
-            const info: IInfoCollect = LocalStorage.loadBakingStatus();
-            info.BaseSetting.GPSInfo = {
-                Longitude: ControlPeriph.gpsLongitude,
-                Latitude: ControlPeriph.gpsLatitude,
-            };
+            // const info: IInfoCollect = LocalStorage.loadBakingStatus();
+            // info.BaseSetting.GPSInfo = {
+            //     Longitude: ControlPeriph.gpsLongitude,
+            //     Latitude: ControlPeriph.gpsLatitude,
+            // };
 
-            LocalStorage.saveBakingStatus(info);
+            // LocalStorage.saveBakingStatus(info);
         }
 
         return 0;

@@ -19,6 +19,8 @@ import { LocalStorage } from "./LocalStorage";
 import { MqttApp } from "./MqttApp";
 import { Tool } from "./utility";
 
+const TRAP_PERIOD = 1400;
+
 const appBaking = new RunningHandle(
     {
         timeDelta: 10000, // in ms, 10 seconds
@@ -128,8 +130,16 @@ function main() {
         setTimeout(() => {
 
             commQT.timer = setInterval(() => {
-                commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
-            }, 1000);
+
+                appBaking.getTrapInfoAsync((err, data) => {
+                    if (err) {
+                        Tool.printRed("getTrapInfoAsync fail");
+                        return;
+                    }
+                    commQT.sendTrap(InfoType.Val_TrapInfo, data);
+                });
+
+            }, TRAP_PERIOD);
         }, 500);
 
         // setTimeout(() => {
@@ -316,8 +326,16 @@ function main() {
                         commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
 
                         commQT.timer = setInterval(() => {
-                            commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
-                        }, 1000);
+                            // commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
+
+                            appBaking.getTrapInfoAsync((err, data) => {
+                                if (err) {
+                                    Tool.printRed("getTrapInfoAsync fail");
+                                    return;
+                                }
+                                commQT.sendTrap(InfoType.Val_TrapInfo, data);
+                            });
+                        }, TRAP_PERIOD);
 
                     }, 2000);
                 } else {
@@ -338,29 +356,48 @@ function main() {
 
         switch (data.Obj) {
             case InfoType.Val_SysInfo:
-                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSysInfo());
+                appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
+                    commQT.sendGetResp(data.PacketId, data.Obj, d.SysInfo);
+                });
+                // commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSysInfo());
                 break;
             case InfoType.Val_SettingCurveInfo:
                 Tool.printRed("SettingCurve is able to get");
                 commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo());
                 break;
             case InfoType.Val_RunningCurveInfo:
-                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadRunningCurveInfo());
+                Tool.printRed("RunningCurveInfo is able to get");
+                appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
+                    commQT.sendGetResp(data.PacketId, data.Obj, d.RunningCurveInfo);
+                });
+                // commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadRunningCurveInfo());
                 break;
             case InfoType.Val_ResultInfo:
-                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadResultInfo());
+                appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
+                    commQT.sendGetResp(data.PacketId, data.Obj, d.ResultInfo);
+                });
+                //commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadResultInfo());
                 break;
             // case InfoType.Val_TrapInfo:
             //     break;
             case InfoType.Val_RunningState:
+
                 commQT.sendGetResp(data.PacketId, data.Obj, appBaking.getRunning());
+
                 break;
             case InfoType.Val_BakingInfo:
-                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadBakingInfo());
+                Tool.printBlue("Get BakingInfo received");
+                appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
+                    commQT.sendGetResp(data.PacketId, data.Obj, d.BakingInfo);
+                });
                 break;
             case InfoType.Val_BaseSetting:
                 Tool.printBlue("Get BaseSetting received");
-                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadBaseSetting());
+
+                appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
+                    commQT.sendGetResp(data.PacketId, data.Obj, d.BaseSetting);
+                });
+
                 break;
             default:
                 Tool.print("Wrong Get packet obj type:" + data.Obj);
@@ -381,7 +418,7 @@ function main() {
                 commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 break;
             case InfoType.Val_RunningCurveInfo:
-                appBaking.updateRunningCurveInfo(data.Content);
+                appBaking.updateRunningCurveInfoAsync(data.Content);
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             case InfoType.Val_ResultInfo:
@@ -393,11 +430,11 @@ function main() {
                 commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 break;
             case InfoType.Val_BakingInfo:
-                appBaking.updateBakingInfo(data.Content);
+                appBaking.updateBakingInfoAsync(data.Content);
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             case InfoType.Val_BaseSetting:
-                appBaking.updateBaseSetting(data.Content);
+                appBaking.updateBaseSettingAsync(data.Content);
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             default:

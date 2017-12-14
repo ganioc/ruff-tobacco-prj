@@ -71,8 +71,8 @@ export class RunningHandle {
         // Create it with default value if not exist
         LocalStorage.checkFileExist();
 
-        // Read IInfo stored on disk
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
+        // Read IInfo stored on disk, can use sync mode
+        const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
 
         // ----------read from app.json config file ----------
         // read parameters from App.json, AppConfig
@@ -145,7 +145,7 @@ export class RunningHandle {
 
         LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
 
-        LocalStorage.saveBakingStatus(info);
+        LocalStorage.saveBakingStatusSync(info);
 
         // reset peripheral stage
         Tool.printYellow("Init peripheral status:");
@@ -166,7 +166,7 @@ export class RunningHandle {
 
         if (this.runningStatus === RunningStatus.STOPPED) {
 
-            const info: IInfoCollect = LocalStorage.loadBakingStatus();
+            const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
 
             this.runningStatus = RunningStatus.WAITING;
 
@@ -183,7 +183,7 @@ export class RunningHandle {
 
             /// -
 
-            LocalStorage.saveBakingStatus(info);
+            LocalStorage.saveBakingStatusSync(info);
 
             // copy status file to the project direc
             this.backupRunningStatus();
@@ -256,12 +256,20 @@ export class RunningHandle {
 
         const proc = new Promise((resolve, reject) => {
             Tool.printGreen("Start In Async mode ==>");
-            setTimeout(() => { resolve("OK"); }, 120);
+            setTimeout(() => {
+                resolve("OK");
+            }, 120);
 
         }).then((val) => {
             return new Promise((resolve, reject) => {
-                info = LocalStorage.loadBakingStatus();
-                resolve("OK");
+                LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+                    if (err) {
+                        reject("NOK");
+                        return;
+                    }
+                    info = o;
+                    resolve("OK");
+                });
             });
         }).then((val) => {
             return new Promise((resolve, reject) => {
@@ -278,6 +286,7 @@ export class RunningHandle {
                     info.SysInfo.bInRunning = RunningStatus.RUNNING;
                 } else {
                     reject("NOK");
+                    return;
                 }
 
                 Tool.print("BakingProc: resetStage");
@@ -297,8 +306,14 @@ export class RunningHandle {
             });
         }).then((val) => {
             return new Promise((resolve, reject) => {
-                LocalStorage.saveBakingStatus(info);
-                resolve("OK");
+                LocalStorage.saveBakingStatusAsync(info, (err, data) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    resolve(data);
+                });
+                // resolve("OK");
             });
         }).then((val) => {
             return new Promise((resolve, reject) => {
@@ -311,41 +326,96 @@ export class RunningHandle {
 
                     this.checkStatus();
 
-                    info = LocalStorage.loadBakingStatus();
+                    // info = LocalStorage.loadBakingStatus();
+                    LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+                        if (err) {
+                            Tool.printRed("Read IInfo fail");
+                            return;
+                        }
+                        info = o;
 
-                    info.RunningCurveInfo.CurrentStage = this.bakingCurve.indexBakingElement;
-                    info.RunningCurveInfo.CurrentStageRunningTime = this.bakingCurve.getCurrentStageElapsedTime();
+                        info.RunningCurveInfo.CurrentStage = this.bakingCurve.indexBakingElement;
+                        info.RunningCurveInfo.CurrentStageRunningTime = this.bakingCurve.getCurrentStageElapsedTime();
 
-                    LocalStorage.saveBakingStatus(info);
-
+                        LocalStorage.saveBakingStatusAsync(info, (erro, data) => {
+                            if (err) {
+                                Tool.printRed("Save IInfo fail");
+                                return;
+                            }
+                            Tool.printBlue("Save IInfo OK");
+                        });
+                    });
                 }, RunningHandle.timeDeltaCheckStatus);
                 resolve("OK");
             });
+        }).then((fb) => {
+            Tool.print(fb);
+            return;
+        }, (err) => {
+            Tool.print(err);
+            return;
         });
 
     }
-
     public pause() {
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
-
-        if (this.runningStatus === RunningStatus.RUNNING) {
-
-            this.runningStatus = RunningStatus.PAUSED;
-            info.SysInfo.bInRunning = RunningStatus.PAUSED;
-            // 记录当前阶段和运行时间, 已经都被记录过了, 在interval里面
-
-            LocalStorage.saveBakingStatus(info);
-
-            clearInterval(this.timerHandler);
-            Tool.print("BakingProc: App paused\n");
-        } else {
-            Tool.print("BakingProc: pause has no effect in mode: " + this.runningStatus);
-
-        }
-
+        this.pauseAsync();
     }
+    public pauseAsync() {
+        let info: IInfoCollect;
+
+        LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+            if (err) {
+                Tool.printRed("pauseAsync load fail");
+                return;
+            }
+
+            info = o;
+
+            if (this.runningStatus === RunningStatus.RUNNING) {
+
+                // 记录当前阶段和运行时间, 已经都被记录过了, 在interval里面
+                this.runningStatus = RunningStatus.PAUSED;
+                info.SysInfo.bInRunning = RunningStatus.PAUSED;
+
+                clearInterval(this.timerHandler);
+                Tool.print("BakingProc: App paused\n");
+
+                LocalStorage.saveBakingStatusAsync(info, (err2, data) => {
+                    if (err2) {
+                        Tool.printRed("pauseasync save fail");
+                        return;
+                    }
+
+                });
+
+            } else {
+                Tool.print("BakingProc: pause has no effect in mode: " + this.runningStatus);
+
+            }
+
+        });
+    }
+    // public pause() {
+    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
+
+    //     if (this.runningStatus === RunningStatus.RUNNING) {
+
+    //         this.runningStatus = RunningStatus.PAUSED;
+    //         info.SysInfo.bInRunning = RunningStatus.PAUSED;
+    //         // 记录当前阶段和运行时间, 已经都被记录过了, 在interval里面
+
+    //         LocalStorage.saveBakingStatus(info);
+
+    //         clearInterval(this.timerHandler);
+    //         Tool.print("BakingProc: App paused\n");
+    //     } else {
+    //         Tool.print("BakingProc: pause has no effect in mode: " + this.runningStatus);
+
+    //     }
+
+    // }
     public stop() {
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
+        const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
 
         if (this.runningStatus === RunningStatus.RUNNING ||
             this.runningStatus === RunningStatus.PAUSED) {
@@ -357,7 +427,7 @@ export class RunningHandle {
             info.RunningCurveInfo.CurrentStage = 0;
             info.RunningCurveInfo.CurrentStageRunningTime = 0;
 
-            LocalStorage.saveBakingStatus(info);
+            LocalStorage.saveBakingStatusSync(info);
 
             clearInterval(this.timerHandler);
 
@@ -373,136 +443,268 @@ export class RunningHandle {
         console.log("-- End of history temp data --");
     }
     public loadSysInfo(): ISysInfo {
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
+        const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
         // info.SysInfo.AppVersion = LocalStorage.getAppVersion();
         // info.SysInfo.UIVersion = LocalStorage.getUiVersion();
         return info.SysInfo;
     }
-    public loadRunningCurveInfo(): IRunningCurveInfo {
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
-        return info.RunningCurveInfo;
-    }
+    // public loadRunningCurveInfo(): IRunningCurveInfo {
+    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
+    //     return info.RunningCurveInfo;
+    // }
     public loadSettingCurveInfo() {
         return LocalStorage.loadDefaultCurve();
     }
-    public updateRunningCurveInfo(data: any) {
+    public updateRunningCurveInfoAsync(data: any) {
         Tool.printMagenta("update RunningCurveInfo");
-        Tool.print(data);
+        let info: IInfoCollect;
 
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
+        LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+            if (err) {
+                Tool.printRed("updateRunningCurveInfoAsync fail");
+                return;
+            }
+            info = o;
 
-        // if (data.CurrentStage === undefined) {
-        //     info.RunningCurveInfo.CurrentStage = 0;
-        //     info.RunningCurveInfo.CurrentStageRunningTime = 0;
-        // }
+            info.RunningCurveInfo.TempCurveDryList = [];
+            info.RunningCurveInfo.TempCurveWetList = [];
+            info.RunningCurveInfo.TempDurationList = [];
 
-        info.RunningCurveInfo.TempCurveDryList = [];
-        info.RunningCurveInfo.TempCurveWetList = [];
-        info.RunningCurveInfo.TempDurationList = [];
+            if (data.TempCurveDryList.length !== data.TempCurveWetList.length) {
+                Tool.printRed("Wrong format runningcurveinfo");
+                return;
+            }
 
-        if (data.TempCurveDryList.length !== data.TempCurveWetList.length) {
-            Tool.printRed("Wrong format runningcurveinfo");
-            return;
-        }
+            console.log(util.inspect(data.TempCurveDryList));
 
-        console.log(util.inspect(data.TempCurveDryList));
+            data.TempCurveDryList.forEach((element) => {
+                info.RunningCurveInfo.TempCurveDryList.push(element);
+            });
 
-        data.TempCurveDryList.forEach((element) => {
-            info.RunningCurveInfo.TempCurveDryList.push(element);
+            console.log(util.inspect(data.TempCurveWetList));
+
+            data.TempCurveWetList.forEach((element) => {
+                info.RunningCurveInfo.TempCurveWetList.push(element);
+            });
+
+            console.log(util.inspect(data.TempDurationList));
+
+            data.TempDurationList.forEach((element) => {
+                info.RunningCurveInfo.TempDurationList.push(element);
+            });
+
+            Tool.printBlue("Update this.runningCurveInfo");
+            console.log(util.inspect(info.RunningCurveInfo));
+
+            this.bakingCurve = new BakingCurve({
+                curve: this.getRunningOption(
+                    info.RunningCurveInfo.TempCurveDryList,
+                    info.RunningCurveInfo.TempCurveWetList,
+                    info.RunningCurveInfo.TempDurationList,
+                ),
+                timeDelta: RunningHandle.timeDeltaCheckStatus,
+            });
+
+            LocalStorage.saveBakingStatusAsync(info, (err, data) => {
+                if (err) {
+                    Tool.printRed("updateRunningCurveInfoAsync fail save");
+                }
+            });
+
         });
-
-        console.log(util.inspect(data.TempCurveWetList));
-
-        data.TempCurveWetList.forEach((element) => {
-            info.RunningCurveInfo.TempCurveWetList.push(element);
-        });
-
-        console.log(util.inspect(data.TempDurationList));
-
-        data.TempDurationList.forEach((element) => {
-            info.RunningCurveInfo.TempDurationList.push(element);
-        });
-
-        Tool.printBlue("Update this.runningCurveInfo");
-        console.log(util.inspect(info.RunningCurveInfo));
-
-        this.bakingCurve = new BakingCurve({
-            curve: this.getRunningOption(
-                info.RunningCurveInfo.TempCurveDryList,
-                info.RunningCurveInfo.TempCurveWetList,
-                info.RunningCurveInfo.TempDurationList,
-            ),
-            timeDelta: RunningHandle.timeDeltaCheckStatus,
-        });
-
-        // this.bakingCurve.resetStage(
-        //     info.RunningCurveInfo.CurrentStage,
-        //     info.RunningCurveInfo.CurrentStageRunningTime,
-        // );
-
-        LocalStorage.saveBakingStatus(info);
     }
-    public loadResultInfo(): IResultInfo {
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
-        return info.ResultInfo;
-    }
+    // public updateRunningCurveInfo(data: any) {
+    //     Tool.printMagenta("update RunningCurveInfo");
+    //     Tool.print(data);
+
+    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
+
+    //     // if (data.CurrentStage === undefined) {
+    //     //     info.RunningCurveInfo.CurrentStage = 0;
+    //     //     info.RunningCurveInfo.CurrentStageRunningTime = 0;
+    //     // }
+
+    //     info.RunningCurveInfo.TempCurveDryList = [];
+    //     info.RunningCurveInfo.TempCurveWetList = [];
+    //     info.RunningCurveInfo.TempDurationList = [];
+
+    //     if (data.TempCurveDryList.length !== data.TempCurveWetList.length) {
+    //         Tool.printRed("Wrong format runningcurveinfo");
+    //         return;
+    //     }
+
+    //     console.log(util.inspect(data.TempCurveDryList));
+
+    //     data.TempCurveDryList.forEach((element) => {
+    //         info.RunningCurveInfo.TempCurveDryList.push(element);
+    //     });
+
+    //     console.log(util.inspect(data.TempCurveWetList));
+
+    //     data.TempCurveWetList.forEach((element) => {
+    //         info.RunningCurveInfo.TempCurveWetList.push(element);
+    //     });
+
+    //     console.log(util.inspect(data.TempDurationList));
+
+    //     data.TempDurationList.forEach((element) => {
+    //         info.RunningCurveInfo.TempDurationList.push(element);
+    //     });
+
+    //     Tool.printBlue("Update this.runningCurveInfo");
+    //     console.log(util.inspect(info.RunningCurveInfo));
+
+    //     this.bakingCurve = new BakingCurve({
+    //         curve: this.getRunningOption(
+    //             info.RunningCurveInfo.TempCurveDryList,
+    //             info.RunningCurveInfo.TempCurveWetList,
+    //             info.RunningCurveInfo.TempDurationList,
+    //         ),
+    //         timeDelta: RunningHandle.timeDeltaCheckStatus,
+    //     });
+
+    //     // this.bakingCurve.resetStage(
+    //     //     info.RunningCurveInfo.CurrentStage,
+    //     //     info.RunningCurveInfo.CurrentStageRunningTime,
+    //     // );
+
+    //     LocalStorage.saveBakingStatus(info);
+    // }
+    // public loadResultInfo(): IResultInfo {
+    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
+    //     return info.ResultInfo;
+    // }
     public updateResult(data: any) {
         Tool.printMagenta("update ResultInfo");
         Tool.print(data);
 
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
+        let info: IInfoCollect
 
         if (data instanceof Array) {
-            info.ResultInfo.content = [];
 
-            data.forEach((element) => {
-                info.ResultInfo.content.push(element);
+            LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+                if (err) {
+                    Tool.printRed("udpateresult fail");
+                    return;
+                }
+                info = o;
+                info.ResultInfo.content = [];
+
+                data.forEach((element) => {
+                    info.ResultInfo.content.push(element);
+                });
+                LocalStorage.saveBakingStatusAsync(info, (err, data) => {
+                    if (err) {
+                        Tool.printRed("udpateresult fail save");
+                        return;
+                    }
+                });
             });
-
-            LocalStorage.saveBakingStatus(info);
 
         } else {
             Tool.printRed("Wrong result format");
         }
 
     }
-    public loadBakingInfo(): IBakingInfo {
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
-        return info.BakingInfo;
-    }
-    public updateBakingInfo(data: any) {
+    // public loadBakingInfo(): IBakingInfo {
+    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
+    //     return info.BakingInfo;
+    // }
 
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
-
+    public updateBakingInfoAsync(data: any) {
         Tool.printMagenta("Update BakingInfo");
-        console.log(data);
+        let info: IInfoCollect;
 
-        for (const k in data) {
-            if (k !== "HistoryCounter" && info.BakingInfo[k] !== undefined) {
-                info.BakingInfo[k] = data[k];
+        LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+            if (err) {
+                Tool.printRed("updateBakingInfoAsync fail");
+                return;
             }
-        }
-        Tool.printMagenta("After update");
-        console.log(info.BakingInfo);
+            info = o;
+            for (const k in data) {
+                if (k !== "HistoryCounter" && info.BakingInfo[k] !== undefined) {
+                    info.BakingInfo[k] = data[k];
+                }
+            }
+            Tool.printMagenta("After update");
+            console.log(info.BakingInfo);
 
-        LocalStorage.saveBakingStatus(info);
+            LocalStorage.saveBakingStatusAsync(info, (err, data) => {
+                if (err) {
+                    Tool.printRed("updateBakingInfoAsync fail save");
+                    return;
+                }
+            });
+        });
+
     }
-    public loadBaseSetting(): IBaseSetting {
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
-        return info.BaseSetting;
+    // public updateBakingInfo(data: any) {
+
+    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
+
+    //     Tool.printMagenta("Update BakingInfo");
+    //     console.log(data);
+
+    //     for (const k in data) {
+    //         if (k !== "HistoryCounter" && info.BakingInfo[k] !== undefined) {
+    //             info.BakingInfo[k] = data[k];
+    //         }
+    //     }
+    //     Tool.printMagenta("After update");
+    //     console.log(info.BakingInfo);
+
+    //     LocalStorage.saveBakingStatus(info);
+    // }
+    public loadInfoCollectAsync(callback: (obj: IInfoCollect) => void) {
+        LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+            if (err) {
+                Tool.printRed("loadbasesettingasync fail");
+                return;
+            }
+            callback(o);
+        });
     }
-    public updateBaseSetting(data: any) {
+    // public loadBaseSetting(): IBaseSetting {
+    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
+    //     return info.BaseSetting;
+    // }
+    public updateBaseSettingAsync(data: any) {
         Tool.printMagenta("Update BaseSetting");
 
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
+        let info: IInfoCollect;
 
-        for (const k in data) {
-            if (info.BaseSetting[k] !== undefined) {
-                info.BaseSetting[k] = data[k];
+        LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+            if (err) {
+                Tool.printRed("udpateBasesettingAsync fail");
+                return;
             }
-        }
-        LocalStorage.saveBakingStatus(info);
+            info = o;
+            for (const k in data) {
+                if (info.BaseSetting[k] !== undefined) {
+                    info.BaseSetting[k] = data[k];
+                }
+            }
+            LocalStorage.saveBakingStatusAsync(info, (err2, data2) => {
+                if (err2) {
+                    Tool.printRed("updateBaseSettingAsync fail save");
+                }
+            });
+        });
+
     }
+    // public updateBaseSetting(data: any) {
+    //     Tool.printMagenta("Update BaseSetting");
+
+    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
+
+    //     for (const k in data) {
+    //         if (info.BaseSetting[k] !== undefined) {
+    //             info.BaseSetting[k] = data[k];
+    //         }
+    //     }
+    //     LocalStorage.saveBakingStatus(info);
+    // }
+
     public getRunning() {
         const obj = { State: "" };
 
@@ -524,11 +726,8 @@ export class RunningHandle {
         }
         return obj;
     }
-    public getTrapInfoWithPromise() {
-
-    }
-    public getTrapInfo() {
-        const info: IInfoCollect = LocalStorage.loadBakingStatus();
+    public getTrapInfoAsync(cb: (err, data) => void) {
+        let info: IInfoCollect;
 
         const obj: ITrapInfo = {
             WetTempAlarm: 1, // 1 alarm, 0 no alarm;
@@ -552,52 +751,147 @@ export class RunningHandle {
             Voltage: ControlPeriph.ADC4 * 87.2,  // 电压值
             Date: new Date().getTime(),  // 当前时间
 
-            HistoryCounter: info.BakingInfo.HistoryCounter,
-            Status: info.SysInfo.bInRunning,
+            HistoryCounter: 0,
+            Status: 0,
         };
 
-        // 根据实际的测试情况进行修改
-        if (info.SysInfo.bTempForUpperRack === true) {
-            obj.PrimaryDryTemp = ControlPeriph.temp4;
-            obj.PrimaryWetTemp = ControlPeriph.temp2;
-            obj.SecondaryDryTemp = ControlPeriph.temp1;
-            obj.SecondaryWetTemp = ControlPeriph.temp3;
+        const proc = new Promise((resolve, reject) => {
+            Tool.printGreen("getTrapInfoAsync ==>");
 
-        } else {
-            obj.PrimaryDryTemp = ControlPeriph.temp1;
-            obj.PrimaryWetTemp = ControlPeriph.temp3;
-            obj.SecondaryDryTemp = ControlPeriph.temp2;
-            obj.SecondaryWetTemp = ControlPeriph.temp4;
+            LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+                if (err) {
+                    reject("NOK");
+                    return;
+                }
+                info = o;
+                resolve("OK");
+            });
 
-        }
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
 
-        // check dry temp
-        obj.DryTempAlarm = Alarm.checkDryTemp(info, obj.PrimaryDryTemp, obj.PrimaryWetTemp);
+                obj.HistoryCounter = info.BakingInfo.HistoryCounter;
+                obj.Status = info.SysInfo.bInRunning;
 
-        // check wet temp
-        obj.WetTempAlarm = Alarm.checkWetTemp(info, obj.PrimaryWetTemp, obj.PrimaryDryTemp);
+                // 根据实际的测试情况进行修改
+                if (info.SysInfo.bTempForUpperRack === true) {
+                    obj.PrimaryDryTemp = ControlPeriph.temp4;
+                    obj.PrimaryWetTemp = ControlPeriph.temp2;
+                    obj.SecondaryDryTemp = ControlPeriph.temp1;
+                    obj.SecondaryWetTemp = ControlPeriph.temp3;
 
-        obj.VoltageLowAlarm = Alarm.checkVoltageLow(ControlPeriph.ADC4 * 87.2);
+                } else {
+                    obj.PrimaryDryTemp = ControlPeriph.temp1;
+                    obj.PrimaryWetTemp = ControlPeriph.temp3;
+                    obj.SecondaryDryTemp = ControlPeriph.temp2;
+                    obj.SecondaryWetTemp = ControlPeriph.temp4;
 
-        obj.ACAlarmPhaseA = Alarm.checkPhaseA(ControlPeriph.ADC1,
-            ControlPeriph.ADC2,
-            ControlPeriph.ADC3);  // 缺相告警
+                }
 
-        obj.ACAlarmPhaseB = 0;
+                // check dry temp
+                obj.DryTempAlarm = Alarm.checkDryTemp(info, obj.PrimaryDryTemp, obj.PrimaryWetTemp);
 
-        obj.ACAlarmPhaseC = 0;
+                // check wet temp
+                obj.WetTempAlarm = Alarm.checkWetTemp(info, obj.PrimaryWetTemp, obj.PrimaryDryTemp);
 
-        obj.GPRSAlarm = Alarm.checkGPRS();
+                obj.VoltageLowAlarm = Alarm.checkVoltageLow(ControlPeriph.ADC4 * 87.2);
 
-        obj.GPSAlarm = Alarm.checkGPS();
+                obj.ACAlarmPhaseA = Alarm.checkPhaseA(ControlPeriph.ADC1,
+                    ControlPeriph.ADC2,
+                    ControlPeriph.ADC3);  // 缺相告警
 
-        // 燃烧门的状态
-        obj.bBurningGateOn = ControlPeriph.bBurningGateOn;
-        // 风门状态
-        obj.bVentOn = (ControlPeriph.VentAngle > 0.5) ? true : false;
+                obj.ACAlarmPhaseB = 0;
 
-        return obj;
+                obj.ACAlarmPhaseC = 0;
+
+                obj.GPRSAlarm = Alarm.checkGPRS();
+
+                obj.GPSAlarm = Alarm.checkGPS();
+
+                // 燃烧门的状态
+                obj.bBurningGateOn = ControlPeriph.bBurningGateOn;
+                // 风门状态
+                obj.bVentOn = (ControlPeriph.VentAngle > 0.5) ? true : false;
+
+                cb(null, obj);
+                resolve("OK");
+
+            });
+        });
     }
+
+    // public getTrapInfo() {
+    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
+
+    //     const obj: ITrapInfo = {
+    //         WetTempAlarm: 1, // 1 alarm, 0 no alarm;
+    //         DryTempAlarm: 1,
+    //         VoltageLowAlarm: 1,
+    //         ACAlarmPhaseA: 1,
+    //         ACAlarmPhaseB: 1,
+    //         ACAlarmPhaseC: 1,
+    //         GPRSAlarm: 1,
+    //         GPSAlarm: 1,
+
+    //         // temp value
+    //         PrimaryDryTemp: ControlPeriph.temp1,
+    //         PrimaryWetTemp: ControlPeriph.temp2,
+    //         SecondaryDryTemp: ControlPeriph.temp3,
+    //         SecondaryWetTemp: ControlPeriph.temp4,
+
+    //         bWindGateHighSpeed: ControlPeriph.bWindGateHighSpeed, // true - hi speed, false - low speed
+    //         bBurningGateOn: ControlPeriph.CheckBurningGate(),     // true - on, false - off
+    //         bVentOn: (ControlPeriph.VentAngle > 0.01) ? true : false,
+    //         Voltage: ControlPeriph.ADC4 * 87.2,  // 电压值
+    //         Date: new Date().getTime(),  // 当前时间
+
+    //         HistoryCounter: info.BakingInfo.HistoryCounter,
+    //         Status: info.SysInfo.bInRunning,
+    //     };
+
+    //     // 根据实际的测试情况进行修改
+    //     if (info.SysInfo.bTempForUpperRack === true) {
+    //         obj.PrimaryDryTemp = ControlPeriph.temp4;
+    //         obj.PrimaryWetTemp = ControlPeriph.temp2;
+    //         obj.SecondaryDryTemp = ControlPeriph.temp1;
+    //         obj.SecondaryWetTemp = ControlPeriph.temp3;
+
+    //     } else {
+    //         obj.PrimaryDryTemp = ControlPeriph.temp1;
+    //         obj.PrimaryWetTemp = ControlPeriph.temp3;
+    //         obj.SecondaryDryTemp = ControlPeriph.temp2;
+    //         obj.SecondaryWetTemp = ControlPeriph.temp4;
+
+    //     }
+
+    //     // check dry temp
+    //     obj.DryTempAlarm = Alarm.checkDryTemp(info, obj.PrimaryDryTemp, obj.PrimaryWetTemp);
+
+    //     // check wet temp
+    //     obj.WetTempAlarm = Alarm.checkWetTemp(info, obj.PrimaryWetTemp, obj.PrimaryDryTemp);
+
+    //     obj.VoltageLowAlarm = Alarm.checkVoltageLow(ControlPeriph.ADC4 * 87.2);
+
+    //     obj.ACAlarmPhaseA = Alarm.checkPhaseA(ControlPeriph.ADC1,
+    //         ControlPeriph.ADC2,
+    //         ControlPeriph.ADC3);  // 缺相告警
+
+    //     obj.ACAlarmPhaseB = 0;
+
+    //     obj.ACAlarmPhaseC = 0;
+
+    //     obj.GPRSAlarm = Alarm.checkGPRS();
+
+    //     obj.GPSAlarm = Alarm.checkGPS();
+
+    //     // 燃烧门的状态
+    //     obj.bBurningGateOn = ControlPeriph.bBurningGateOn;
+    //     // 风门状态
+    //     obj.bVentOn = (ControlPeriph.VentAngle > 0.5) ? true : false;
+
+    //     return obj;
+    // }
+
     public getTrapBaking() {
         const obj: ITrapBaking = {
             PrimaryTargetDryTemp: 0,
@@ -629,8 +923,22 @@ export class RunningHandle {
             + LocalStorage.getDataDirec() + this.bakingCurve.getNameOfHistoryCounter()
             + "/" + LocalStorage.getStatusFileName());
 
-        fs.writeFileSync(LocalStorage.getDataDirec() + this.bakingCurve.getNameOfHistoryCounter()
-            + "/" + LocalStorage.getStatusFileName(), JSON.stringify(LocalStorage.loadBakingStatus()));
+        LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+            if (err) {
+                Tool.printRed("backupRunningStatus fail");
+                return;
+            }
+            fs.writeFile(LocalStorage.getDataDirec() + this.bakingCurve.getNameOfHistoryCounter()
+                + "/" + LocalStorage.getStatusFileName(), JSON.stringify(o), (err2) => {
+                    if (err2) {
+                        Tool.printRed("backupRunningStatus fail at 2nd step");
+                    }
+                });
+
+        });
+
+        // fs.writeFileSync(LocalStorage.getDataDirec() + this.bakingCurve.getNameOfHistoryCounter()
+        //     + "/" + LocalStorage.getStatusFileName(), JSON.stringify(LocalStorage.loadBakingStatus()));
     }
 
     public ResetToDefault() {
