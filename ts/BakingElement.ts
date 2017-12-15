@@ -1,4 +1,5 @@
 import { ITempLog, MoistureProperty } from "./BakingCfg";
+import { RunningHandle } from "./BakingProc";
 import { ControlPeriph } from "./ControlPeripheral";
 import { Tool } from "./utility";
 
@@ -56,21 +57,23 @@ export class BakingElement {
         Tool.print(this.timeBegin);
         Tool.print(this.timeElapsed);
     }
-    public controlVent(newAngle: number) {
+    public controlVent(newDelta: number) {
         // how to control the vent?
         // angle of vent
-        let deltaAngle: number = 0;
-        deltaAngle = newAngle - ControlPeriph.VentAngle;
+        // let deltaAngle: number = 0;
+        // deltaAngle = newAngle - ControlPeriph.VentAngle;
 
         // 角度只能在 0~90度之间
+        Tool.printRed("Current angle is " + ControlPeriph.VentAngle);
+        Tool.printRed("Vent angle delta " + " is " + newDelta);
 
-        if (deltaAngle > 0) {
-            ControlPeriph.IncreaseVentAngle(deltaAngle, () => {
-                Tool.print("Algorithm -> increase: " + deltaAngle);
+        if (newDelta > 0) {
+            ControlPeriph.IncreaseVentAngle(newDelta, () => {
+                Tool.print("Algorithm -> increase: " + newDelta);
             });
-        } else if (deltaAngle < 0) {
-            ControlPeriph.DecreaseVentAngle(-deltaAngle, () => {
-                Tool.print("Algorithm -> decrease: " + -deltaAngle);
+        } else if (newDelta < 0) {
+            ControlPeriph.DecreaseVentAngle(-newDelta, () => {
+                Tool.print("Algorithm -> decrease: " + -newDelta);
             });
         } else {
             Tool.printRed("No need to adjust vent angle");
@@ -106,14 +109,28 @@ export class BakingElement {
     protected checkTempSensors() {
         console.log("Read temp sensor 1");
 
-        this.tempLogs.push({
-            temp1: ControlPeriph.temp1,
-            temp2: ControlPeriph.temp1,
-            temp3: ControlPeriph.temp1,
-            temp4: ControlPeriph.temp1,
-            timeElapsed: this.timeElapsed,
-            timeStamp: new Date().getTime(),
-        });
+        // How to check upperrack or lowerrack?
+        if (RunningHandle.bTempForUpperRack === true) {
+            Tool.printYellow("upperrack");
+            this.tempLogs.push({
+                temp1: ControlPeriph.temp4,
+                temp2: ControlPeriph.temp2,
+                temp3: ControlPeriph.temp1,
+                temp4: ControlPeriph.temp3,
+                timeElapsed: this.timeElapsed,
+                timeStamp: new Date().getTime(),
+            });
+        } else {
+            Tool.printYellow("lowerrack");
+            this.tempLogs.push({
+                temp1: ControlPeriph.temp1,
+                temp2: ControlPeriph.temp3,
+                temp3: ControlPeriph.temp4,
+                temp4: ControlPeriph.temp2,
+                timeElapsed: this.timeElapsed,
+                timeStamp: new Date().getTime(),
+            });
+        }
     }
 
     protected controlFire(onPeriod: number) {

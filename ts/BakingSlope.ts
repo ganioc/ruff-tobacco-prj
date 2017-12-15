@@ -1,6 +1,7 @@
 import { BakingType, MoistureProperty } from "./BakingCfg";
 import { BakingElement } from "./BakingElement";
 import { IBakingControlParams, TempControl } from "./ControlAlgorithm";
+import { Tool } from "./utility";
 
 export class BakingSlope extends BakingElement {
     // static timerSlope;
@@ -54,10 +55,15 @@ export class BakingSlope extends BakingElement {
         };
 
         if (this.moistureType === MoistureProperty.DRY) {
+            Tool.print("Dry curve");
             this.controlFire(TempControl.keepSlope(param));
         } else if (this.moistureType === MoistureProperty.WET &&
             (this.counter % BakingElement.COUNTER_FOR_VENT_CHECKING) === 0) { // MoistureProperty.WET
+            Tool.printGreen("Wet curve " + this.counter % BakingElement.COUNTER_FOR_VENT_CHECKING);
             this.controlVent(TempControl.keepWetSlope(param));
+        } else if (this.moistureType === MoistureProperty.WET) {
+            Tool.printGreen("Wet curve " + this.counter % BakingElement.COUNTER_FOR_VENT_CHECKING);
+            Tool.printRed("Wet curve no need to update");
         }
 
     }

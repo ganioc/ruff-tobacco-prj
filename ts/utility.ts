@@ -72,7 +72,8 @@ export class Tool {
 
     public static clearQTProcess() {
         // clear QT UI process in time
-        // Spawn.spawn("/ruff/app.data/clearqt");
+        Tool.printGreen("Clear QTProcess");
+        Spawn.spawn("bash", ["/ruff/app.data/clean_ex_gui.sh"]);
     }
 
 }

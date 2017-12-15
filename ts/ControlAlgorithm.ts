@@ -29,6 +29,20 @@ function getParams(params: IBakingControlParams, num: number): number[] {
     return tempList;
 }
 
+function getParamsWet(params: IBakingControlParams, num: number): number[] {
+    const tempList: number[] = [];
+
+    for (let i = 0; i < num; i++) {
+        const index = (params.tempLogs.length - 1 - i);
+
+        tempList[i] = (index >= 0) ? (params.tempLogs[index].temp2) : (params.tempLogs[0].temp2);
+    }
+    Tool.print("tempList of number:" + NUM_SAMPLE);
+    Tool.print(tempList);
+
+    return tempList;
+}
+
 /** PID control algorithm
  *  P
  *  I integration of history data, Not used
@@ -60,10 +74,10 @@ export class TempControl {
         // }
 
         // modified on 2017-12-13
-        if (deltaTemp > 0) {
+        if (deltaTemp > 0.2) {
             return 0;
 
-        } else if (deltaTemp < -0.5) {
+        } else if (deltaTemp < 0.2) {
             return 1;
         } else {
             return 0;
@@ -99,22 +113,22 @@ export class TempControl {
         // }
 
         // modified on 2017-12-13
-        if (deltaTemp > 0) {
+        if (deltaTemp > 0.2) {
             return 0;
 
-        } else if (deltaTemp < -0.5) {
+        } else if (deltaTemp < 0.2) {
             return 1;
         } else {
             return 0;
         }
     }
-    // return vent angle, 0 ~ 90 degree
+    // return vent angle delta, -90 ~ 90 degree
     public static keepWetConstant(params: IBakingControlParams): number {
 
         let tempList: number[] = [];
         let targetTemp: number;
 
-        tempList = getParams(params, NUM_SAMPLE);
+        tempList = getParamsWet(params, NUM_SAMPLE);
 
         targetTemp = params.tempBegin;
 
@@ -133,19 +147,19 @@ export class TempControl {
         // }
 
         if (deltaTemp < 0) {
-            return 0;
+            return -30;
         } else if (deltaTemp > 0) {
-            return 90;
+            return 15;
         } else {
             return 0;
         }
     }
-    // return vent angle, 0 ~ 90 degree
+    // return vent angle delta, -90 ~ 90 degree
     public static keepWetSlope(params: IBakingControlParams): number {
         let tempList: number[] = [];
         let targetTemp: number;
 
-        tempList = getParams(params, NUM_SAMPLE);
+        tempList = getParamsWet(params, NUM_SAMPLE);
 
         targetTemp = params.tempBegin
             + (params.tempEnd - params.tempBegin)
@@ -171,9 +185,9 @@ export class TempControl {
         // }
 
         if (deltaTemp < 0) {
-            return 0;
+            return -30;
         } else if (deltaTemp > 0) {
-            return 90;
+            return 15;
         } else {
             return 0;
         }

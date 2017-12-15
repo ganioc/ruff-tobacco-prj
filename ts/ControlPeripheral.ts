@@ -58,7 +58,6 @@ export class ControlPeriph {
         Tool.print("Vent speed degree/second :" + ControlPeriph.VENT_SPEED);
         Tool.print("Default angle:" + ControlPeriph.VentAngle);
 
-        ControlPeriph.ResetVent();
 
         ControlPeriph.bToggleWD = true;
 
@@ -87,7 +86,7 @@ export class ControlPeriph {
         ControlPeriph.vGPRSSignal = 0;
 
         // reset VentGateAngle to default value here?
-        ControlPeriph.ResetVent();
+        // ControlPeriph.ResetVent();
 
     }
 
@@ -193,8 +192,11 @@ export class ControlPeriph {
         }
     }
     public static ResetVent() {
+
+        Tool.printYellow("Reset Vent angle to 0 degree");
+
         ControlPeriph.DecreaseVentAngle(90, () => {
-            Tool.printYellow("Reset Vent angle to 0 degree");
+            ControlPeriph.VentAngle = 0;
         });
     }
     public static TurnOnGPS(cb) {

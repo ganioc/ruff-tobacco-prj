@@ -1,6 +1,7 @@
 import { BakingType, MoistureProperty } from "./BakingCfg";
 import { BakingElement } from "./BakingElement";
 import { IBakingControlParams, TempControl } from "./ControlAlgorithm";
+import { Tool } from "./utility";
 
 export class BakingSegment extends BakingElement {
     // static timerSegment;
@@ -42,10 +43,14 @@ export class BakingSegment extends BakingElement {
         // TempControl.keepConstant(param);
 
         if (this.moistureType === MoistureProperty.DRY) {
+            console.log("Dry curve");
             this.controlFire(TempControl.keepConstant(param));
         } else if (this.moistureType === MoistureProperty.WET &&
             (this.counter % BakingElement.COUNTER_FOR_VENT_CHECKING) === 0) {
+            console.log("Wet curve " + this.counter % BakingElement.COUNTER_FOR_VENT_CHECKING);
             this.controlVent(TempControl.keepWetConstant(param));
+        } else if (this.moistureType === MoistureProperty.WET) {
+            Tool.printRed("Wet curve no need to update");
         }
     }
 }

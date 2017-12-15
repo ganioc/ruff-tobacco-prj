@@ -87,15 +87,17 @@ $.ready((error) => {
         // test.testGPRS(gprs);
     }, 2000);
 
+    appBaking.init({});
+
 });
 
 $.end(() => {
     Tool.printMagenta("################");
     Tool.print("Ruff App end");
 
-    if (appBaking.runningStatus === RunningStatus.RUNNING) {
-        appBaking.pause();
-    }
+    // if (appBaking.runningStatus === RunningStatus.RUNNING) {
+    //     appBaking.pause();
+    // }
 
     setTimeout(() => {
         Tool.print("Quit QT process");
@@ -112,8 +114,6 @@ function main() {
     // mqttApp.start();
 
     // Task init, very important
-    appBaking.init({});
-
     /***************************
      * CommQT
      */
@@ -304,7 +304,7 @@ function main() {
 
                 break;
             case "resetdefault":
-                ControlPeriph.Buzzer();
+                ControlPeriph.Buzzer2();
 
                 Tool.print("App reset to default");
 
@@ -330,12 +330,12 @@ function main() {
                         commQT.timer = setInterval(() => {
                             // commQT.sendTrap(InfoType.Val_TrapInfo, appBaking.getTrapInfo());
 
-                            appBaking.getTrapInfoAsync((err, data) => {
+                            appBaking.getTrapInfoAsync((err, data1) => {
                                 if (err) {
                                     Tool.printRed("getTrapInfoAsync fail");
                                     return;
                                 }
-                                commQT.sendTrap(InfoType.Val_TrapInfo, data);
+                                commQT.sendTrap(InfoType.Val_TrapInfo, data1);
                             });
                         }, TRAP_PERIOD);
 
@@ -378,7 +378,7 @@ function main() {
                 appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
                     commQT.sendGetResp(data.PacketId, data.Obj, d.ResultInfo);
                 });
-                //commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadResultInfo());
+                // commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadResultInfo());
                 break;
             // case InfoType.Val_TrapInfo:
             //     break;

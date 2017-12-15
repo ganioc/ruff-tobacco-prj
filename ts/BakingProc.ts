@@ -26,6 +26,7 @@ export class RunningHandle {
 
     public static timeDeltaCheckStatus: number;  // tobacco temperature checking period
     public static HistoryCounter: number; // currrent batch ID
+    public static bTempForUpperRack: boolean;
 
     public timerHandler: NodeJS.Timer;
 
@@ -61,6 +62,8 @@ export class RunningHandle {
         this.bBakingFinished = false;  // 标志位
 
         this.emitter = new Events.EventEmitter();
+
+        RunningHandle.bTempForUpperRack = true;
     }
 
     public init(options) {
@@ -85,12 +88,13 @@ export class RunningHandle {
         info.SysInfo.AppVersion = LocalStorage.getAppVersion();
         info.SysInfo.UIVersion = LocalStorage.getUiVersion();
 
-        info.RunningCurveInfo.TempCurveDryList =
-            appConfig.baking_config.default_curve.dryList;
-        info.RunningCurveInfo.TempCurveWetList =
-            appConfig.baking_config.default_curve.wetList;
-        info.RunningCurveInfo.TempDurationList =
-            appConfig.baking_config.default_curve.durList;
+        // baking curve will not be changed by config file
+        // info.RunningCurveInfo.TempCurveDryList =
+        //     info.RunningCurveInfo.TempCurveDryList;
+        // info.RunningCurveInfo.TempCurveWetList =
+        //     info.RunningCurveInfo.TempCurveWetList;
+        // info.RunningCurveInfo.TempDurationList =
+        //     info.RunningCurveInfo.TempDurationList;
 
         // ---------- read from app.json End ----------
 
@@ -98,68 +102,78 @@ export class RunningHandle {
         Tool.print("Check upper rack position");
 
         ControlPeriph.CheckUpperRack((data) => {
+            Tool.printGreen("CheckUpperRack");
+            console.log(data);
+
             if (data === 0) {
                 info.SysInfo.bTempForUpperRack = false;
+                RunningHandle.bTempForUpperRack = false;
+                info.BakingInfo.bTempForUpperRack = false;
             } else if (data === 1) {
                 info.SysInfo.bTempForUpperRack = true;
+                RunningHandle.bTempForUpperRack = true;
+                info.BakingInfo.bTempForUpperRack = true;
             } else {
                 Tool.printRed("Wrong result checkupperRack");
             }
+
+            // move in
+            // configure bakingCurve parameters
+            this.bakingCurve = new BakingCurve({
+                curve: this.getRunningOption(
+                    info.RunningCurveInfo.TempCurveDryList,
+                    info.RunningCurveInfo.TempCurveWetList,
+                    info.RunningCurveInfo.TempDurationList,
+                ),
+                timeDelta: RunningHandle.timeDeltaCheckStatus,
+            });
+
+            // Where to recover : current state, remain time?
+
+            if (info.SysInfo.bInRunning === RunningStatus.PAUSED) {
+                this.runningStatus = RunningStatus.PAUSED;
+                info.SysInfo.bInRunning = RunningStatus.PAUSED;
+                this.bBakingFinished = false;
+            } else if (info.SysInfo.bInRunning === RunningStatus.STOPPED) {
+                this.runningStatus = RunningStatus.STOPPED;
+                info.SysInfo.bInRunning = RunningStatus.STOPPED;
+                this.bBakingFinished = true;
+
+            } else if (info.SysInfo.bInRunning === RunningStatus.RUNNING) {
+                this.runningStatus = RunningStatus.PAUSED;
+                info.SysInfo.bInRunning = RunningStatus.PAUSED;
+                this.bBakingFinished = false;
+
+            } else if (info.SysInfo.bInRunning === RunningStatus.WAITING) {
+                this.runningStatus = RunningStatus.WAITING;
+                info.SysInfo.bInRunning = RunningStatus.WAITING;
+                this.bBakingFinished = false;
+            }
+
+            Tool.printRed("check sysinfo bInrunning " + info.SysInfo.bInRunning + " " + this.runningStatus);
+
+            RunningHandle.HistoryCounter = info.BakingInfo.HistoryCounter;
+
+            LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
+
+            LocalStorage.saveBakingStatusSync(info);
+
+            // reset peripheral stage
+            Tool.printYellow("Init peripheral status:");
+
+            Tool.printGreen("status is:" + this.runningStatus);
+
+            ControlPeriph.TurnOffBakingFire(() => {
+                Tool.print("Turn off baking fire");
+            });
+
+            ControlPeriph.StopWindVent(() => {
+                Tool.print("Stop wind vent");
+            });
+
+            ControlPeriph.ResetVent();
+
         });
-
-        // configure bakingCurve parameters
-        this.bakingCurve = new BakingCurve({
-            curve: this.getRunningOption(
-                info.RunningCurveInfo.TempCurveDryList,
-                info.RunningCurveInfo.TempCurveWetList,
-                info.RunningCurveInfo.TempDurationList,
-            ),
-            timeDelta: RunningHandle.timeDeltaCheckStatus,
-        });
-
-        // Where to recover : current state, remain time?
-
-        if (info.SysInfo.bInRunning === RunningStatus.PAUSED) {
-            this.runningStatus = RunningStatus.PAUSED;
-            info.SysInfo.bInRunning = RunningStatus.PAUSED;
-            this.bBakingFinished = false;
-        } else if (info.SysInfo.bInRunning === RunningStatus.STOPPED) {
-            this.runningStatus = RunningStatus.STOPPED;
-            info.SysInfo.bInRunning = RunningStatus.STOPPED;
-            this.bBakingFinished = true;
-
-        } else if (info.SysInfo.bInRunning === RunningStatus.RUNNING) {
-            this.runningStatus = RunningStatus.PAUSED;
-            info.SysInfo.bInRunning = RunningStatus.PAUSED;
-            this.bBakingFinished = false;
-
-        } else if (info.SysInfo.bInRunning === RunningStatus.WAITING) {
-            this.runningStatus = RunningStatus.WAITING;
-            info.SysInfo.bInRunning = RunningStatus.WAITING;
-            this.bBakingFinished = false;
-        }
-
-        Tool.printRed("check sysinfo bInrunning " + info.SysInfo.bInRunning + " " + this.runningStatus);
-
-        RunningHandle.HistoryCounter = info.BakingInfo.HistoryCounter;
-
-        LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
-
-        LocalStorage.saveBakingStatusSync(info);
-
-        // reset peripheral stage
-        Tool.printYellow("Init peripheral status:");
-
-        Tool.printGreen("status:" + this.runningStatus);
-
-        ControlPeriph.TurnOffBakingFire(() => {
-            Tool.print("Turn off baking fire");
-        });
-
-        ControlPeriph.StopWindVent(() => {
-            Tool.print("Stop wind vent");
-        });
-
     }
 
     public reset() {
@@ -505,8 +519,8 @@ export class RunningHandle {
                 timeDelta: RunningHandle.timeDeltaCheckStatus,
             });
 
-            LocalStorage.saveBakingStatusAsync(info, (err, data) => {
-                if (err) {
+            LocalStorage.saveBakingStatusAsync(info, (err2, data2) => {
+                if (err2) {
                     Tool.printRed("updateRunningCurveInfoAsync fail save");
                 }
             });
@@ -578,7 +592,7 @@ export class RunningHandle {
         Tool.printMagenta("update ResultInfo");
         Tool.print(data);
 
-        let info: IInfoCollect
+        let info: IInfoCollect;
 
         if (data instanceof Array) {
 
@@ -593,8 +607,8 @@ export class RunningHandle {
                 data.forEach((element) => {
                     info.ResultInfo.content.push(element);
                 });
-                LocalStorage.saveBakingStatusAsync(info, (err, data) => {
-                    if (err) {
+                LocalStorage.saveBakingStatusAsync(info, (err2, data2) => {
+                    if (err2) {
                         Tool.printRed("udpateresult fail save");
                         return;
                     }
@@ -629,8 +643,8 @@ export class RunningHandle {
             Tool.printMagenta("After update");
             console.log(info.BakingInfo);
 
-            LocalStorage.saveBakingStatusAsync(info, (err, data) => {
-                if (err) {
+            LocalStorage.saveBakingStatusAsync(info, (err2, data2) => {
+                if (err2) {
                     Tool.printRed("updateBakingInfoAsync fail save");
                     return;
                 }
@@ -783,8 +797,8 @@ export class RunningHandle {
                 } else {
                     obj.PrimaryDryTemp = ControlPeriph.temp1;
                     obj.PrimaryWetTemp = ControlPeriph.temp3;
-                    obj.SecondaryDryTemp = ControlPeriph.temp2;
-                    obj.SecondaryWetTemp = ControlPeriph.temp4;
+                    obj.SecondaryDryTemp = ControlPeriph.temp4;
+                    obj.SecondaryWetTemp = ControlPeriph.temp2;
 
                 }
 
