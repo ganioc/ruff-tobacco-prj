@@ -58,7 +58,6 @@ export class ControlPeriph {
         Tool.print("Vent speed degree/second :" + ControlPeriph.VENT_SPEED);
         Tool.print("Default angle:" + ControlPeriph.VentAngle);
 
-
         ControlPeriph.bToggleWD = true;
 
         ControlPeriph.gpsLatitude = 0.0;
@@ -194,10 +193,23 @@ export class ControlPeriph {
     public static ResetVent() {
 
         Tool.printYellow("Reset Vent angle to 0 degree");
+        const angle = 90;
 
-        ControlPeriph.DecreaseVentAngle(90, () => {
-            ControlPeriph.VentAngle = 0;
+        const delay = angle / ControlPeriph.VENT_SPEED;
+        // in seconds
+        ControlPeriph.TurnOffWindVent(() => {
+            Tool.printBlue("Turn off Vent , angle:" + angle);
+            Tool.printBlue("Turn off Vent for :" + delay + " seconds");
         });
+        setTimeout(() => {
+            ControlPeriph.StopWindVent(() => {
+                Tool.printRed("vent end");
+            });
+            ControlPeriph.VentAngle -= angle;
+            if (ControlPeriph.VentAngle < 0) {
+                ControlPeriph.VentAngle = 0;
+            }
+        }, delay * 1000);
     }
     public static TurnOnGPS(cb) {
         $("#outGPSPower").turnOn(cb);
@@ -220,17 +232,19 @@ export class ControlPeriph {
     public static GetVentAngle(): number {
         return ControlPeriph.VentAngle;
     }
+    /*
+        Still send open command after the angle is 90 degree
 
+    **/
     public static IncreaseVentAngle(angle: number, cb) {
         Tool.print("ControlPeriph: increase vent angle");
         const delay = angle / ControlPeriph.VENT_SPEED;
 
         if (angle > 90) {
             Tool.print("Too big value for vent");
+            cb(0);
             return;
         }
-
-        ControlPeriph.VentAngle += angle;
 
         // in seconds
         ControlPeriph.TurnOnWindVent(() => {
@@ -238,22 +252,33 @@ export class ControlPeriph {
             Tool.printBlue("Turn on Vent for :" + delay + " seconds");
         });
         setTimeout(() => {
-            ControlPeriph.StopWindVent(cb);
+            ControlPeriph.StopWindVent(() => {
+                Tool.printRed("Vent stop");
+            });
             ControlPeriph.VentAngle += angle;
             if (ControlPeriph.VentAngle > 90) {
                 ControlPeriph.VentAngle = 90;
             }
+            cb(angle);
         }, delay * 1000);
     }
+    /**
+     *
+     */
     public static DecreaseVentAngle(angle: number, cb) {
         Tool.print("ControlPeriph: decrease vent angle");
 
         if (angle > 90) {
             Tool.print("Too big value for vent");
+            cb(0);
             return;
         }
 
-        ControlPeriph.VentAngle -= angle;
+        if (ControlPeriph.VentAngle < 0.02) {
+            ControlPeriph.VentAngle = 0;
+            Tool.printRed("No need to control angle, already 0 deg");
+            return;
+        }
 
         const delay = angle / ControlPeriph.VENT_SPEED;
         // in seconds
@@ -262,11 +287,14 @@ export class ControlPeriph {
             Tool.printBlue("Turn off Vent for :" + delay + " seconds");
         });
         setTimeout(() => {
-            ControlPeriph.StopWindVent(cb);
+            ControlPeriph.StopWindVent(() => {
+                Tool.printRed("vent end");
+            });
             ControlPeriph.VentAngle -= angle;
             if (ControlPeriph.VentAngle < 0) {
                 ControlPeriph.VentAngle = 0;
             }
+            cb(angle);
         }, delay * 1000);
     }
 

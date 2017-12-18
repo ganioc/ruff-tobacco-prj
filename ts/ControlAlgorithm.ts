@@ -146,12 +146,10 @@ export class TempControl {
         //     return 90 * deltaTemp / 4.5;
         // }
 
-        if (deltaTemp < 0) {
+        if (deltaTemp <= 0.2) {
             return -30;
-        } else if (deltaTemp > 0) {
+        } else if (deltaTemp > 0.2) {
             return 15;
-        } else {
-            return 0;
         }
     }
     // return vent angle delta, -90 ~ 90 degree
@@ -184,12 +182,10 @@ export class TempControl {
         //     return 90 * deltaTemp / 4.5;
         // }
 
-        if (deltaTemp < 0) {
+        if (deltaTemp <= 0.2) {
             return -30;
-        } else if (deltaTemp > 0) {
+        } else if (deltaTemp > 0.2) {
             return 15;
-        } else {
-            return 0;
         }
     }
 }

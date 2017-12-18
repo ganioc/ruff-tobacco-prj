@@ -68,12 +68,12 @@ export class BakingElement {
         Tool.printRed("Vent angle delta " + " is " + newDelta);
 
         if (newDelta > 0) {
-            ControlPeriph.IncreaseVentAngle(newDelta, () => {
-                Tool.print("Algorithm -> increase: " + newDelta);
+            ControlPeriph.IncreaseVentAngle(newDelta, (data) => {
+                Tool.print("Algorithm -> increase: " + data);
             });
         } else if (newDelta < 0) {
-            ControlPeriph.DecreaseVentAngle(-newDelta, () => {
-                Tool.print("Algorithm -> decrease: " + -newDelta);
+            ControlPeriph.DecreaseVentAngle(-newDelta, (data) => {
+                Tool.print("Algorithm -> decrease: " + data);
             });
         } else {
             Tool.printRed("No need to adjust vent angle");
