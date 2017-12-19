@@ -178,6 +178,7 @@ export class ProtobufDecode {
                 clientId: this.info.mqttResponse.dyId,
             });
             this.mqtt.start();
+
             return Promise.resolve("OK");
         }).then((d) => {
             // backgorund work

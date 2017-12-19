@@ -528,6 +528,8 @@ export class ControlPeriph {
                 if (ControlPeriph.vHiLowWindEngine >= 6) {
                     // hi speed
                     ControlPeriph.bWindGateHighSpeed = true;
+                } else if (ControlPeriph.vHiLowWindEngine === 0) {
+                    Tool.printRed("Wind gate stopped, should we alram?");
                 } else {
                     // low speed
                     ControlPeriph.bWindGateHighSpeed = false;

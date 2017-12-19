@@ -292,6 +292,8 @@ function main() {
                     appBaking.reset();
                     Tool.print("App reseted");
 
+                    decoder.init({});
+
                     ControlPeriph.TurnOffRunningLED(() => {
                         Tool.print("Turn off LED");
                     });
@@ -403,6 +405,15 @@ function main() {
 
                 appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
                     commQT.sendGetResp(data.PacketId, data.Obj, d.BaseSetting);
+                });
+
+                break;
+            case InfoType.Val_CloudCurveInfo:
+                Tool.printBlue("Get CloudCurveInfo received");
+
+                // Read curves from cloud
+                appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
+                    commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo());
                 });
 
                 break;

@@ -87,9 +87,9 @@ export class MqttApp {
         this.client.on("clsoe", () => {
             Tool.printRed("MQTT to baidu closed");
 
-            setTimeout(() => {
-                this.reconnect();
-            }, 15000);
+            // setTimeout(() => {
+            //     this.reconnect();
+            // }, 15000);
         });
         this.client.on("error", (err) => {
             Tool.printRed("MQTT baidu, error");

@@ -13,6 +13,7 @@ export enum ObjType {
     TrapBaking,
     TrapUpdateCurve,
     TrapYesNo,  // 20
+    CloudCurveInfo, // 21
 }
 
 export enum BakingType {

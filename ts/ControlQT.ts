@@ -20,6 +20,7 @@ export enum InfoType {
     Val_BakingInfo = 16,
     Val_BaseSetting = 17,
     Val_TrapBaking = 18,
+    Val_CloudCurveInfo = 21,
 }
 
 export interface IfPacket {
