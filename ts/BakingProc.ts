@@ -195,8 +195,6 @@ export class RunningHandle {
 
             LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
 
-            /// -
-
             LocalStorage.saveBakingStatusSync(info);
 
             // copy status file to the project direc

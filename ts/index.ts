@@ -16,7 +16,8 @@ import { CommQT, IfMsgCmd, IfPacket, InfoType } from "./ControlQT";
 import { HttpsApp, IfHttpsApp } from "./HttpsApp";
 import { JustTest } from "./JustTest";
 import { LocalStorage } from "./LocalStorage";
-import { MqttApp } from "./MqttApp";
+
+import { ProtobufDecode } from "./ProtobufDecode";
 import { Tool } from "./utility";
 
 const TRAP_PERIOD = 1400;
@@ -34,13 +35,15 @@ const gprs = new ControlGPRS();
 
 const commMCU = new ControlMcu();
 
-const mqttApp = new MqttApp({
-    address: "ssl://a5de16f68b2d48098d601c885a3aa444.mqtt.iot.gz.baidubce.com",
-    port: 1884,
-    name: "a5de16f68b2d48098d601c885a3aa444/ruff_super_test",
-    key: "7KokioMzX17dwj0tkZ2yVJ0GRdt71aAK5bCNCs2Y8Hk=",
-    clientId: "curing_device_ruff_test",
-});
+// const mqttApp = new MqttApp({
+//     address: "ssl://a5de16f68b2d48098d601c885a3aa444.mqtt.iot.gz.baidubce.com",
+//     port: 1884,
+//     name: "a5de16f68b2d48098d601c885a3aa444/ruff_super_test",
+//     key: "7KokioMzX17dwj0tkZ2yVJ0GRdt71aAK5bCNCs2Y8Hk=",
+//     clientId: "curing_device_ruff_test",
+// });
+
+const decoder = new ProtobufDecode();
 
 const option: IfHttpsApp = {
     hostname: "api.shdingyun.com",
@@ -87,8 +90,6 @@ $.ready((error) => {
         // test.testGPRS(gprs);
     }, 2000);
 
-    appBaking.init({});
-
 });
 
 $.end(() => {
@@ -112,6 +113,10 @@ $.end(() => {
 function main() {
     // This is the mqtt client
     // mqttApp.start();
+    appBaking.init({});
+
+    // 云端交互初始化
+    decoder.init({});
 
     // Task init, very important
     /***************************
@@ -462,3 +467,9 @@ function main() {
     }, 1300);
 
 }
+// For cloud interface
+// function cloud_main() {
+//     setInterval(() => {
+//         // client.login();
+//     }, 24 * 3600 * 1000);
+// }

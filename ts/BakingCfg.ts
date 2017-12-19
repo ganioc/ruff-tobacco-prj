@@ -235,3 +235,17 @@ export interface IfConfigFile {
         base_setting: IBaseSetting;
     };
 }
+export interface IfMqttResponse {
+    imei: string;
+    dyId: string;
+    dypassword: string;
+    mqttTcpEndpoint: string;
+    mqttSslEndpoint: string;
+    mqttWssEndpoint: string;
+    mqttUsername: string;
+    mqttKey: string;
+}
+export interface IfMachineInfo {
+    mqttResponse: IfMqttResponse;
+    currentBatchId: string;
+}

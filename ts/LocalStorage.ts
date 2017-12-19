@@ -35,6 +35,7 @@ const C_FILE_DEFAULT_CURVE_NAME = "defaultBakingCurve.json";  // default baking 
 const C_FILE_LOG = "_baking.log"; // job started, job durationg, job time,
 // tabacco level , history data, at each directory
 const C_MACHINE_ID = "RUFF-0001";
+const C_FILE_MACHINE = "/home/root/machine.json"; // to store machine's device_id, code, mqtt user, code
 
 Tool.printGreen(path.dirname(__filename));
 
@@ -66,6 +67,9 @@ export class LocalStorage {
     public static getDefaultCurveDirec(): string {
         Tool.printBlue(C_ROOT_DIR + "/" + C_FILE_DEFAULT_CURVE_NAME);
         return C_ROOT_DIR + "/" + C_FILE_DEFAULT_CURVE_NAME;
+    }
+    public static getMachineFile(): string {
+        return C_FILE_MACHINE;
     }
     /*
     public static saveSysInfo() {
@@ -309,6 +313,32 @@ export class LocalStorage {
     }
     public static getUiVersion(): string {
         return UI_VERSION;
+    }
+
+    public static loadMachineInfoAsync(callback) {
+        Tool.printMagenta(LocalStorage.getMachineFile() + "---->");
+        if (fs.existsSync(LocalStorage.getMachineFile())) {
+            Tool.print("file already exist: ");
+            fs.readFile(LocalStorage.getMachineFile(), (err, data) => {
+                if (err) {
+                    callback(err, null);
+                    return;
+                }
+                let obj: any;
+                try {
+                    obj = JSON.parse(data.toString());
+                } catch (e) {
+                    Tool.printRed("loadMachineInfo error");
+                    Tool.printRed(e);
+                    callback(e, null);
+                    return;
+                }
+                callback(null, obj);
+            });
+        } else {
+            Tool.print("Not exist, it's a new machine: ");
+            callback("NOK", null);
+        }
     }
 }
 /*

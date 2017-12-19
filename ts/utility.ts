@@ -7,7 +7,7 @@ export class Tool {
     public static MachineSN: string;
 
     public static readMachineSNFromRuffd() {
-        this.MachineSN = process.env.RUFF_SN;
+        Tool.MachineSN = process.env.RUFF_SN;
         Tool.printYellow(this.MachineSN);
     }
 
