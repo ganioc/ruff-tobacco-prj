@@ -74,10 +74,10 @@ export class TempControl {
         // }
 
         // modified on 2017-12-13
-        if (deltaTemp > 0.2) {
+        if (deltaTemp > 0) {
             return 0;
 
-        } else if (deltaTemp < 0.2) {
+        } else if (deltaTemp < -0.2) {
             return 1;
         } else {
             return 0;
@@ -113,10 +113,10 @@ export class TempControl {
         // }
 
         // modified on 2017-12-13
-        if (deltaTemp > 0.2) {
+        if (deltaTemp > 0) {
             return 0;
 
-        } else if (deltaTemp < 0.2) {
+        } else if (deltaTemp < -0.2) {
             return 1;
         } else {
             return 0;
@@ -150,6 +150,8 @@ export class TempControl {
             return -30;
         } else if (deltaTemp > 0.2) {
             return 15;
+        } else {
+            return 0;
         }
     }
     // return vent angle delta, -90 ~ 90 degree
@@ -186,6 +188,8 @@ export class TempControl {
             return -30;
         } else if (deltaTemp > 0.2) {
             return 15;
+        } else {
+            return 0;
         }
     }
 }

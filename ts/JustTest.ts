@@ -13,6 +13,7 @@ import { HttpsApp, IfHttpsApp } from "./HttpsApp";
 
 const protoFile = __dirname + "/../data/awesome.proto";
 import { Tool } from "./utility";
+import { setTimeout } from "timers";
 
 export class JustTest {
 
@@ -380,5 +381,101 @@ export class JustTest {
     public testGPRS(gprs: ControlGPRS) {
 
         gprs.start();
+    }
+    public testWindGate() {
+        console.log("hello");
+
+        ControlPeriph.ResetVent();
+
+        const proc = new Promise((resolve, reject) => {
+
+            setTimeout(() => {
+                resolve("OK");
+            }, 5000);
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.IncreaseVentAngle(15, () => {
+                    console.log("to 15 degree  1");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.IncreaseVentAngle(15, () => {
+                    console.log("to 15 degree  2");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.IncreaseVentAngle(15, () => {
+                    console.log("to 15 degree  3");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.IncreaseVentAngle(15, () => {
+                    console.log("to 15 degree 4");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.IncreaseVentAngle(15, () => {
+                    console.log("to 15 degree 5");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.IncreaseVentAngle(15, () => {
+                    console.log("to 15 degree 6");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 5000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.DecreaseVentAngle(30, () => {
+                    console.log("to 30 degree 1");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.DecreaseVentAngle(30, () => {
+                    console.log("to 30 degree 2");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.DecreaseVentAngle(30, () => {
+                    console.log("to 30 degree 3");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
+        });
+    }
+    public testWindGateProtect() {
+        //
     }
 }

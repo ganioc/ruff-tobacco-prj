@@ -7,6 +7,9 @@ import { ControlGPRS } from "./ControlGPRS";
 import { ControlMcu } from "./ControlMcu";
 import { Tool } from "./utility";
 
+// a tuning parameter
+const DEGREE_DELTA = 180;
+
 export interface IfControlPeriphOption {
     max_angle: number;
     min_angle: number;
@@ -209,7 +212,7 @@ export class ControlPeriph {
             if (ControlPeriph.VentAngle < 0) {
                 ControlPeriph.VentAngle = 0;
             }
-        }, delay * 1000);
+        }, delay * 1000 + DEGREE_DELTA);
     }
     public static TurnOnGPS(cb) {
         $("#outGPSPower").turnOn(cb);
@@ -238,13 +241,20 @@ export class ControlPeriph {
     **/
     public static IncreaseVentAngle(angle: number, cb) {
         Tool.print("ControlPeriph: increase vent angle");
-        const delay = angle / ControlPeriph.VENT_SPEED;
 
         if (angle > 90) {
             Tool.print("Too big value for vent");
             cb(0);
             return;
         }
+
+        const delay = angle / ControlPeriph.VENT_SPEED;
+
+        // if (ControlPeriph.VentAngle > 89.8) {
+        //     ControlPeriph.VentAngle = 90;
+        //     Tool.printRed("No need to control angle, already 0 deg, but do it a little");
+        //     delay = 2 * DEGREE_DELTA;
+        // }
 
         // in seconds
         ControlPeriph.TurnOnWindVent(() => {
@@ -260,13 +270,14 @@ export class ControlPeriph {
                 ControlPeriph.VentAngle = 90;
             }
             cb(angle);
-        }, delay * 1000);
+        }, delay * 1000 - DEGREE_DELTA);
     }
     /**
      *
      */
     public static DecreaseVentAngle(angle: number, cb) {
         Tool.print("ControlPeriph: decrease vent angle");
+        const delay = angle / ControlPeriph.VENT_SPEED;
 
         if (angle > 90) {
             Tool.print("Too big value for vent");
@@ -274,13 +285,12 @@ export class ControlPeriph {
             return;
         }
 
-        if (ControlPeriph.VentAngle < 0.02) {
-            ControlPeriph.VentAngle = 0;
-            Tool.printRed("No need to control angle, already 0 deg");
-            return;
-        }
+        // if (ControlPeriph.VentAngle < 0.02) {
+        //     ControlPeriph.VentAngle = 0;
+        //     Tool.printRed("No need to control angle, already 0 deg, but do it a little");
+        //     delay = 2 * DEGREE_DELTA;
+        // }
 
-        const delay = angle / ControlPeriph.VENT_SPEED;
         // in seconds
         ControlPeriph.TurnOffWindVent(() => {
             Tool.printBlue("Turn off Vent , angle:" + angle);
@@ -295,7 +305,7 @@ export class ControlPeriph {
                 ControlPeriph.VentAngle = 0;
             }
             cb(angle);
-        }, delay * 1000);
+        }, delay * 1000 - DEGREE_DELTA);
     }
 
     public static TurnOnBakingFire(cb) {

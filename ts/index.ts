@@ -74,7 +74,7 @@ $.ready((error) => {
     ControlPeriph.init({
         max_angle: 90,
         min_angle: 0,
-        speed: 10,
+        speed: 22, // speed of windgate
     });
 
     gps.start();
@@ -83,11 +83,13 @@ $.ready((error) => {
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        main();
+        // main();
         // test.test();
         // test.testHttps();
         // test.testSN();
         // test.testGPRS(gprs);
+        // test.testWindGate();
+        test.testWindGateProtect();
     }, 2000);
 
 });
