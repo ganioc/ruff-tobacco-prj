@@ -84,12 +84,12 @@ export class MqttApp {
                 password: this.key,
             },
         );
-        this.client.on("clsoe", () => {
+        this.client.on("close", () => {
             Tool.printRed("MQTT to baidu closed");
 
-            // setTimeout(() => {
-            //     this.reconnect();
-            // }, 15000);
+            setTimeout(() => {
+                this.reconnect();
+            }, 100000);
         });
         this.client.on("error", (err) => {
             Tool.printRed("MQTT baidu, error");
@@ -97,7 +97,7 @@ export class MqttApp {
 
             this.counterError++;
 
-            if (this.counterError > 10) {
+            if (this.counterError > 100) {
                 this.reconnect();
             }
         });

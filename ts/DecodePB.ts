@@ -3,7 +3,7 @@
  */
 
 import * as Protobuf from "protobufjs";
-import { Message } from "protobufjs";
+//import { Message } from "protobufjs";
 import { inspect } from "util";
 import { Tool } from "./utility";
 
@@ -93,7 +93,7 @@ export class DecodePB {
                 lst.push(obj[i]);
             }
         }
-        console.log(lst);
+        // console.log(lst);
 
         const errMsg = this.decoder.verify(obj);
 
@@ -115,7 +115,7 @@ export class DecodePB {
                 lst.push(buffer[i]);
             }
         }
-        console.log(lst);
+        //console.log(lst);
         Tool.printYellow("==== out of Encode PB ====");
 
         return buffer;
@@ -126,8 +126,8 @@ export class DecodePB {
         let objRx;
 
         console.log("proto decode buf:");
-        console.log(buf);
-        console.log(buf.toString());
+        //console.log(buf);
+        //console.log(buf.toString());
         console.log(buf.length);
 
         try {
@@ -139,7 +139,7 @@ export class DecodePB {
             return {};
         }
 
-        console.log(objRx);
+        //console.log(objRx);
 
         return objRx;
 

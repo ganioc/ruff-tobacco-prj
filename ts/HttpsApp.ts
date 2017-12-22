@@ -57,8 +57,8 @@ export class HttpsApp {
             imei: sn,
         };
         Tool.printYellow(sn);
-        console.log(data);
-        console.log(JSON.stringify(data));
+        //console.log(data);
+        //console.log(JSON.stringify(data));
 
         this.post("/login", JSON.stringify(data), callback);
     }
@@ -106,7 +106,7 @@ export class HttpsApp {
             Tool.printYellow("------Response from PUT-------");
             console.log("statusCode:" + res.statusCode);
             console.log("headers:" + res.headers);
-            console.log(inspect(res.headers));
+            // console.log(inspect(res.headers));
 
             if (res.statusCode === 403) {
                 Tool.printRed("Forbidden path");
@@ -114,8 +114,8 @@ export class HttpsApp {
 
             res.on("data", (d) => {
                 Tool.printMagenta("<-- PUT response from https server:");
-                Tool.print(d);
-                Tool.print(d.toString());
+                //Tool.print(d);
+                //Tool.print(d.toString());
                 Tool.printMagenta("----end----");
                 callback(null, d);
             });
@@ -165,17 +165,17 @@ export class HttpsApp {
             rejectUnauthorized: false,
         };
 
-        console.log(option);
-        console.log(data);
+        // console.log(option);
+        // console.log(data);
 
         const req = https.request(option, (res) => {
             console.log("statusCode:" + res.statusCode);
             console.log("headers:" + res.headers);
-            console.log(inspect(res));
+            //console.log(inspect(res));
 
             res.on("data", (d) => {
                 Tool.printMagenta("<-- from https server:");
-                Tool.print(d);
+                // Tool.print(d);
                 Tool.printYellow("to object");
                 Tool.printMagenta("----end----");
                 callback(null, d);
@@ -217,7 +217,7 @@ export class HttpsApp {
             Tool.printYellow("------Response from GET-------");
             console.log("statusCode:" + res.statusCode);
             console.log("headers:" + res.headers);
-            console.log(inspect(res.headers));
+            //console.log(inspect(res.headers));
 
             if (res.statusCode === 403) {
                 Tool.printRed("Forbidden path");
@@ -225,7 +225,7 @@ export class HttpsApp {
 
             res.on("data", (d) => {
                 Tool.printMagenta("<-- from https server:");
-                Tool.print(d);
+                //Tool.print(d);
                 Tool.printMagenta("----end----");
                 callback(null, d);
             });
@@ -242,7 +242,7 @@ export class HttpsApp {
             callback(e, null);
         });
 
-        Tool.printYellow(inspect(req));
+        //Tool.printYellow(inspect(req));
 
         req.end();
     }

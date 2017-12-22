@@ -81,6 +81,10 @@ $.ready((error) => {
 
     // gprs.start();
 
+    
+    // 云端交互初始化
+    decoder.init({});
+
     setTimeout(() => {
         Tool.printYellow("Go to main()");
         main();
@@ -90,7 +94,7 @@ $.ready((error) => {
         // test.testGPRS(gprs);
         // test.testWindGate(commMCU);
         // test.testWindGateProtect(commMCU);
-    }, 2000);
+    }, 5000);
 
 });
 
@@ -117,8 +121,6 @@ function main() {
     // mqttApp.start();
     appBaking.init({});
 
-    // 云端交互初始化
-    // decoder.init({});
 
     // Task init, very important
     /***************************
@@ -294,7 +296,7 @@ function main() {
                     appBaking.reset();
                     Tool.print("App reseted");
 
-                    decoder.init({});
+                    // decoder.init({});
 
                     ControlPeriph.TurnOffRunningLED(() => {
                         Tool.print("Turn off LED");
@@ -480,9 +482,3 @@ function main() {
     }, 1300);
 
 }
-// For cloud interface
-// function cloud_main() {
-//     setInterval(() => {
-//         // client.login();
-//     }, 24 * 3600 * 1000);
-// }

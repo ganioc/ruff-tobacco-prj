@@ -8,7 +8,7 @@ import { MqttApp } from "./MqttApp";
 import { Tool } from "./utility";
 import { LocalStorage } from "./LocalStorage";
 import { HttpsApp, IfHttpsApp } from "./HttpsApp";
-import { IfMachineInfo } from "./BakingCfg";
+import { IfMachineInfo, IfMqttResponse } from "./BakingCfg";
 import { setInterval } from "timers";
 
 const protoFile = __dirname + "/../data/awesome.proto";
@@ -102,6 +102,7 @@ export class ProtobufDecode {
             // read local storage for machine Info
             Tool.printBlue("There is network, TOKEN:" + d);
             ProtobufDecode.bOnline = true;
+
             return new Promise((resolve, reject) => {
                 if (fs.existsSync(LocalStorage.getMachineFile())) {
                     Tool.print("Machine Already exist: ");
@@ -121,7 +122,8 @@ export class ProtobufDecode {
                             reject("NOEXIST");
                             return;
                         }
-                        resolve(obj);
+                        this.info = JSON.parse(JSON.stringify(obj));
+                        resolve("OK");
                     });
 
                 } else {
@@ -136,39 +138,45 @@ export class ProtobufDecode {
         }).then((obj: any) => {
             return Promise.resolve(obj);
         }, (d: any) => {
-
-            if (d === "NONETWORK") {
-                return Promise.reject(d);
-            }
-            // register to the server
-            this.client.register(Tool.MachineSN, this.TOKEN, (err, buf) => {
-                if (err) {
-                    return Promise.reject("NOK");
+            return new Promise((resolve, reject) => {
+                if (d === "NONETWORK") {
+                    reject(d);
+                    return;
                 }
-                let obj: any;
-                try {
-                    obj = JSON.parse(buf.toString());
-                } catch (e) {
-                    Tool.printRed("parse registerresponse data error");
-                    Tool.printRed(e);
+                // register to the server
+                this.client.register(Tool.MachineSN, this.TOKEN, (err, buf) => {
+                    if (err) {
+                        reject("NOK");
+                    }
+                    let objRegisterResponse: IfMqttResponse;
+                    try {
+                        objRegisterResponse = this.decodeRegisterResponse.decode(new Uint8Array(buf));
+                    } catch (e) {
+                        Tool.printRed("parse registerresponse data error");
+                        Tool.printRed(e);
 
-                    return Promise.reject("NOK");
-                }
-                const objAll = {
-                    mqttResponse: obj,
-                    currentBatchId: "",
-                };
-                // save it to local file
-                fs.writeFileSync(LocalStorage.getMachineFile(), JSON.stringify(objAll));
-                Tool.print("Save to machine file");
-                return Promise.resolve(objAll);
+                        reject("NOK");
+                    }
+                    const objAll = {
+                        mqttResponse: objRegisterResponse,
+                        currentBatchId: "",
+                    };
+                    // save it to local file
+                    fs.writeFileSync(LocalStorage.getMachineFile(), JSON.stringify(objAll));
+                    Tool.print("Save to machine file");
+                    this.info = JSON.parse(JSON.stringify(objAll));
+                    console.log("objAll")
+                    console.log(objAll);
+                    console.log("Info")
+                    console.log(this.info);
+                    resolve("OK");
+                });
             });
-
         }).then((obj: any) => {
-            this.info = obj;
+
             Tool.printBlue("Machine info");
 
-            console.log(obj);
+            console.log(this.info);
             // create the mqtt client
             this.mqtt = new MqttApp({
                 address: this.info.mqttResponse.mqttSslEndpoint,
@@ -186,8 +194,10 @@ export class ProtobufDecode {
                 this.client.login(Tool.MachineSN, (err, buf) => {
                     if (err) {
                         console.log(err);
+                        ProtobufDecode.bOnline = false;
                         return;
                     }
+                    ProtobufDecode.bOnline = true;
                     console.log(buf.length);
                     this.TOKEN = buf.toString();
                     Tool.printBlue(this.TOKEN);
