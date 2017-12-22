@@ -77,19 +77,19 @@ $.ready((error) => {
         speed: 22, // speed of windgate
     });
 
-    gps.start();
+    // gps.start();
 
-    gprs.start();
+    // gprs.start();
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        // main();
+        main();
         // test.test();
         // test.testHttps();
         // test.testSN();
         // test.testGPRS(gprs);
-        // test.testWindGate();
-        test.testWindGateProtect();
+        // test.testWindGate(commMCU);
+        // test.testWindGateProtect(commMCU);
     }, 2000);
 
 });
@@ -118,7 +118,7 @@ function main() {
     appBaking.init({});
 
     // 云端交互初始化
-    decoder.init({});
+    // decoder.init({});
 
     // Task init, very important
     /***************************

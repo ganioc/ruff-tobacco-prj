@@ -144,6 +144,7 @@ export class CommQT {
     public write(data: string) {
         Tool.printMagenta("QT.write:-->");
         Tool.print(data);
+        Tool.printMagenta("------------");
         this.client.write(data);
     }
     public sendQuery(header: string, text: string, type: number, cb: (err, data) => void) {

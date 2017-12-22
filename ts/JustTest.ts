@@ -13,7 +13,7 @@ import { HttpsApp, IfHttpsApp } from "./HttpsApp";
 
 const protoFile = __dirname + "/../data/awesome.proto";
 import { Tool } from "./utility";
-import { setTimeout } from "timers";
+import { setTimeout, setInterval } from "timers";
 
 export class JustTest {
 
@@ -382,7 +382,7 @@ export class JustTest {
 
         gprs.start();
     }
-    public testWindGate() {
+    public testWindGate(commMCU) {
         console.log("hello");
 
         ControlPeriph.ResetVent();
@@ -448,6 +448,24 @@ export class JustTest {
             });
         }).then((d) => {
             return new Promise((resolve, reject) => {
+                ControlPeriph.IncreaseVentAngle(15, () => {
+                    console.log("to 15 degree 7");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 5000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.IncreaseVentAngle(15, () => {
+                    console.log("to 15 degree 8");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 5000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
                 ControlPeriph.DecreaseVentAngle(30, () => {
                     console.log("to 30 degree 1");
                 });
@@ -473,9 +491,48 @@ export class JustTest {
                     resolve("OK");
                 }, 3000);
             });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.DecreaseVentAngle(30, () => {
+                    console.log("to 30 degree 4");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
+        }).then((d) => {
+            return new Promise((resolve, reject) => {
+                ControlPeriph.DecreaseVentAngle(30, () => {
+                    console.log("to 30 degree 5");
+                });
+                setTimeout(() => {
+                    resolve("OK");
+                }, 3000);
+            });
         });
+
+        setInterval(() => {
+            commMCU.GetADC((err, data) => {
+                if (err) {
+                    Tool.printGreen("err");
+                    return;
+                }
+                // Tool.printYellow(data.content);
+                // Tool.printYellow(data.content.slice(32, 40));
+                const ADC5: number = parseFloat(data.content.slice(32, 40).toString());
+                console.log("v:" + ADC5);
+            });
+        }, 100);
     }
-    public testWindGateProtect() {
+    public testWindGateProtect(commMCU) {
         //
+        ControlPeriph.ResetVent();
+        // increase it and detect the adc
+        setInterval(() => {
+            commMCU.GetADC((err, data) => {
+                const ADC5: number = parseFloat(data.content.slice(32, 40).toString());
+                console.log("v:" + ADC5);
+            });
+        }, 150);
     }
 }
