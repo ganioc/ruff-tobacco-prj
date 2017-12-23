@@ -129,6 +129,16 @@ export class Alarm {
     public static wetTempCounter: number;
     public static wetTempCounterMax: number;
 
+    public static windEnginePhaseLostCounter: number;
+    public static windEngineOverloadCounter: number;
+    public static windEngineCounterMax: number;
+
+    public static windEngineState: boolean;
+    public static windEngineTimerCounter: number;
+    public static windEngineInCheck: boolean;
+    public static windEngineInCheckPeriod: boolean;
+    public static windEngineOpenCounter: number;
+
     public static init() {
         Alarm.checkPeriod = ALARM_CHECKING_PERIOD;
 
@@ -139,6 +149,15 @@ export class Alarm {
 
         Alarm.wetTempCounter = 0;
         Alarm.wetTempCounterMax = WET_TEMP_ALARM_PERIOD / ALARM_CHECKING_PERIOD;
+
+        Alarm.windEnginePhaseLostCounter = 0;
+        Alarm.windEngineOverloadCounter = 0;
+        Alarm.windEngineCounterMax = 6; // TRAP_PERIOD = 1.5, so 1.5 * 10 = 15 seconds;
+        Alarm.windEngineState = true; // It's on state
+        Alarm.windEngineTimerCounter = 0;
+        Alarm.windEngineInCheck = false;
+        Alarm.windEngineInCheckPeriod = false;
+        Alarm.windEngineOpenCounter = 0;
 
     }
     public static reset() {
@@ -220,6 +239,28 @@ export class Alarm {
         } else {
             return 0;
         }
+    }
+    public static delayOpen(time) {
+
+        Alarm.windEngineTimerCounter++;
+
+        if (Alarm.windEngineTimerCounter > 10) {
+            return;
+        }
+
+        Alarm.windEngineInCheckPeriod = true;
+
+        setTimeout(() => {
+
+            ControlPeriph.TurnOnWindEngine(() => {
+                Tool.printRed("Turn on WindEngine: after 60 seconds");
+                Alarm.windEngineInCheck = true;
+                Alarm.windEngineState = true;
+                Alarm.windEngineOpenCounter = 3;
+                Alarm.windEnginePhaseLostCounter = 0;
+                Alarm.windEngineOverloadCounter = 0;
+            });
+        }, time);
     }
     public static checkPhaseA(vA: number, vB: number, vAplusB: number): number {
 
