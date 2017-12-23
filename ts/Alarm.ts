@@ -299,13 +299,69 @@ export class Alarm {
     }
 
     public static checkPhaseA(vA: number, vB: number, vAplusB: number): number {
+        if ((Alarm.windEngineInCheckPeriod === true) && (Alarm.windEngineInCheck === true)) {
 
-        if (vA < 0.5 || vB < 0.5) {
+            Alarm.checkPowerExist(vA, vB, vAplusB);
+
+            return 1;
+
+        } else if (Alarm.windEngineInCheckPeriod === true) {
+            Tool.print("go");
             return 1;
         }
 
-        if (vA > 1.5 || vB > 1.5 || vAplusB > 3) {
+        if (vA < 0.03 && vB < 0.03 && vAplusB < 0.03 && Alarm.windEngineState === true) {
+            // ControlPeriph.TurnOnWindEngine(() => {
+            //     Tool.printRed("Turn on WindEngine: no alarm");
+            // });
+            Tool.printYellow("Windengine is turn off");
+            return 0;
+        }
+
+        if (vA < 0.03 || vB < 0.03 || vAplusB < 0.03) {
+            Alarm.windEnginePhaseLostCounter++;
+        } else {
+            Alarm.windEnginePhaseLostCounter--;
+            if (Alarm.windEnginePhaseLostCounter < 0) {
+                Alarm.windEnginePhaseLostCounter = 0;
+            }
+        }
+
+        if (vA > 1.818 || vB > 1.818 || vAplusB > 1.818) {
+            Alarm.windEngineOverloadCounter++;
+        } else {
+            Alarm.windEngineOverloadCounter--;
+            if (Alarm.windEngineOverloadCounter < 0) {
+                Alarm.windEngineOverloadCounter = 0;
+            }
+        }
+
+        if (Alarm.windEnginePhaseLostCounter >= Alarm.windEngineCounterMax) {
+            Tool.printRed("Windengine phase lost Alarm !!!");
+            Alarm.windEnginePhaseLostCounter = 10;
+            ControlPeriph.TurnOffWindEngine(() => {
+                Tool.printRed("Turn off WindEnginej:phase lost");
+                Alarm.windEngineState = false;
+            });
+            Alarm.delayOpen(60000);
             return 1;
+        }
+        if (Alarm.windEngineOverloadCounter >= Alarm.windEngineCounterMax) {
+            Tool.printRed("Windengine overload Alarm !!!");
+            Alarm.windEngineOverloadCounter = 10;
+            ControlPeriph.TurnOffWindEngine(() => {
+                Tool.printRed("Turn off WindEngine: overload");
+                Alarm.windEngineState = false;
+            });
+            Alarm.delayOpen(60000);
+            return 1;
+        }
+
+        if (Alarm.windEnginePhaseLostCounter === 0 && Alarm.windEngineOverloadCounter === 0 && Alarm.windEngineState === false) {
+            ControlPeriph.TurnOnWindEngine(() => {
+                Tool.printRed("Turn on WindEngine: no alarm");
+                Alarm.windEngineState = true;
+            });
         }
 
         return 0;
