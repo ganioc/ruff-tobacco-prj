@@ -262,6 +262,42 @@ export class Alarm {
             });
         }, time);
     }
+
+    public static checkPowerExist(vA: number, vB: number, vAplusB: number): number {
+
+        Alarm.windEngineOpenCounter--;
+
+        if (Alarm.windEngineOpenCounter === 0) {
+            ControlPeriph.TurnOffWindEngine(() => {
+                Tool.printRed("Turn off WindEngine");
+            });
+            Alarm.windEngineState = false;
+            Alarm.windEngineInCheck = false;
+            Alarm.delayOpen(60000);
+
+            return 1;
+        }
+
+        if (vA < 0.03 || vB < 0.03 || vAplusB < 0.03) {
+            Tool.printRed("Still no power");
+
+            return 1;
+        }
+
+        if (vA > 1.818 || vB > 1.818 || vAplusB > 1.818) {
+            Tool.printRed("Still overload power");
+
+            return 1;
+        }
+
+        Alarm.windEngineInCheck = false;
+        Alarm.windEnginePhaseLostCounter = 0;
+        Alarm.windEngineOverloadCounter = 0;
+        Alarm.windEngineInCheckPeriod = false;
+
+        return 0;
+    }
+
     public static checkPhaseA(vA: number, vB: number, vAplusB: number): number {
 
         if (vA < 0.5 || vB < 0.5) {
