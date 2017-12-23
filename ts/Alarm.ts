@@ -256,7 +256,7 @@ export class Alarm {
                 Tool.printRed("Turn on WindEngine: after 60 seconds");
                 Alarm.windEngineInCheck = true;
                 Alarm.windEngineState = true;
-                Alarm.windEngineOpenCounter = 3;
+                Alarm.windEngineOpenCounter = 5;
                 Alarm.windEnginePhaseLostCounter = 0;
                 Alarm.windEngineOverloadCounter = 0;
             });
