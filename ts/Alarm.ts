@@ -264,7 +264,6 @@ export class Alarm {
     }
 
     public static checkPowerExist(vA: number, vB: number, vAplusB: number): number {
-
         Alarm.windEngineOpenCounter--;
 
         if (Alarm.windEngineOpenCounter === 0) {

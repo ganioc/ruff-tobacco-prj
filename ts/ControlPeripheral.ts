@@ -166,10 +166,10 @@ export class ControlPeriph {
         // }, 500);
     }
     public static TurnOnWindEngine(cb) {
-        $("#outWindEngine").turnOn(cb);
+        $("#outWindEngine").turnOff(cb);
     }
     public static TurnOffWindEngine(cb) {
-        $("#outWindEngine").turnOff(cb);
+        $("#outWindEngine").turnOn(cb);
     }
     public static TurnOnWindVent(cb) {
         $("#outRelayRY4").turnOn();
