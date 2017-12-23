@@ -283,7 +283,7 @@ export class Alarm {
             return 1;
         }
 
-        if (vA > 1.818 || vB > 1.818 || vAplusB > 1.818) {
+        if (vA > 3 && vB > 3 && vAplusB > 3 && Alarm.windEngineOpenCounter === 1) {
             Tool.printRed("Still overload power");
 
             return 1;
@@ -326,7 +326,7 @@ export class Alarm {
             }
         }
 
-        if (vA > 1.818 || vB > 1.818 || vAplusB > 1.818) {
+        if (vA > 1.818 && vB > 1.818 && vAplusB > 1.818) {
             Alarm.windEngineOverloadCounter++;
         } else {
             Alarm.windEngineOverloadCounter--;

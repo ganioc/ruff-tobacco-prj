@@ -81,7 +81,6 @@ $.ready((error) => {
 
     // gprs.start();
 
-
     // 云端交互初始化
     // decoder.init({});
 
@@ -120,7 +119,6 @@ function main() {
     // This is the mqtt client
     // mqttApp.start();
     appBaking.init({});
-
 
     // Task init, very important
     /***************************
@@ -473,7 +471,7 @@ function main() {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
-    }, 5000);
+    }, 4000);
 
     setInterval(() => {
         ControlPeriph.fetchFastParamsWithPromise(() => {
