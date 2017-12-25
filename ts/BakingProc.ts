@@ -72,6 +72,7 @@ export class RunningHandle {
 
         // Read parameters from local storage file
         // Create it with default value if not exist
+
         LocalStorage.checkFileExist();
 
         // Read IInfo stored on disk, can use sync mode

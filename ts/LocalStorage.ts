@@ -3,7 +3,7 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.1.11";
+const APP_VERSION = "1.1.12";
 // require("../package.json").version;
 
 const UI_VERSION = "1.1";
@@ -271,7 +271,9 @@ export class LocalStorage {
         try {
             obj = JSON.parse(data.toString());
         } catch (e) {
-            Tool.printRed("loadBakingStatus");
+            Tool.printRed("loadBakingStatus Failure");
+            console.log(data.length);
+            console.log(data.toString());
             Tool.printRed(e);
             return undefined;
         }

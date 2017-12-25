@@ -1,5 +1,6 @@
 
 declare var $: any;
+import * as fs from "fs";
 // import { ControlMcu } from "./ControlMcu";
 import * as Protobuf from "protobufjs";
 import { clearInterval, setInterval, setTimeout } from "timers";
@@ -117,6 +118,7 @@ $.end(() => {
 
 function main() {
     // This is the mqtt client
+
     // mqttApp.start();
     appBaking.init({});
 
@@ -471,7 +473,7 @@ function main() {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
-    }, 4000);
+    }, 5000);
 
     setInterval(() => {
         ControlPeriph.fetchFastParamsWithPromise(() => {
