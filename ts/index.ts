@@ -21,7 +21,7 @@ import { LocalStorage } from "./LocalStorage";
 import { ProtobufDecode } from "./ProtobufDecode";
 import { Tool } from "./utility";
 
-const TRAP_PERIOD = 1400;
+const TRAP_PERIOD = 2500;
 
 const appBaking = new RunningHandle(
     {
@@ -119,6 +119,24 @@ $.end(() => {
 function main() {
     // This is the mqtt client
 
+    // const deleteFolderRecursive = (path) => {
+    //     let files = [];
+    //     if (fs.existsSync(path)) {
+    //         files = fs.readdirSync(path);
+    //         files.forEach((file, index) => {
+    //             const curPath = path + "/" + file;
+    //             if (fs.lstatSync(curPath).isDirectory()) { // recurse
+    //                 deleteFolderRecursive(curPath);
+    //             } else { // delete file
+    //                 fs.unlinkSync(curPath);
+    //             }
+    //         });
+    //         fs.rmdirSync(path);
+    //     }
+    // };
+    // Tool.printRed("Delete:" + LocalStorage.getRootDir());
+    // deleteFolderRecursive(LocalStorage.getRootDir());
+
     // mqttApp.start();
     appBaking.init({});
 
@@ -151,7 +169,7 @@ function main() {
                 });
 
             }, TRAP_PERIOD);
-        }, 500);
+        }, 5000);
 
         // setTimeout(() => {
         //     commQT.sendQuickDlg(

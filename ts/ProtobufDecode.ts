@@ -165,9 +165,9 @@ export class ProtobufDecode {
                     fs.writeFileSync(LocalStorage.getMachineFile(), JSON.stringify(objAll));
                     Tool.print("Save to machine file");
                     this.info = JSON.parse(JSON.stringify(objAll));
-                    console.log("objAll")
+                    console.log("objAll");
                     console.log(objAll);
-                    console.log("Info")
+                    console.log("Info");
                     console.log(this.info);
                     resolve("OK");
                 });

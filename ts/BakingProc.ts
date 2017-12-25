@@ -280,7 +280,7 @@ export class RunningHandle {
                         reject("NOK");
                         return;
                     }
-                    info = o;
+                    info = JSON.parse(JSON.stringify(o));
                     resolve("OK");
                 });
             });
@@ -345,7 +345,7 @@ export class RunningHandle {
                             Tool.printRed("Read IInfo fail");
                             return;
                         }
-                        info = o;
+                        info = JSON.parse(JSON.stringify(o));
 
                         info.RunningCurveInfo.CurrentStage = this.bakingCurve.indexBakingElement;
                         info.RunningCurveInfo.CurrentStageRunningTime = this.bakingCurve.getCurrentStageElapsedTime();
@@ -382,7 +382,7 @@ export class RunningHandle {
                 return;
             }
 
-            info = o;
+            info = JSON.parse(JSON.stringify(o));
 
             if (this.runningStatus === RunningStatus.RUNNING) {
 
@@ -477,7 +477,7 @@ export class RunningHandle {
                 Tool.printRed("updateRunningCurveInfoAsync fail");
                 return;
             }
-            info = o;
+            info = JSON.parse(JSON.stringify(o));
 
             info.RunningCurveInfo.TempCurveDryList = [];
             info.RunningCurveInfo.TempCurveWetList = [];
@@ -600,7 +600,7 @@ export class RunningHandle {
                     Tool.printRed("udpateresult fail");
                     return;
                 }
-                info = o;
+                info = JSON.parse(JSON.stringify(o));
                 info.ResultInfo.content = [];
 
                 data.forEach((element) => {
@@ -633,7 +633,7 @@ export class RunningHandle {
                 Tool.printRed("updateBakingInfoAsync fail");
                 return;
             }
-            info = o;
+            info = JSON.parse(JSON.stringify(o));
             for (const k in data) {
                 if (k !== "HistoryCounter" && info.BakingInfo[k] !== undefined) {
                     info.BakingInfo[k] = data[k];
@@ -691,7 +691,7 @@ export class RunningHandle {
                 Tool.printRed("udpateBasesettingAsync fail");
                 return;
             }
-            info = o;
+            info = JSON.parse(JSON.stringify(o));
             for (const k in data) {
                 if (info.BaseSetting[k] !== undefined) {
                     info.BaseSetting[k] = data[k];
@@ -776,15 +776,18 @@ export class RunningHandle {
                     reject("NOK");
                     return;
                 }
-                info = o;
+                info = JSON.parse(JSON.stringify(o));
                 resolve("OK");
             });
+            // resolve("OK");
 
         }).then((val) => {
             return new Promise((resolve, reject) => {
 
-                obj.HistoryCounter = info.BakingInfo.HistoryCounter;
-                obj.Status = info.SysInfo.bInRunning;
+                // obj.HistoryCounter = info.BakingInfo.HistoryCounter; //
+                obj.HistoryCounter = RunningHandle.HistoryCounter;
+                // obj.Status = info.SysInfo.bInRunning;
+                obj.Status = this.runningStatus;
 
                 // 根据实际的测试情况进行修改
                 if (info.SysInfo.bTempForUpperRack === true) {
