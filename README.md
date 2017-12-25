@@ -13,6 +13,8 @@ GPIO
 ```
 
 ├── ts
+│   ├── Alarm.ts
+│   ├── AppConfig.ts
 │   ├── BakingCfg.ts         烤烟阶段的数据结构
 │   ├── BakingCurve.ts
 │   ├── BakingElement.ts
@@ -20,19 +22,22 @@ GPIO
 │   ├── BakingSegment.ts
 │   ├── BakingSlope.ts
 │   ├── ControlAlgorithm.ts  温度**控制算法**
+│   ├── ControlGPRS.ts
 │   ├── ControlGPS.ts        
 │   ├── ControlMcu.ts
 │   ├── ControlPeripheral.ts 获取Temp, ADC值, 读取控制GPIO值
 │   ├── ControlQT.ts         与QT GUI程序的通信
 │   ├── DecodePB.ts          ProtoBuf encode, decode
 │   ├── HttpsApp.ts          Https 
+│   ├── JustTest.ts
 │   ├── LocalStorage.ts
 │   ├── MqttApp.ts           Mqtt
+│   ├── ProtobufDecode.ts    云端交互的程序
 │   ├── index.ts             主程序
 │   ├── test
 │   │   └── test.ts
-│   ├── utility.ts
-│   └── yjasync.ts
+│   └── utility.ts
+
 
 ```
 
@@ -67,11 +72,11 @@ RunningHandle.timeDeltaCheckStatus ,  检查温度参数的时间间隔
 
 1） 烤烟控制器每隔 T= RunningHandle.timeDeltaCheckStatus 检查一次传感器的温度
 
-2） TempControl 根据历史温度数据，利用算法，给出下一段T内，燃烧室或风门打开的时间比例，打开时间 = T * percentage (0.0 ~1.0)
+2） TempControl 根据当前温度T和目标温度进行比较, 差值大于0度关，小于-0.2度则开
 
-3)  通过周期性地改变风门，燃烧门的开关状态，实现温控
+3)  湿度的控制，当前温度T和目标温度进行比较，差值大于0则开，小于0则关；
 
-4)  风门的开合角度控制，也可以做类似的处理
+4） 湿度风门的角度变化，开是一次15度，关是一次30度
 
 ## 使用说明
 
