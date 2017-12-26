@@ -15,6 +15,7 @@ import {
     ITrapInfo,
     RunningStatus,
 } from "./BakingCfg";
+import { Alarm } from "./Alarm";
 
 const ADDRESS = "127.0.0.1";
 const PORT = "1883";
@@ -56,7 +57,7 @@ export class MqttApp {
     private lost: boolean;
 
     constructor(option) {
-        this.appBaking = option.handle;
+        this.appBaking = option.baking;
         this.address = option.address || ADDRESS;
         this.port = option.port || PORT;
         this.name = option.name;
@@ -159,22 +160,21 @@ export class MqttApp {
                     dry_bulb_temperature_target: this.appBaking.bakingCurve.getTempDryTarget(),
                     wet_bulb_temperature_target: this.appBaking.bakingCurve.getTempWetTarget(),
                     control_loc: RunningHandle.bTempForUpperRack === true ? "top" : "bottom",  // top, bottom
-                    circulation_speed: 1, // 0,低速; 1, 高速
-                    moisture_removal: 0, // 0 , off; 1, on
+                    circulation_speed: ControlPeriph.bWindGateHighSpeed === true ? 1 : 0, // 0,低速; 1, 高速
+                    moisture_removal: (ControlPeriph.VentAngle > 0.01) ? 1 : 0, // 0 , off; 1, on
                     stage_remain_min: info.RunningCurveInfo.CurrentStageRunningTime, // in minutes
-                    transducer_communication: 1, // 1 norml, 0 abnormal
+                    transducer_communication: (ControlPeriph.temp1 == 0 || ControlPeriph.temp2 == 0 || ControlPeriph.temp3 == 0 || ControlPeriph.temp4 == 0) ? 1 : 0, // 1 norml, 0 abnormal
                     bottom_dry_bulb_temp: ControlPeriph.temp1, //
                     bottom_wet_bulb_temp: ControlPeriph.temp3,
                     top_dry_bulb_temp: ControlPeriph.temp4,
                     top_wet_bulb_temp: ControlPeriph.temp2,
-                    overload: 1, // 0 normal, 1 abnormal
-                    voltage: 247, // AC power source voltage, 247
+                    overload: 0, // 0 normal, 1 abnormal
+                    voltage: ControlPeriph.ADC4 * 87.2, // AC power source voltage, 247
                     phase_loss: 0, // 0 normal, 1 abnormal
-                    combustion_fan: 1, // 0 stop, 1 running
+                    combustion_fan:  ControlPeriph.CheckBurningGate() === true ? 1 : 0, // 0 stop, 1 running
                     gps: info.BaseSetting.GPSInfo.Latitude + "," + info.BaseSetting.GPSInfo.Longitude, // "xxxx, xxxx"
                 },
-            };
-            Tool.print(this.updateTopic);
+            };    
             Tool.print(JSON.stringify(data));
             this.client.publish(this.updateTopic, JSON.stringify(data), { qos: 1, retain: false });
             Tool.printGreen("Update report to cloud");

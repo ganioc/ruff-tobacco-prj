@@ -43,13 +43,12 @@ const commMCU = new ControlMcu();
 //     key: "7KokioMzX17dwj0tkZ2yVJ0GRdt71aAK5bCNCs2Y8Hk=",
 //     clientId: "curing_device_ruff_test",
 // });
-
-const decoder = new ProtobufDecode({handle: appBaking});
-
 const option: IfHttpsApp = {
     hostname: "api.shdingyun.com",
     port: 443,
 };
+
+const decoder = new ProtobufDecode({baking: appBaking});
 
 const client = new HttpsApp(option);
 
@@ -83,7 +82,7 @@ $.ready((error) => {
     // gprs.start();
 
     // 云端交互初始化
-    // decoder.init({});
+    decoder.init({});
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");

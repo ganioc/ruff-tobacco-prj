@@ -14,7 +14,7 @@ import { RunningHandle } from "./BakingProc";
 
 const protoFile = __dirname + "/../data/awesome.proto";
 
-const option: IfHttpsApp = {
+const httpoption: IfHttpsApp = {
     hostname: "api.shdingyun.com",
     port: 443,
 };
@@ -61,11 +61,11 @@ export class ProtobufDecode {
             className: "awesomepackage.BatchSummary",
         });
 
-        this.appBaking = option.handle;
+        this.appBaking = option.baking;
         ProtobufDecode.bOnline = false;
         this.mqtt = undefined;
 
-        this.client = new HttpsApp(option);
+        this.client = new HttpsApp(httpoption);
         this.timer = undefined;
         this.TOKEN = "";
         this.info = {
@@ -188,7 +188,7 @@ export class ProtobufDecode {
                 name: this.info.mqttResponse.mqttUsername,
                 key: this.info.mqttResponse.mqttKey,
                 clientId: this.info.mqttResponse.dyId,
-                handle: this.appBaking,
+                baking: this.appBaking,
             });
             this.mqtt.start();
 

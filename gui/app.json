@@ -1,0 +1,475 @@
+{
+    "devices": [
+        {
+            "id": "LED-Running",
+            "model": "LED-Running",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "LED-Setting",
+            "model": "LED-Setting",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "CodeSwitch-2",
+            "model": "CodeSwitch-2",
+            "driver": "gpio-input",
+            "inputs": {
+                "gpio-in": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "in",
+                        "edge": "both"
+                    }
+                }
+            }
+        },
+        {
+            "id": "CodeSwitch-3",
+            "model": "CodeSwitch-3",
+            "driver": "gpio-input",
+            "inputs": {
+                "gpio-in": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "in",
+                        "edge": "both"
+                    }
+                }
+            }
+        },
+        {
+            "id": "uart-mcu",
+            "model": "uart-mcu",
+            "driver": "tobacco-uart",
+            "inputs": {
+                "uart": {
+                    "type": "uart",
+                    "args": {
+                        "baudRate": 115200,
+                        "stopBits": 1,
+                        "dataBits": 8,
+                        "parity": "none",
+                        "flowControl": "none"
+                    }
+                }
+            }
+        },
+        {
+            "id": "CodeSwitch-4",
+            "model": "CodeSwitch-4",
+            "driver": "gpio-input",
+            "inputs": {
+                "gpio-in": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "in",
+                        "edge": "both"
+                    }
+                }
+            }
+        },
+        {
+            "id": "bPhaseVoltage",
+            "model": "bPhaseVoltage",
+            "driver": "gpio-input",
+            "inputs": {
+                "gpio-in": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "in",
+                        "edge": "both"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outBuzzer",
+            "model": "outBuzzer",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outCtrlWatchDog",
+            "model": "outCtrlWatchDog",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outResetMcu",
+            "model": "outResetMcu",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outWindEngine",
+            "model": "outWindEngine",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outRelayRY4",
+            "model": "outRelayRY4",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outRelayRY2",
+            "model": "outRelayRY2",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outCtrolFire",
+            "model": "outCtrolFire",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outGPSPower",
+            "model": "outGPSPower",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "outMiniPCIePower",
+            "model": "outMiniPCIePower",
+            "driver": "gpio-output",
+            "inputs": {
+                "gpio-out": {
+                    "type": "gpio",
+                    "args": {
+                        "direction": "out",
+                        "level": "low"
+                    }
+                }
+            }
+        },
+        {
+            "id": "uart-gps",
+            "model": "uart-gps",
+            "driver": "tobacco-uart",
+            "inputs": {
+                "uart": {
+                    "type": "uart",
+                    "args": {
+                        "baudRate": 9600,
+                        "stopBits": 1,
+                        "dataBits": 8,
+                        "parity": "none",
+                        "flowControl": "none"
+                    }
+                }
+            }
+        }
+    ],
+    "baking_config": {
+        "default_curve": {
+            "dryList": [
+                [
+                    36,
+                    36
+                ],
+                [
+                    36,
+                    38
+                ],
+                [
+                    38,
+                    38
+                ],
+                [
+                    38,
+                    40
+                ],
+                [
+                    40,
+                    40
+                ],
+                [
+                    40,
+                    42
+                ],
+                [
+                    42,
+                    42
+                ],
+                [
+                    42,
+                    46
+                ],
+                [
+                    46,
+                    46
+                ],
+                [
+                    46,
+                    48
+                ],
+                [
+                    48,
+                    48
+                ],
+                [
+                    48,
+                    50
+                ],
+                [
+                    50,
+                    50
+                ],
+                [
+                    50,
+                    54
+                ],
+                [
+                    54,
+                    54
+                ],
+                [
+                    54,
+                    60
+                ],
+                [
+                    60,
+                    60
+                ],
+                [
+                    60,
+                    68
+                ],
+                [
+                    68,
+                    68
+                ]
+            ],
+            "wetList": [
+                [
+                    34,
+                    34
+                ],
+                [
+                    34,
+                    36
+                ],
+                [
+                    36,
+                    36
+                ],
+                [
+                    36,
+                    37
+                ],
+                [
+                    37,
+                    37
+                ],
+                [
+                    37,
+                    37.5
+                ],
+                [
+                    37.5,
+                    37.5
+                ],
+                [
+                    37.5,
+                    38
+                ],
+                [
+                    38,
+                    38
+                ],
+                [
+                    38,
+                    38
+                ],
+                [
+                    38,
+                    38
+                ],
+                [
+                    38,
+                    38
+                ],
+                [
+                    39,
+                    39
+                ],
+                [
+                    39,
+                    39
+                ],
+                [
+                    39,
+                    39
+                ],
+                [
+                    39,
+                    40
+                ],
+                [
+                    40,
+                    40
+                ],
+                [
+                    40,
+                    42
+                ],
+                [
+                    42,
+                    42
+                ]
+            ],
+            "durList": [
+                2,
+                2,
+                15,
+                4,
+                2,
+                4,
+                2,
+                8,
+                4,
+                4,
+                2,
+                4,
+                2,
+                5,
+                5,
+                6,
+                2,
+                8,
+                12
+            ]
+        },
+        "tobacco_type": [
+            {
+                "name": "大金华",
+                "id": 1
+            },
+            {
+                "name": "小金华",
+                "id": 2
+            }
+        ],
+        "quality_level": [
+            {
+                "name": "优等",
+                "id": 1
+            },
+            {
+                "name": "中等",
+                "id": 2
+            },
+            {
+                "name": "下等",
+                "id": 3
+            }
+        ],
+        "alarm_threshold": {
+            "max_temp": 70,
+            "min_temp": 0,
+            "alarm_checking_period": 5000,
+            "dry_temp_alarm_period": 30,
+            "dry_temp_alarm_limit": 2,
+            "dry_temp_alarm_period_2": 10,
+            "dry_temp_alarm_limit_2": 4,
+            "wet_temp_alarm_period": 10,
+            "wet_temp_alarm_limit": 2
+        },
+        "base_setting": {
+            "GPSInfo": {
+                "Longitude": 0,
+                "Altitude": 0
+            },
+            "AirFlowPattern": "rise",
+            "InnerHeight": 23,
+            "WallMaterial": 0,
+            "ControllerName": "控制器Alpha",
+            "LocName": "上海市浦东新区金科路"
+        }
+    }
+}
