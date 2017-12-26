@@ -138,6 +138,8 @@ export class Alarm {
     public static windEngineInCheck: boolean;
     public static windEngineInCheckPeriod: boolean;
     public static windEngineOpenCounter: number;
+    public static bOverload: boolean;
+    public static bPhaseLost: boolean;
 
     public static init() {
         Alarm.checkPeriod = ALARM_CHECKING_PERIOD;
@@ -158,6 +160,9 @@ export class Alarm {
         Alarm.windEngineInCheck = false;
         Alarm.windEngineInCheckPeriod = false;
         Alarm.windEngineOpenCounter = 0;
+
+        Alarm.bOverload = false;
+        Alarm.bPhaseLost = false;
 
     }
     public static reset() {
@@ -327,6 +332,7 @@ export class Alarm {
             Alarm.windEnginePhaseLostCounter--;
             if (Alarm.windEnginePhaseLostCounter < 0) {
                 Alarm.windEnginePhaseLostCounter = 0;
+                Alarm.bPhaseLost = false;
             }
         }
 
@@ -336,6 +342,7 @@ export class Alarm {
             Alarm.windEngineOverloadCounter--;
             if (Alarm.windEngineOverloadCounter < 0) {
                 Alarm.windEngineOverloadCounter = 0;
+                Alarm.bOverload = false;
             }
         }
 
@@ -347,6 +354,9 @@ export class Alarm {
                 Alarm.windEngineState = false;
             });
             Alarm.delayOpen(60000);
+
+            Alarm.bPhaseLost = true;
+
             return 1;
         }
         if (Alarm.windEngineOverloadCounter >= Alarm.windEngineCounterMax) {
@@ -357,6 +367,9 @@ export class Alarm {
                 Alarm.windEngineState = false;
             });
             Alarm.delayOpen(60000);
+
+            Alarm.bOverload = true;
+
             return 1;
         }
 
