@@ -10,6 +10,7 @@ import { LocalStorage } from "./LocalStorage";
 import { HttpsApp, IfHttpsApp } from "./HttpsApp";
 import { IfMachineInfo, IfMqttResponse } from "./BakingCfg";
 import { setInterval } from "timers";
+import { RunningHandle } from "./BakingProc";
 
 const protoFile = __dirname + "/../data/awesome.proto";
 
@@ -26,13 +27,15 @@ export class ProtobufDecode {
     public decodeBatchDetail: DecodePB;
     public decodeBatchSummary: DecodePB;
 
+    public appBaking: RunningHandle;
     public mqtt: MqttApp; // Mqtt Client
     public TOKEN: string;
     private client: HttpsApp; // https client
     private info: IfMachineInfo;
     private timer: NodeJS.Timer;
+    private mqttTimer: NodeJS.Timer;
 
-    constructor() {
+    constructor(option) {
         this.decodeRegisterResponse = new DecodePB({
             path: protoFile,
             className: "awesomepackage.RegisterResponse",
@@ -58,6 +61,7 @@ export class ProtobufDecode {
             className: "awesomepackage.BatchSummary",
         });
 
+        this.appBaking = option.handle;
         ProtobufDecode.bOnline = false;
         this.mqtt = undefined;
 
@@ -184,6 +188,7 @@ export class ProtobufDecode {
                 name: this.info.mqttResponse.mqttUsername,
                 key: this.info.mqttResponse.mqttKey,
                 clientId: this.info.mqttResponse.dyId,
+                handle: this.appBaking,
             });
             this.mqtt.start();
 
@@ -203,6 +208,10 @@ export class ProtobufDecode {
                     Tool.printBlue(this.TOKEN);
                 });
             }, 24 * 3600 * 1000);
+
+            this.mqttTimer = setInterval(() => {
+                this.mqtt.updateReport();
+            }, 5000);
         });
     }
 }

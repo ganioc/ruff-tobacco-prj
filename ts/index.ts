@@ -44,7 +44,7 @@ const commMCU = new ControlMcu();
 //     clientId: "curing_device_ruff_test",
 // });
 
-const decoder = new ProtobufDecode();
+const decoder = new ProtobufDecode({handle: appBaking});
 
 const option: IfHttpsApp = {
     hostname: "api.shdingyun.com",
