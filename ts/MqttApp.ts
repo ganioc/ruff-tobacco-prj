@@ -4,15 +4,22 @@
 import Mqtt = require("mqtt");
 import { Promise } from "promise";
 import { Tool } from "./utility";
+import { LocalStorage } from "./LocalStorage";
+import { RunningHandle } from "./BakingProc";
+import { ControlPeriph } from "./ControlPeripheral";
+import {
+    IBakingInfo, IBaseSetting, IDefaultCurve, IInfoCollect,
+    IResultInfo, IRunningCurveInfo, IRunningOption, ISettingCurveInfo,
+    ISysInfo,
+    ITrapBaking,
+    ITrapInfo,
+    RunningStatus,
+} from "./BakingCfg";
 
 const ADDRESS = "127.0.0.1";
 const PORT = "1883";
 
-export interface IfStructRepot {
-    requestId: {
-        UUID: number;
-        timeStamp: number;
-    };
+export interface IfStructReport {
     reported: {
         stage_mode: string;  // keep, heat
         stage: number; // 1
@@ -36,6 +43,7 @@ export interface IfStructRepot {
 }
 
 export class MqttApp {
+    private appBaking: RunningHandle;
     private address: string;
     private port: number;
     private conn;
@@ -44,15 +52,21 @@ export class MqttApp {
     private key: string;
     private clientId: string;
     private counterError: number;
+    private updateTopic: string;
+    private lost: boolean;
 
     constructor(option) {
+        this.appBaking = option.handle;
         this.address = option.address || ADDRESS;
         this.port = option.port || PORT;
         this.name = option.name;
         this.key = option.key;
         this.clientId = option.clientId;
+        this.updateTopic = "$baidu/iot/shadow/" + this.clientId + "/update";
 
         this.counterError = 0;
+
+        this.lost = false;
 
         Tool.printBlue("Init CloudApp");
     }
@@ -85,6 +99,7 @@ export class MqttApp {
             },
         );
         this.client.on("close", () => {
+            this.lost = true;
             Tool.printRed("MQTT to baidu closed");
 
             setTimeout(() => {
@@ -102,6 +117,7 @@ export class MqttApp {
             }
         });
         this.client.on("connect", () => {
+            this.lost = false;
             Tool.printBlue("\nMQTT baidu Connected\n");
 
             // subscribe
@@ -110,7 +126,59 @@ export class MqttApp {
 
     }
     public updateReport() {
-        Tool.printGreen("Update report to cloud");
+        if (this.lost) {
+            return;
+        }
+
+        let data: IfStructReport;
+        let info: IInfoCollect;
+        const proc = new Promise((resolve, reject) => {
+            LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
+                if (err) {
+                    reject("NOK");
+                    return;
+                }
+                info = JSON.parse(JSON.stringify(o));
+                resolve("OK");
+            });
+        }).then((value) => {
+            let mode: string;
+            let stage: number;
+            stage = this.appBaking.bakingCurve.indexBakingElement;
+
+            if (info.RunningCurveInfo.TempCurveDryList[stage][0] === info.RunningCurveInfo.TempCurveDryList[stage][1]) {
+                mode = "keep";
+            } else {
+                mode = "heat";
+            }
+
+            data = {
+                reported: {
+                    stage_mode: mode,  // keep, heat
+                    stage: this.appBaking.bakingCurve.indexBakingElement, // 1
+                    dry_bulb_temperature_target: this.appBaking.bakingCurve.getTempDryTarget(),
+                    wet_bulb_temperature_target: this.appBaking.bakingCurve.getTempWetTarget(),
+                    control_loc: RunningHandle.bTempForUpperRack === true ? "top" : "bottom",  // top, bottom
+                    circulation_speed: 1, // 0,低速; 1, 高速
+                    moisture_removal: 0, // 0 , off; 1, on
+                    stage_remain_min: info.RunningCurveInfo.CurrentStageRunningTime, // in minutes
+                    transducer_communication: 1, // 1 norml, 0 abnormal
+                    bottom_dry_bulb_temp: ControlPeriph.temp1, //
+                    bottom_wet_bulb_temp: ControlPeriph.temp3,
+                    top_dry_bulb_temp: ControlPeriph.temp4,
+                    top_wet_bulb_temp: ControlPeriph.temp2,
+                    overload: 1, // 0 normal, 1 abnormal
+                    voltage: 247, // AC power source voltage, 247
+                    phase_loss: 0, // 0 normal, 1 abnormal
+                    combustion_fan: 1, // 0 stop, 1 running
+                    gps: info.BaseSetting.GPSInfo.Latitude + "," + info.BaseSetting.GPSInfo.Longitude, // "xxxx, xxxx"
+                },
+            };
+            Tool.print(this.updateTopic);
+            Tool.print(JSON.stringify(data));
+            this.client.publish(this.updateTopic, JSON.stringify(data), { qos: 1, retain: false });
+            Tool.printGreen("Update report to cloud");
+        });
     }
     public downloadCurve() {
         Tool.print("Download cuve from cloud server");
