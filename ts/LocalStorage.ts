@@ -3,7 +3,7 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.1.13";
+const APP_VERSION = "1.1.14";
 // require("../package.json").version;
 
 const UI_VERSION = "1.1";
@@ -42,6 +42,7 @@ const C_FILE_MACHINE = "/home/root/machine.json"; // to store machine's device_i
 // 放两份,currentStage.json, currentStage1.json
 // currentStageRunningTime.json, currentStageRunningTime1.json
 const C_FILE_CURRENT_STAGE = "/home/root/baking/currentStage.json";
+const C_FILE_CURRENT_STAGE_BACKUP = "/home/root/baking/currentStageBackup.json";
 // const C_FILE_CURRENT_STAGE_RUNNING_TIME = "/home/root/baking/currentStageRunningTime.json";
 
 Tool.printGreen(path.dirname(__filename));
@@ -81,6 +82,10 @@ export class LocalStorage {
     public static getCurrentStageDirec(): string {
         return C_FILE_CURRENT_STAGE;
     }
+    public static getCurrentStageBackupDirec(): string {
+        return C_FILE_CURRENT_STAGE_BACKUP;
+    }
+
     /*
     public static saveSysInfo() {
 
@@ -294,6 +299,24 @@ export class LocalStorage {
             callback(null, obj);
         });
     }
+    public static loadCurrentStageBackupAsync(callback: (err, o: IfCurrentStageInfo) => void) {
+        fs.readFile(LocalStorage.getCurrentStageBackupDirec(), (err, data) => {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            let obj: any;
+            try {
+                obj = JSON.parse(data.toString());
+            } catch (e) {
+                Tool.printRed("loadCurrentStageBackup error");
+                Tool.printRed(e);
+                callback(e, null);
+                return;
+            }
+            callback(null, obj);
+        });
+    }
     public static saveCurrentStageAsync(obj: IfCurrentStageInfo, callback: (err, data) => void) {
         Tool.printYellow("saveCurrentStage");
 
@@ -304,6 +327,19 @@ export class LocalStorage {
                 return;
             }
             Tool.printBlue("saveCurrentStage OK");
+            callback(null, "OK");
+        });
+    }
+    public static saveCurrentStageBackupAsync(obj: IfCurrentStageInfo, callback: (err, data) => void) {
+        Tool.printYellow("saveCurrentStageBackup");
+
+        fs.writeFile(LocalStorage.getCurrentStageBackupDirec(), JSON.stringify(obj), (err) => {
+            if (err) {
+                Tool.printRed("savecurrent stage backup error");
+                callback(err, null);
+                return;
+            }
+            Tool.printBlue("saveCurrentStage backup OK");
             callback(null, "OK");
         });
     }

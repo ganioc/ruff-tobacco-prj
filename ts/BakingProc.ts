@@ -22,7 +22,6 @@ import { ControlMcu } from "./ControlMcu";
 import { ControlPeriph } from "./ControlPeripheral";
 import { LocalStorage } from "./LocalStorage";
 import { ILooseObject, Tool } from "./utility";
-import { cursorTo } from "readline";
 
 const SAVE_COUNTER_MAX = 12; // 12 * 10 = 120 seconds
 
@@ -269,6 +268,7 @@ export class RunningHandle {
 
     //     }, RunningHandle.timeDeltaCheckStatus);
     // }
+
     public start() {
         this.startInAsync();
     }
@@ -278,32 +278,63 @@ export class RunningHandle {
         let currentObj: IfCurrentStageInfo;
 
         const proc = new Promise((resolve, reject) => {
-            Tool.printGreen("Start In Async mode ==>");
-            LocalStorage.loadCurrentStageAsync((err, o: IfCurrentStageInfo) => {
-                if (err) {
-                    Tool.printRed("Read current stage file failure");
-                    const stageInfo = LocalStorage.getStageFromDirec();
-                    currentObj = {
-                        CurrentStage: stageInfo.CurrentStage,  // Or read the directory number under data/
-                        CurrentStageRunningTime: 0,
-                    };
-                    resolve("OK");
-                    return;
-                }
-
-                try {
-                    currentObj = JSON.parse(JSON.stringify(o));
-                } catch (e) {
-                    Tool.printRed(e);
-                    const stageInfo = LocalStorage.getStageFromDirec();
-                    currentObj = {
-                        CurrentStage: stageInfo.CurrentStage,  // Or read the directory number under data/
-                        CurrentStageRunningTime: 0,
-                    };
-                }
+            setTimeout(() => {
                 resolve("OK");
+            }, 250);
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                Tool.printGreen("Start In Async mode ==>");
+                LocalStorage.loadCurrentStageAsync((err, o: IfCurrentStageInfo) => {
+                    if (err) {
+                        Tool.printRed("Read current stage file failure");
+
+                        reject("NOK");
+                        return;
+                    }
+
+                    try {
+                        currentObj = JSON.parse(JSON.stringify(o));
+                    } catch (e) {
+                        Tool.printRed(e);
+                        reject("NOK");
+                        return;
+                    }
+                    resolve("OK");
+                });
+
             });
 
+        }).then((val) => {
+            return new Promise((resolve, reject) => {
+                resolve("OK");
+            });
+        }, (fb) => {
+            return new Promise((resolve, reject) => {
+                LocalStorage.loadCurrentStageBackupAsync((err, o: IfCurrentStageInfo) => {
+                    if (err) {
+                        Tool.printRed("Read current stage backup file failure");
+                        const stageInfo = LocalStorage.getStageFromDirec();
+                        currentObj = {
+                            CurrentStage: stageInfo.CurrentStage,  // Or read the directory number under data/
+                            CurrentStageRunningTime: 0,
+                        };
+                        resolve("OK");
+                        return;
+                    }
+
+                    try {
+                        currentObj = JSON.parse(JSON.stringify(o));
+                    } catch (e) {
+                        Tool.printRed(e);
+                        const stageInfo = LocalStorage.getStageFromDirec();
+                        currentObj = {
+                            CurrentStage: stageInfo.CurrentStage,  // Or read the directory number under data/
+                            CurrentStageRunningTime: 0,
+                        };
+                    }
+                    resolve("OK");
+                });
+            });
         }).then((val) => {
             return new Promise((resolve, reject) => {
                 LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
@@ -329,6 +360,9 @@ export class RunningHandle {
 
                     info.RunningCurveInfo.CurrentStage = 0; // Not used
                     info.RunningCurveInfo.CurrentStageRunningTime = 0; // Not used
+
+                    currentObj.CurrentStageRunningTime = 0;
+                    currentObj.CurrentStageRunningTime = 0;
 
                 } else if (this.runningStatus === RunningStatus.PAUSED) {
                     this.runningStatus = RunningStatus.RUNNING;
@@ -358,7 +392,8 @@ export class RunningHandle {
             return new Promise((resolve, reject) => {
                 LocalStorage.saveBakingStatusAsync(info, (err, data) => {
                     if (err) {
-                        reject(err);
+                        Tool.printRed("save baking status async fail");
+                        Tool.printRed(err);
                         return;
                     }
                     resolve(data);
@@ -388,27 +423,11 @@ export class RunningHandle {
                         LocalStorage.saveCurrentStageAsync(currentObj, (err, data) => {
                             Tool.print("save current stage");
                         });
+
+                        LocalStorage.saveCurrentStageBackupAsync(currentObj, (err, data) => {
+                            Tool.print("save current stage backup");
+                        });
                     }
-
-                    //
-                    // LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
-                    //     if (err) {
-                    //         Tool.printRed("Read IInfo fail");
-                    //         return;
-                    //     }
-                    //     info = JSON.parse(JSON.stringify(o));
-
-                    //     info.RunningCurveInfo.CurrentStage = this.bakingCurve.indexBakingElement;
-                    //     info.RunningCurveInfo.CurrentStageRunningTime = this.bakingCurve.getCurrentStageElapsedTime();
-
-                    //     LocalStorage.saveBakingStatusAsync(info, (erro, data) => {
-                    //         if (err) {
-                    //             Tool.printRed("Save IInfo fail");
-                    //             return;
-                    //         }
-                    //         Tool.printBlue("Save IInfo OK");
-                    //     });
-                    // });
                 }, RunningHandle.timeDeltaCheckStatus);
                 resolve("OK");
             });
@@ -459,25 +478,7 @@ export class RunningHandle {
 
         });
     }
-    // public pause() {
-    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
 
-    //     if (this.runningStatus === RunningStatus.RUNNING) {
-
-    //         this.runningStatus = RunningStatus.PAUSED;
-    //         info.SysInfo.bInRunning = RunningStatus.PAUSED;
-    //         // 记录当前阶段和运行时间, 已经都被记录过了, 在interval里面
-
-    //         LocalStorage.saveBakingStatus(info);
-
-    //         clearInterval(this.timerHandler);
-    //         Tool.print("BakingProc: App paused\n");
-    //     } else {
-    //         Tool.print("BakingProc: pause has no effect in mode: " + this.runningStatus);
-
-    //     }
-
-    // }
     public stop() {
         const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
 
