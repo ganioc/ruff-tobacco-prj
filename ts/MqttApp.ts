@@ -168,9 +168,9 @@ export class MqttApp {
                     bottom_wet_bulb_temp: ControlPeriph.temp3,
                     top_dry_bulb_temp: ControlPeriph.temp4,
                     top_wet_bulb_temp: ControlPeriph.temp2,
-                    overload: 0, // 0 normal, 1 abnormal
+                    overload: Alarm.bOverload ? 1 : 0, // 0 normal, 1 abnormal
                     voltage: ControlPeriph.ADC4 * 87.2, // AC power source voltage, 247
-                    phase_loss: 0, // 0 normal, 1 abnormal
+                    phase_loss: Alarm.bPhaseLost ? 1 : 0, // 0 normal, 1 abnormal
                     combustion_fan:  ControlPeriph.CheckBurningGate() === true ? 1 : 0, // 0 stop, 1 running
                     gps: info.BaseSetting.GPSInfo.Latitude + "," + info.BaseSetting.GPSInfo.Longitude, // "xxxx, xxxx"
                 },
