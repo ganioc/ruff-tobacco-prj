@@ -3,7 +3,7 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.1.12";
+const APP_VERSION = "1.1.13";
 // require("../package.json").version;
 
 const UI_VERSION = "1.1";
@@ -21,6 +21,7 @@ import {
     IRunningCurveInfo,
     ISysInfo,
     RunningStatus,
+    IfCurrentStageInfo,
 } from "./BakingCfg";
 // export interface IfDefaultCurve {
 //     dryList: number[][];
@@ -36,6 +37,12 @@ const C_FILE_LOG = "_baking.log"; // job started, job durationg, job time,
 // tabacco level , history data, at each directory
 const C_MACHINE_ID = "RUFF-0001";
 const C_FILE_MACHINE = "/home/root/machine.json"; // to store machine's device_id, code, mqtt user, code
+
+// 再存一份在当前工作的 log 目录下面
+// 放两份,currentStage.json, currentStage1.json
+// currentStageRunningTime.json, currentStageRunningTime1.json
+const C_FILE_CURRENT_STAGE = "/home/root/baking/currentStage.json";
+// const C_FILE_CURRENT_STAGE_RUNNING_TIME = "/home/root/baking/currentStageRunningTime.json";
 
 Tool.printGreen(path.dirname(__filename));
 
@@ -70,6 +77,9 @@ export class LocalStorage {
     }
     public static getMachineFile(): string {
         return C_FILE_MACHINE;
+    }
+    public static getCurrentStageDirec(): string {
+        return C_FILE_CURRENT_STAGE;
     }
     /*
     public static saveSysInfo() {
@@ -192,11 +202,20 @@ export class LocalStorage {
             TempDurationList: DEFAULT_CURVE.durList,
         };
     }
+    public static initCurrentStage(): IfCurrentStageInfo {
+        return {
+            CurrentStage: 0,
+            CurrentStageRunningTime: 0,
+        };
+    }
     public static strInitBakingStatus(): string {
         return JSON.stringify(LocalStorage.initBakingStatus());
     }
     public static strInitDefaultCurve(): string {
         return JSON.stringify(LocalStorage.initDefaultCurve());
+    }
+    public static strInitCurrentStage(): string {
+        return JSON.stringify(LocalStorage.initCurrentStage());
     }
     public static checkLogDirecExist(dir: string) {
         Tool.printMagenta(LocalStorage.getDataDirec() + dir);
@@ -245,6 +264,48 @@ export class LocalStorage {
             fs.writeFileSync(LocalStorage.getDefaultCurveDirec(),
                 LocalStorage.strInitDefaultCurve());
         }
+
+        // add 2017-12-26, for currentStage.json file
+        Tool.printMagenta(LocalStorage.getCurrentStageDirec() + "---->");
+        if (fs.existsSync(LocalStorage.getCurrentStageDirec())) {
+            Tool.print("Already exist: ");
+        } else {
+            Tool.print("Not exist: ");
+            fs.writeFileSync(LocalStorage.getCurrentStageDirec(),
+                LocalStorage.strInitCurrentStage());
+        }
+
+    }
+    public static loadCurrentStageAsync(callback: (err, o: IfCurrentStageInfo) => void) {
+        fs.readFile(LocalStorage.getCurrentStageDirec(), (err, data) => {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            let obj: any;
+            try {
+                obj = JSON.parse(data.toString());
+            } catch (e) {
+                Tool.printRed("loadCurrentStage error");
+                Tool.printRed(e);
+                callback(e, null);
+                return;
+            }
+            callback(null, obj);
+        });
+    }
+    public static saveCurrentStageAsync(obj: IfCurrentStageInfo, callback: (err, data) => void) {
+        Tool.printYellow("saveCurrentStage");
+
+        fs.writeFile(LocalStorage.getCurrentStageDirec(), JSON.stringify(obj), (err) => {
+            if (err) {
+                Tool.printRed("savecurrent stage error");
+                callback(err, null);
+                return;
+            }
+            Tool.printBlue("saveCurrentStage OK");
+            callback(null, "OK");
+        });
     }
     public static loadBakingStatusAsync(callback: (err, o: IInfoCollect) => void) {
         fs.readFile(LocalStorage.getStatusFileDirec(), (err, data) => {
@@ -275,7 +336,8 @@ export class LocalStorage {
             console.log(data.length);
             console.log(data.toString());
             Tool.printRed(e);
-            return undefined;
+            Tool.printRed("Use default BakingStatus info");
+            return LocalStorage.initBakingStatus();
         }
         return obj;
     }
@@ -342,7 +404,40 @@ export class LocalStorage {
             callback("NOK", null);
         }
     }
+
+    public static getStageFromDirec(): IfCurrentStageInfo {
+        // let num: number;
+        let files = [];
+        let nameDirec: number = 0;
+
+        // 找到 data/log/ 目录下的子目录里，值最大的目录
+        files = fs.readdirSync(LocalStorage.getDataDirec());
+
+        if (files === []) {
+            return {
+                CurrentStage: 0,
+                CurrentStageRunningTime: 0,
+            };
+        }
+
+        files.forEach((file, index) => {
+            const nName = parseInt(file, 10);
+            if (nName > nameDirec) {
+                nameDirec = nName;
+            }
+        });
+        // 找到该子目录里的 *.log 文件里面， 值最大的文件值
+        const tempName: string = nameDirec + "";
+
+        files = fs.readdirSync(LocalStorage.getCurrentStageDirec() + tempName);
+
+        return {
+            CurrentStage: files.length,
+            CurrentStageRunningTime: 0,
+        };
+    }
 }
+
 /*
 
     // 以下的数据是要存在磁盘上的

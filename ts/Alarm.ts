@@ -96,26 +96,26 @@ function GetTargetTemp(option: IfTargetTemp) {
             * timeElapsed / (duration * 60));
     }
 }
-function GetDryTargetTemp(info: IInfoCollect): number {
-    const obj: IfTargetTemp = {
-        index: info.RunningCurveInfo.CurrentStage,
-        timeElapsed: info.RunningCurveInfo.CurrentStageRunningTime,
-        lstTemp: info.RunningCurveInfo.TempCurveDryList,
-        lstDur: info.RunningCurveInfo.TempDurationList,
-    };
+// function GetDryTargetTemp(info: IInfoCollect): number {
+//     const obj: IfTargetTemp = {
+//         index: info.RunningCurveInfo.CurrentStage,
+//         timeElapsed: info.RunningCurveInfo.CurrentStageRunningTime,
+//         lstTemp: info.RunningCurveInfo.TempCurveDryList,
+//         lstDur: info.RunningCurveInfo.TempDurationList,
+//     };
 
-    return GetTargetTemp(obj);
-}
-function GetWetTargetTemp(info: IInfoCollect): number {
-    const obj: IfTargetTemp = {
-        index: info.RunningCurveInfo.CurrentStage,
-        timeElapsed: info.RunningCurveInfo.CurrentStageRunningTime,
-        lstTemp: info.RunningCurveInfo.TempCurveWetList,
-        lstDur: info.RunningCurveInfo.TempDurationList,
-    };
+//     return GetTargetTemp(obj);
+// }
+// function GetWetTargetTemp(info: IInfoCollect): number {
+//     const obj: IfTargetTemp = {
+//         index: info.RunningCurveInfo.CurrentStage,
+//         timeElapsed: info.RunningCurveInfo.CurrentStageRunningTime,
+//         lstTemp: info.RunningCurveInfo.TempCurveWetList,
+//         lstDur: info.RunningCurveInfo.TempDurationList,
+//     };
 
-    return GetTargetTemp(obj);
-}
+//     return GetTargetTemp(obj);
+// }
 export class Alarm {
 
     public static checkPeriod: number;
@@ -166,11 +166,15 @@ export class Alarm {
         Alarm.wetTempCounter = 0;
     }
 
-    public static checkDryTemp(info: IInfoCollect, dryT: number, wetT: number): number {
-        const tempDryTarget: number = GetDryTargetTemp(info);
+    /**
+     * bRunning
+     * dryTargetTemp
+     */
+    public static checkDryTemp(bRunning: boolean, targetTemp: number, dryT: number, wetT: number): number {
+        const tempDryTarget: number = targetTemp;
 
         // 不运行就无告警
-        if (!isRunning(info)) {
+        if (!bRunning) {
             return 0;
         }
         if (wetT > dryT) {
@@ -205,10 +209,10 @@ export class Alarm {
 
         return 0;
     }
-    public static checkWetTemp(info: IInfoCollect, wetT: number, dryT: number): number {
-        const tempWetTarget: number = GetWetTargetTemp(info);
+    public static checkWetTemp(bRunning: boolean, targetTemp: number, wetT: number, dryT: number): number {
+        const tempWetTarget: number = targetTemp;
 
-        if (!isRunning(info)) {
+        if (!bRunning) {
             return 0;
         }
         if (wetT > dryT) {

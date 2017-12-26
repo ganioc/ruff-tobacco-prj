@@ -250,3 +250,9 @@ export interface IfMachineInfo {
     mqttResponse: IfMqttResponse;
     currentBatchId: string;
 }
+
+export interface IfCurrentStageInfo {
+    CurrentStage: number;
+    CurrentStageRunningTime: number; // 分钟
+}
+
