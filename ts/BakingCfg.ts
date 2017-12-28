@@ -145,6 +145,13 @@ export interface ITrapInfo {
     HistoryCounter: number; // Running Batch ID
 
     Status: number;
+
+    vGPRSSignalLevel: number;
+    vWifiSignalLevel: number;
+
+    Lattitude: number;
+    Longitude: number;
+
 }
 // confirmed by XX
 export interface ITrapBaking {
@@ -255,4 +262,3 @@ export interface IfCurrentStageInfo {
     CurrentStage: number;
     CurrentStageRunningTime: number; // 分钟
 }
-

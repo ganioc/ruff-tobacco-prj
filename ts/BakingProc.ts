@@ -21,6 +21,7 @@ import { BakingCurve } from "./BakingCurve";
 import { ControlMcu } from "./ControlMcu";
 import { ControlPeriph } from "./ControlPeripheral";
 import { LocalStorage } from "./LocalStorage";
+import { ProtobufDecode} from "./ProtobufDecode";
 import { ILooseObject, Tool } from "./utility";
 
 const SAVE_COUNTER_MAX = 12; // 12 * 10 = 120 seconds
@@ -801,7 +802,7 @@ export class RunningHandle {
             ACAlarmPhaseA: 1,
             ACAlarmPhaseB: 1,
             ACAlarmPhaseC: 1,
-            GPRSAlarm: 1,
+            GPRSAlarm: (ProtobufDecode.bOnline === true) ? 1 : 0,
             GPSAlarm: 1,
 
             // temp value
@@ -818,6 +819,12 @@ export class RunningHandle {
 
             HistoryCounter: 0,
             Status: 0,
+
+            vGPRSSignalLevel: ControlPeriph.vGPRSSignal,
+            vWifiSignalLevel: 0,
+
+            Lattitude: 0,
+            Longitude: 0,
         };
 
         const proc = new Promise((resolve, reject) => {
