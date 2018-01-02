@@ -21,7 +21,7 @@ import { BakingCurve } from "./BakingCurve";
 import { ControlMcu } from "./ControlMcu";
 import { ControlPeriph } from "./ControlPeripheral";
 import { LocalStorage } from "./LocalStorage";
-import { ProtobufDecode} from "./ProtobufDecode";
+import { ProtobufDecode } from "./ProtobufDecode";
 import { ILooseObject, Tool } from "./utility";
 
 const SAVE_COUNTER_MAX = 12; // 12 * 10 = 120 seconds
@@ -167,6 +167,9 @@ export class RunningHandle {
             LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
 
             LocalStorage.saveBakingStatusSync(info);
+
+            // add by yang
+            LocalStorage.resetCurrentStageSync();
 
             // reset peripheral stage
             Tool.printYellow("Init peripheral status:");
@@ -1076,6 +1079,16 @@ export class RunningHandle {
             Tool.printYellow("######################### ");
 
             this.bBakingFinished = true;
+
+            // stop the fire
+            ControlPeriph.TurnOffBakingFire(() => {
+                console.log("Stop the fire");
+            });
+
+            // stop the vent
+            ControlPeriph.StopWindVent(() => {
+                Tool.print("Stop the vent");
+            });
 
             // This is a good time to save current baking curve to the data subdirectory
             // this.backupRunningStatus();

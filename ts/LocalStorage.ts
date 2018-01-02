@@ -3,7 +3,7 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.1.14";
+const APP_VERSION = "1.1.15";
 // require("../package.json").version;
 
 const UI_VERSION = "1.1";
@@ -328,6 +328,18 @@ export class LocalStorage {
             }
             Tool.printBlue("saveCurrentStage OK");
             callback(null, "OK");
+        });
+    }
+    public static resetCurrentStageSync() {
+        const obj: IfCurrentStageInfo = {
+            CurrentStage: 0,
+            CurrentStageRunningTime: 0, // 分钟
+        };
+        LocalStorage.saveCurrentStageAsync(obj, () => {
+            console.log("currentstage :0");
+            LocalStorage.saveCurrentStageBackupAsync(obj, () => {
+                console.log("back up currentstage :0");
+            });
         });
     }
     public static saveCurrentStageBackupAsync(obj: IfCurrentStageInfo, callback: (err, data) => void) {
