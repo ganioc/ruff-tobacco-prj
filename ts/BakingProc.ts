@@ -498,6 +498,8 @@ export class RunningHandle {
 
             LocalStorage.saveBakingStatusSync(info);
 
+            LocalStorage.resetCurrentStageSync();
+
             clearInterval(this.timerHandler);
 
             Tool.print("BakingProc:App stopped\n");
