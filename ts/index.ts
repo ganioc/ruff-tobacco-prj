@@ -19,7 +19,9 @@ import { JustTest } from "./JustTest";
 import { LocalStorage } from "./LocalStorage";
 
 import { ProtobufDecode } from "./ProtobufDecode";
+import { UDisk } from "./udisk";
 import { Tool } from "./utility";
+import { basename } from "path";
 
 const TRAP_PERIOD = 2500;
 
@@ -475,6 +477,15 @@ function main() {
             case InfoType.Val_BaseSetting:
                 appBaking.updateBaseSettingAsync(data.Content);
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+                break;
+            case InfoType.Val_UDisk:
+                UDisk.handle(data.Content, (err, fb) => {
+                    if (err) {
+                        commQT.sendSetResp(data.PacketId, data.Obj, fb);
+                        return;
+                    }
+                    commQT.sendSetResp(data.PacketId, data.Obj, fb);
+                });
                 break;
             default:
                 Tool.print("Wrong Get packet obj type:" + data.Obj);

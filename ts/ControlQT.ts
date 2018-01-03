@@ -21,6 +21,7 @@ export enum InfoType {
     Val_BaseSetting = 17,
     Val_TrapBaking = 18,
     Val_CloudCurveInfo = 21,
+    Val_UDisk = 22,
 }
 
 export interface IfPacket {
@@ -249,6 +250,8 @@ export class CommQT {
             case InfoType.Val_ResultInfo:
             case InfoType.Val_TrapInfo:
             case InfoType.Val_TrapBaking:
+            case InfoType.Val_CloudCurveInfo:
+            case InfoType.Val_UDisk:
                 this.emitter.emit("set", data);
                 break;
             case InfoType.Val_RunningState:
