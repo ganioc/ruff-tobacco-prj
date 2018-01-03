@@ -162,7 +162,7 @@ export class MqttApp {
                     control_loc: RunningHandle.bTempForUpperRack === true ? "top" : "bottom",  // top, bottom
                     circulation_speed: ControlPeriph.bWindGateHighSpeed === true ? 1 : 0, // 0,低速; 1, 高速
                     moisture_removal: (ControlPeriph.VentAngle > 0.01) ? 1 : 0, // 0 , off; 1, on
-                    stage_remain_min: info.RunningCurveInfo.TempDurationList[stage] * 60 - this.appBaking.bakingCurve.getCurrentStageElapsedTime()/60, // in minutes
+                    stage_remain_min: info.RunningCurveInfo.TempDurationList[stage] * 60 - this.appBaking.bakingCurve.getCurrentStageElapsedTime() / 60, // in minutes
                     transducer_communication: (ControlPeriph.temp1 === 0 || ControlPeriph.temp2 === 0 || ControlPeriph.temp3 === 0 || ControlPeriph.temp4 === 0) ? 0 : 1, // 1 norml, 0 abnormal
                     bottom_dry_bulb_temp: ControlPeriph.temp1, //
                     bottom_wet_bulb_temp: ControlPeriph.temp3,
@@ -171,10 +171,10 @@ export class MqttApp {
                     overload: Alarm.bOverload ? 1 : 0, // 0 normal, 1 abnormal
                     voltage: ControlPeriph.ADC4 * 87.2, // AC power source voltage, 247
                     phase_loss: Alarm.bPhaseLost ? 1 : 0, // 0 normal, 1 abnormal
-                    combustion_fan:  ControlPeriph.CheckBurningGate() === true ? 1 : 0, // 0 stop, 1 running
+                    combustion_fan: ControlPeriph.CheckBurningGate() === true ? 1 : 0, // 0 stop, 1 running
                     GPS: info.BaseSetting.GPSInfo.Latitude + "," + info.BaseSetting.GPSInfo.Longitude, // "xxxx, xxxx"
                 },
-            };    
+            };
             Tool.print(JSON.stringify(data));
             this.client.publish(this.updateTopic, JSON.stringify(data), { qos: 1, retain: false });
             Tool.printGreen("Update report to cloud");
