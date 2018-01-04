@@ -25,11 +25,10 @@
         "gpio-158": "gpio-158/gpio",
         "gpio-159": "gpio-159/gpio",
         "gpio-161": "gpio-161/gpio",
-        "gpio-161": "gpio-162/gpio",
+        "gpio-162": "gpio-162/gpio",
         "gpio-163": "gpio-163/gpio"
     },
-    "devices": [
-        {
+    "devices": [{
             "id": "gpio-164",
             "model": "ruff-gpio",
             "driver": "sys-gpio",

@@ -97,5 +97,6 @@ export class UDisk {
 
         console.log(file_wait_copy_path + file_wait_copy);
         console.log("dev_copy finished");
+        cb(null, "OK");
     }
 }
