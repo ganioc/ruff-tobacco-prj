@@ -113,19 +113,21 @@ export class RunningHandle {
             Tool.printGreen("CheckUpperRack");
             console.log(data);
 
-            if (data === 0) {
-                info.SysInfo.bTempForUpperRack = false;
-                RunningHandle.bTempForUpperRack = false;
-                info.BakingInfo.bTempForUpperRack = false;
+            // if (data === 0) {
+            //     info.SysInfo.bTempForUpperRack = true;
+            //     RunningHandle.bTempForUpperRack = true;
+            //     info.BakingInfo.bTempForUpperRack = true;
 
-            } else if (data === 1) {
-                info.SysInfo.bTempForUpperRack = true;
-                RunningHandle.bTempForUpperRack = true;
-                info.BakingInfo.bTempForUpperRack = true;
+            // } else if (data === 1) {
+            //     info.SysInfo.bTempForUpperRack = true;
+            //     RunningHandle.bTempForUpperRack = true;
+            //     info.BakingInfo.bTempForUpperRack = true;
 
-            } else {
-                Tool.printRed("Wrong result checkupperRack");
-            }
+            // } else {
+            //     Tool.printRed("Wrong result checkupperRack");
+            // }
+            RunningHandle.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
+            info.BakingInfo.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
 
             // move in
             // configure bakingCurve parameters
@@ -755,6 +757,22 @@ export class RunningHandle {
                     info.BaseSetting[k] = data[k];
                 }
             }
+
+            if (data.AirFlowPattern === "rise") {
+                info.SysInfo.bTempForUpperRack = true;
+                RunningHandle.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
+                info.BakingInfo.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
+                info.BaseSetting.AirFlowPattern = "rise";
+
+            } else if (data.AirFlowPattern === "fall") {
+                info.SysInfo.bTempForUpperRack = false;
+                RunningHandle.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
+                info.BakingInfo.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
+                info.BaseSetting.AirFlowPattern = "fall";
+            } else {
+                Tool.printRed("Unrecognized airflowpattern");
+            }
+
             LocalStorage.saveBakingStatusAsync(info, (err2, data2) => {
                 if (err2) {
                     Tool.printRed("updateBaseSettingAsync fail save");
