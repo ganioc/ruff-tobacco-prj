@@ -79,16 +79,16 @@ export class CommQT {
     }
     public exit() {
         // kill the qt process
-        if (this.subprocess !== undefined) {
-            this.subprocess.kill("SIGTERM");
-        }
+        // if (this.subprocess !== undefined) {
+        //     this.subprocess.kill("SIGTERM");
+        // }
     }
     public init() {
-        this.subprocess = Spawn.spawn("/ruff/app.data/tabacooui", ["-platform", "eglfs"]);
+        // this.subprocess = Spawn.spawn("/ruff/app.data/tabacooui", ["-platform", "eglfs"]);
 
-        this.subprocess.on("exit", (code) => {
-            Tool.printRed("QT process exit with code: " + code);
-        });
+        // this.subprocess.on("exit", (code) => {
+        //     Tool.printRed("QT process exit with code: " + code);
+        // });
 
         setTimeout(() => {
             this.start();
@@ -148,12 +148,13 @@ export class CommQT {
         Tool.printMagenta("------------");
         this.client.write(data);
     }
-    public sendQuery(header: string, text: string, type: number, cb: (err, data) => void) {
+    public sendQuery(header: string, text: string, type: number, timeout: number, cb: (err, data) => void) {
         const tuple: IfPacket = this.sendTrap(ObjType.TrapYesNo,
             {
                 TextHeader: header,
                 Text: text,
                 Type: type,
+                Timeout: timeout,
                 Reply: "",
             });
         const session: IfSession = {
@@ -165,20 +166,20 @@ export class CommQT {
     }
     // 显示yes/no对话框
     public sendQueryYesNo(header: string, text: string, cb: (err, data) => void) {
-        this.sendQuery(header, text, 1, cb);
+        this.sendQuery(header, text, 1, 20000, cb);
     }
     // 显示OK确认对话框
     public sendQueryOk(header: string, text: string, cb: (err, data) => void) {
-        this.sendQuery(header, text, 2, cb);
+        this.sendQuery(header, text, 2, 15000, cb);
     }
     // 显示对话框
     public sendQuickDlg(header: string, text: string, cb: (err, data) => void) {
-        this.sendQuery(header, text, 3, cb);
+        this.sendQuery(header, text, 3, 10000, cb);
     }
 
     // 显示对话框
     public sendSlowDlg(header: string, text: string, cb: (err, data) => void) {
-        this.sendQuery(header, text, 4, cb);
+        this.sendQuery(header, text, 4, 5000, cb);
     }
 
     public sendTrap(obj: number, objContent: any): IfPacket {
@@ -299,7 +300,7 @@ export class CommQT {
         // Find the task which is waiting ,and response
         for (const ele of this.sessionLst) {
             if (ele.packetId === data.PacketId) {
-                ele.callback(null, data);
+                ele.callback(null, data.Content);
                 this.popSession(ele);
                 return;
             }
@@ -332,7 +333,7 @@ export class CommQT {
             return;
         }
         for (const ele of this.sessionLst) {
-            if ((stamp - ele.timeStamp) > 3000) {
+            if ((stamp - ele.timeStamp) > 5000) {
                 ele.callback("timeout", null);
                 this.popSession(ele);
                 return;

@@ -332,7 +332,6 @@ export class ControlPeriph {
 
                     Tool.printRed("GetTempError error");
                     resolve("OK");
-                    return;
                 }
 
                 Tool.printGreen("GetTemp");

@@ -263,3 +263,10 @@ export interface IfCurrentStageInfo {
     CurrentStage: number;
     CurrentStageRunningTime: number; // 分钟
 }
+export interface IfTrapYesNo {
+    TextHeader: string;
+    Text: string;
+    Type: number;
+    TimeOut: number;
+    Reply: string;
+}

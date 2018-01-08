@@ -66,7 +66,7 @@ $.ready((error) => {
     Tool.printMagenta("App Begin");
     Tool.printMagenta("################\n");
 
-    Tool.clearQTProcess();
+    // Tool.clearQTProcess();
 
     Tool.readMachineSNFromRuffd();
     LocalStorage.loadAppVersion();
@@ -171,6 +171,18 @@ function main() {
 
             }, TRAP_PERIOD);
         }, 5000);
+
+        setTimeout(() => {
+            commQT.sendQueryYesNo("Test Dlg", "测试对话框功能，5秒钟消失", (err, data) => {
+
+                if (err) {
+                    Tool.printYellow("Received Dlg timeout");
+                    return;
+                }
+                Tool.printYellow("Received Dlg Response");
+                console.log(data);
+            });
+        }, 2000);
 
         // setTimeout(() => {
         //     commQT.sendQuickDlg(
