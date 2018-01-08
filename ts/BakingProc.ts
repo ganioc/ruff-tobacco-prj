@@ -902,6 +902,10 @@ export class RunningHandle {
 
                 obj.ACAlarmPhaseC = 0;
 
+                if (ControlPeriph.ADC1 < 0.03 && ControlPeriph.ADC2 < 0.03 && ControlPeriph.ADC3 < 0.03) {
+                    obj.bWindGateHighSpeed = -1;
+                }
+
                 obj.GPRSAlarm = Alarm.checkGPRS();
 
                 obj.GPSAlarm = Alarm.checkGPS();

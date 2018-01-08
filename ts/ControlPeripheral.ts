@@ -43,7 +43,7 @@ export class ControlPeriph {
     public static bToggleWD: boolean;
 
     public static vHiLowWindEngine: number;
-    public static bWindGateHighSpeed: boolean;
+    public static bWindGateHighSpeed: number;
 
     public static vGPRSSignal: number;
 
@@ -70,7 +70,7 @@ export class ControlPeriph {
             Tool.print("Stop the vent");
         });
         ControlPeriph.vHiLowWindEngine = 0;
-        ControlPeriph.bWindGateHighSpeed = true;
+        ControlPeriph.bWindGateHighSpeed = -1;
 
         ControlPeriph.ADC1 = 0;
         ControlPeriph.ADC2 = 0;
@@ -536,12 +536,12 @@ export class ControlPeriph {
             return new Promise((resolve, reject) => {
                 if (ControlPeriph.vHiLowWindEngine >= 6) {
                     // hi speed
-                    ControlPeriph.bWindGateHighSpeed = true;
+                    ControlPeriph.bWindGateHighSpeed = 1;
                 } else if (ControlPeriph.vHiLowWindEngine === 0) {
                     Tool.printRed("Wind gate stopped, should we alram?");
                 } else {
                     // low speed
-                    ControlPeriph.bWindGateHighSpeed = false;
+                    ControlPeriph.bWindGateHighSpeed = 0;
                 }
                 resolve("OK");
             });

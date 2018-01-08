@@ -136,7 +136,7 @@ export interface ITrapInfo {
     SecondaryDryTemp: number;
     SecondaryWetTemp: number;
 
-    bWindGateHighSpeed: boolean; // true - hi speed, false - low speed
+    bWindGateHighSpeed: number; // 1 - hi speed, 0 - low speed, -1 - stop
     bBurningGateOn: boolean;     // true - on, false - off
     bVentOn: boolean;
 
