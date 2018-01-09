@@ -21,10 +21,11 @@ export class ControlGPS {
     }
     public start() {
         Tool.printBlue("GPS start");
+
         $("#uart-gps").on("data", (data) => {
             // console.log("length:" + data.length);
             // Tool.printGreen(data);
-            // console.log(data.toString());
+            console.log("gps :" + data.toString());
 
             const data_temp = data.toString();
             const index1 = data_temp.indexOf("$GPRMC");
@@ -77,8 +78,8 @@ export class ControlGPS {
 
                 ControlPeriph.gpsLongitude = degree + minute / 60;
 
-                // Tool.printRed(ControlPeriph.gpsLatitude);
-                // Tool.printRed(ControlPeriph.gpsLongitude);
+                Tool.printRed("gps :" + ControlPeriph.gpsLatitude);
+                Tool.printRed("gps :" + ControlPeriph.gpsLongitude);
             }
         });
 

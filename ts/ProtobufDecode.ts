@@ -92,12 +92,14 @@ export class ProtobufDecode {
         });
 
         this.appBaking = option.baking;
+
         ProtobufDecode.bOnline = false;
         this.mqtt = undefined;
 
         this.client = new HttpsApp(httpoption);
         this.timer = undefined;
         this.TOKEN = "";
+
         this.info = {
             mqttResponse: {
                 imei: "",
@@ -119,6 +121,7 @@ export class ProtobufDecode {
     public init(options): void {
         let version: string;
         let data: IfConfigFile;
+
         const proc = new Promise((resolve, reject) => {
             Tool.printGreen("Protobu decoder init()==>");
 
@@ -279,6 +282,7 @@ export class ProtobufDecode {
 
                     ProtobufDecode.bOnline = true;
                     const config: any = this.decodeConfig.decode(new Uint8Array(buf));
+
                     console.log(config);
                     const types: IfTobaccoType[] = [];
                     const levels: IfQualityLevel[] = [];
@@ -325,8 +329,8 @@ export class ProtobufDecode {
                     data.baking_config.alarm_threshold.alarm_checking_period = config.alarm_threshold.alarm_checking_period;
                     data.baking_config.base_setting.AirFlowPattern = config.base_setting.airflow_pattern;
                     data.baking_config.base_setting.ControllerName = config.base_setting.controller_name;
-                    data.baking_config.base_setting.GPSInfo.Latitude = config.base_setting.GPSInfo.altitude;
-                    data.baking_config.base_setting.GPSInfo.Longitude = config.base_setting.GPSInfo.longitude;
+                    data.baking_config.base_setting.GPSInfo.Latitude = ControlPeriph.gpsLatitude;
+                    data.baking_config.base_setting.GPSInfo.Longitude = ControlPeriph.gpsLongitude;
                     data.baking_config.base_setting.InnerHeight = config.base_setting.inner_height;
                     data.baking_config.base_setting.LocName = config.base_setting.location_name;
                     data.baking_config.base_setting.WallMaterial = config.base_setting.wall_material;

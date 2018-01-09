@@ -50,7 +50,7 @@ const option: IfHttpsApp = {
     port: 443,
 };
 
-// const decoder = new ProtobufDecode({ baking: appBaking });
+const decoder = new ProtobufDecode({ baking: appBaking });
 
 const client = new HttpsApp(option);
 
@@ -66,7 +66,7 @@ $.ready((error) => {
     Tool.printMagenta("App Begin");
     Tool.printMagenta("################\n");
 
-    // Tool.clearQTProcess();
+    Tool.clearQTProcess();
 
     Tool.readMachineSNFromRuffd();
     LocalStorage.loadAppVersion();
@@ -138,7 +138,6 @@ function main() {
     // Tool.printRed("Delete:" + LocalStorage.getRootDir());
     // deleteFolderRecursive(LocalStorage.getRootDir());
 
-    // mqttApp.start();
     appBaking.init({});
 
     // Task init, very important
@@ -519,6 +518,6 @@ function main() {
         ControlPeriph.fetchFastParamsWithPromise(() => {
             Tool.print("Fetch fast params");
         });
-    }, 1300);
+    }, 1500);
 
 }

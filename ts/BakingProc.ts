@@ -662,6 +662,8 @@ export class RunningHandle {
                 Tool.printRed("loadbasesettingasync fail");
                 return;
             }
+            o.BaseSetting.GPSInfo.Latitude = ControlPeriph.gpsLatitude;
+            o.BaseSetting.GPSInfo.Longitude = ControlPeriph.gpsLongitude;
             callback(o);
         });
     }

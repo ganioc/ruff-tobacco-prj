@@ -7,7 +7,7 @@ message RegisterResponse {
 	string dypassword = 3;
 	string mqttTcpEndpoint = 4;
 	string mqttSslEndpoint = 5;
-    string mqttWssEndpoint = 6;
+	string mqttWssEndpoint = 6;
 	string mqttUsername = 7;
 	string mqttKey = 8;
 }
@@ -35,14 +35,9 @@ message RecoProfileRequest {
 }
 
 message ProfileItem {
-    enum Mode {
-        KEEP = 0;
-        HEAT_UP = 1;
-    }
-    Mode mode = 1;
-    double targetDryBulbTemp = 2;
-    double targetWetBulbTemp = 3;
-    int64 minutes = 4;
+    double targetDryBulbTemp = 1;
+    double targetWetBulbTemp = 2;
+    int64 minutes = 3;
 }
 
 message Profile {
@@ -59,14 +54,6 @@ message BatchRating {
     string rating = 1;
     double weight = 2;
 }
-// message BatchYDetail{
-//     string rating =1;
-//     double item =2;
-//     int64 batchId = 3;
-//     string deviceId = 4;
-//     repeated BatchRating ratings = 5;
-//     int64 start_time = 6;
-// }
 
 message BatchDetail {
     int64 batchId = 1;
@@ -101,4 +88,72 @@ message BatchSummary {
     string deviceId = 2;
     int64 start_time = 3;
     int64 end_time = 4;
+}
+
+message ResumeResponse {
+	int32 batchId = 1;
+	Profile profile = 2;
+	int32 stage = 3;
+	int32 remainMinutes = 4;
+}
+
+message ConfigTemperaturePair {
+	double start_temperature = 1;
+	double end_temperature = 2;
+}
+
+message ConfigCurve {
+	repeated ConfigTemperaturePair dry_list = 1;
+	repeated ConfigTemperaturePair wet_list = 2;
+	repeated int32 during_list = 3;
+}
+
+message ConfigTobaccoType {
+	string name = 1;
+	int32 id = 2;
+}
+
+message ConfigTobaccoQuality {
+	string name = 1;
+	int32 id = 2;
+}
+
+message ConfigAlarmThreshold {
+	double max_temperature = 1;
+	double min_temperature = 2;
+	int32 alarm_checking_period = 3;
+	int32 dry_temperature_alarm_period = 4;
+	int32 dry_temperature_alarm_limit = 5;
+	int32 dry_temperature_alarm_period2 = 6;
+	int32 dry_temperature_alarm_limit2 = 7;
+	int32 wet_temperature_alarm_period = 8;
+	int32 wet_temperature_alarm_limit = 9;
+}
+
+message ConfigGPS {
+	double longitude = 1;
+	double altitude = 2;
+}
+
+message ConfigBaseSetting {
+	ConfigGPS GPSInfo = 1;
+	string airflow_pattern = 2;
+	int32 inner_height = 3;
+	int32 wall_material = 4;
+	string controller_name = 5;
+	string location_name = 6;
+}
+
+message Config {
+	int32 update_tag = 1;
+	ConfigCurve default_curve = 2;
+	repeated ConfigTobaccoType tobacco_type = 3;
+	repeated ConfigTobaccoQuality quality_level = 4;
+	ConfigAlarmThreshold alarm_threshold = 5;
+	ConfigBaseSetting base_setting = 6;
+}
+
+message UpdateRequest {
+	string deviceId = 1;
+	string app_version = 2;
 }
