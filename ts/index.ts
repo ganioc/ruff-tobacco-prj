@@ -79,7 +79,7 @@ $.ready((error) => {
         speed: 22, // speed of windgate
     });
 
-    // gps.start();
+    gps.start();
 
     gprs.start();
 
@@ -172,17 +172,17 @@ function main() {
             }, TRAP_PERIOD);
         }, 5000);
 
-        setTimeout(() => {
-            commQT.sendQueryYesNo("Test Dlg", "测试对话框功能，5秒钟消失", (err, data) => {
+        // setTimeout(() => {
+        //     commQT.sendQueryYesNo("Test Dlg", "测试对话框功能，5秒钟消失", (err, data) => {
 
-                if (err) {
-                    Tool.printYellow("Received Dlg timeout");
-                    return;
-                }
-                Tool.printYellow("Received Dlg Response");
-                console.log(data);
-            });
-        }, 2000);
+        //         if (err) {
+        //             Tool.printYellow("Received Dlg timeout");
+        //             return;
+        //         }
+        //         Tool.printYellow("Received Dlg Response");
+        //         console.log(data);
+        //     });
+        // }, 2000);
 
         // setTimeout(() => {
         //     commQT.sendQuickDlg(

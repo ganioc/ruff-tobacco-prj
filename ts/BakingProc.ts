@@ -586,67 +586,7 @@ export class RunningHandle {
 
         });
     }
-    // public updateRunningCurveInfo(data: any) {
-    //     Tool.printMagenta("update RunningCurveInfo");
-    //     Tool.print(data);
 
-    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
-
-    //     // if (data.CurrentStage === undefined) {
-    //     //     info.RunningCurveInfo.CurrentStage = 0;
-    //     //     info.RunningCurveInfo.CurrentStageRunningTime = 0;
-    //     // }
-
-    //     info.RunningCurveInfo.TempCurveDryList = [];
-    //     info.RunningCurveInfo.TempCurveWetList = [];
-    //     info.RunningCurveInfo.TempDurationList = [];
-
-    //     if (data.TempCurveDryList.length !== data.TempCurveWetList.length) {
-    //         Tool.printRed("Wrong format runningcurveinfo");
-    //         return;
-    //     }
-
-    //     console.log(util.inspect(data.TempCurveDryList));
-
-    //     data.TempCurveDryList.forEach((element) => {
-    //         info.RunningCurveInfo.TempCurveDryList.push(element);
-    //     });
-
-    //     console.log(util.inspect(data.TempCurveWetList));
-
-    //     data.TempCurveWetList.forEach((element) => {
-    //         info.RunningCurveInfo.TempCurveWetList.push(element);
-    //     });
-
-    //     console.log(util.inspect(data.TempDurationList));
-
-    //     data.TempDurationList.forEach((element) => {
-    //         info.RunningCurveInfo.TempDurationList.push(element);
-    //     });
-
-    //     Tool.printBlue("Update this.runningCurveInfo");
-    //     console.log(util.inspect(info.RunningCurveInfo));
-
-    //     this.bakingCurve = new BakingCurve({
-    //         curve: this.getRunningOption(
-    //             info.RunningCurveInfo.TempCurveDryList,
-    //             info.RunningCurveInfo.TempCurveWetList,
-    //             info.RunningCurveInfo.TempDurationList,
-    //         ),
-    //         timeDelta: RunningHandle.timeDeltaCheckStatus,
-    //     });
-
-    //     // this.bakingCurve.resetStage(
-    //     //     info.RunningCurveInfo.CurrentStage,
-    //     //     info.RunningCurveInfo.CurrentStageRunningTime,
-    //     // );
-
-    //     LocalStorage.saveBakingStatus(info);
-    // }
-    // public loadResultInfo(): IResultInfo {
-    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
-    //     return info.ResultInfo;
-    // }
     public updateResult(data: any) {
         Tool.printMagenta("update ResultInfo");
         Tool.print(data);
@@ -711,23 +651,7 @@ export class RunningHandle {
         });
 
     }
-    // public updateBakingInfo(data: any) {
 
-    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
-
-    //     Tool.printMagenta("Update BakingInfo");
-    //     console.log(data);
-
-    //     for (const k in data) {
-    //         if (k !== "HistoryCounter" && info.BakingInfo[k] !== undefined) {
-    //             info.BakingInfo[k] = data[k];
-    //         }
-    //     }
-    //     Tool.printMagenta("After update");
-    //     console.log(info.BakingInfo);
-
-    //     LocalStorage.saveBakingStatus(info);
-    // }
     public loadInfoCollectAsync(callback: (obj: IInfoCollect) => void) {
         LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
             if (err) {
@@ -781,18 +705,6 @@ export class RunningHandle {
         });
 
     }
-    // public updateBaseSetting(data: any) {
-    //     Tool.printMagenta("Update BaseSetting");
-
-    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
-
-    //     for (const k in data) {
-    //         if (info.BaseSetting[k] !== undefined) {
-    //             info.BaseSetting[k] = data[k];
-    //         }
-    //     }
-    //     LocalStorage.saveBakingStatus(info);
-    // }
 
     public getRunning() {
         const obj = { State: "" };
@@ -921,78 +833,6 @@ export class RunningHandle {
             });
         });
     }
-
-    // public getTrapInfo() {
-    //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
-
-    //     const obj: ITrapInfo = {
-    //         WetTempAlarm: 1, // 1 alarm, 0 no alarm;
-    //         DryTempAlarm: 1,
-    //         VoltageLowAlarm: 1,
-    //         ACAlarmPhaseA: 1,
-    //         ACAlarmPhaseB: 1,
-    //         ACAlarmPhaseC: 1,
-    //         GPRSAlarm: 1,
-    //         GPSAlarm: 1,
-
-    //         // temp value
-    //         PrimaryDryTemp: ControlPeriph.temp1,
-    //         PrimaryWetTemp: ControlPeriph.temp2,
-    //         SecondaryDryTemp: ControlPeriph.temp3,
-    //         SecondaryWetTemp: ControlPeriph.temp4,
-
-    //         bWindGateHighSpeed: ControlPeriph.bWindGateHighSpeed, // true - hi speed, false - low speed
-    //         bBurningGateOn: ControlPeriph.CheckBurningGate(),     // true - on, false - off
-    //         bVentOn: (ControlPeriph.VentAngle > 0.01) ? true : false,
-    //         Voltage: ControlPeriph.ADC4 * 87.2,  // 电压值
-    //         Date: new Date().getTime(),  // 当前时间
-
-    //         HistoryCounter: info.BakingInfo.HistoryCounter,
-    //         Status: info.SysInfo.bInRunning,
-    //     };
-
-    //     // 根据实际的测试情况进行修改
-    //     if (info.SysInfo.bTempForUpperRack === true) {
-    //         obj.PrimaryDryTemp = ControlPeriph.temp4;
-    //         obj.PrimaryWetTemp = ControlPeriph.temp2;
-    //         obj.SecondaryDryTemp = ControlPeriph.temp1;
-    //         obj.SecondaryWetTemp = ControlPeriph.temp3;
-
-    //     } else {
-    //         obj.PrimaryDryTemp = ControlPeriph.temp1;
-    //         obj.PrimaryWetTemp = ControlPeriph.temp3;
-    //         obj.SecondaryDryTemp = ControlPeriph.temp2;
-    //         obj.SecondaryWetTemp = ControlPeriph.temp4;
-
-    //     }
-
-    //     // check dry temp
-    //     obj.DryTempAlarm = Alarm.checkDryTemp(info, obj.PrimaryDryTemp, obj.PrimaryWetTemp);
-
-    //     // check wet temp
-    //     obj.WetTempAlarm = Alarm.checkWetTemp(info, obj.PrimaryWetTemp, obj.PrimaryDryTemp);
-
-    //     obj.VoltageLowAlarm = Alarm.checkVoltageLow(ControlPeriph.ADC4 * 87.2);
-
-    //     obj.ACAlarmPhaseA = Alarm.checkPhaseA(ControlPeriph.ADC1,
-    //         ControlPeriph.ADC2,
-    //         ControlPeriph.ADC3);  // 缺相告警
-
-    //     obj.ACAlarmPhaseB = 0;
-
-    //     obj.ACAlarmPhaseC = 0;
-
-    //     obj.GPRSAlarm = Alarm.checkGPRS();
-
-    //     obj.GPSAlarm = Alarm.checkGPS();
-
-    //     // 燃烧门的状态
-    //     obj.bBurningGateOn = ControlPeriph.bBurningGateOn;
-    //     // 风门状态
-    //     obj.bVentOn = (ControlPeriph.VentAngle > 0.5) ? true : false;
-
-    //     return obj;
-    // }
 
     public getTrapBaking() {
         const obj: ITrapBaking = {
