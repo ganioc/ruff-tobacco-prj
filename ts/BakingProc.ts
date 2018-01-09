@@ -208,6 +208,10 @@ export class RunningHandle {
 
             info.BakingInfo.HistoryCounter = RunningHandle.HistoryCounter;
 
+            // change to default upperRack position
+            info.SysInfo.bTempForUpperRack = true;
+            info.BakingInfo.bTempForUpperRack = true;
+
             LocalStorage.checkLogDirecExist(RunningHandle.HistoryCounter.toString());
 
             LocalStorage.saveBakingStatusSync(info);
@@ -683,13 +687,13 @@ export class RunningHandle {
             }
 
             if (data.AirFlowPattern === "rise") {
-                info.SysInfo.bTempForUpperRack = true;
+                info.SysInfo.bTempForUpperRack = false;
                 RunningHandle.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
                 info.BakingInfo.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
                 info.BaseSetting.AirFlowPattern = "rise";
 
             } else if (data.AirFlowPattern === "fall") {
-                info.SysInfo.bTempForUpperRack = false;
+                info.SysInfo.bTempForUpperRack = true;
                 RunningHandle.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
                 info.BakingInfo.bTempForUpperRack = info.SysInfo.bTempForUpperRack;
                 info.BaseSetting.AirFlowPattern = "fall";

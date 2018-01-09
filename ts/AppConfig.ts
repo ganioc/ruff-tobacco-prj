@@ -54,4 +54,10 @@ export class AppConfig {
         return objConfig;
 
     }
+
+    public static setAppConfig(config: IfConfigFile): void {
+        const C_CONFIG_FILE_NAME = path.dirname(__filename) + "/../../app.data/app.json";
+        fs.writeFileSync(C_CONFIG_FILE_NAME, JSON.stringify(config));
+        console.log("run setAppConfig()");
+    }
 }

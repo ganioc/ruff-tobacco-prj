@@ -145,7 +145,7 @@ export class LocalStorage {
             PieceWeight: 0,
             Quality: 1,
             UpperWeight: 0,
-            bTempForUpperRack: false, // 是上棚吗?
+            bTempForUpperRack: true, // 是上棚吗?
         };
     }
     public static initRunningCurveInfo(): IRunningCurveInfo {

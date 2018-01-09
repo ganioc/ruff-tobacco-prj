@@ -50,7 +50,7 @@ const option: IfHttpsApp = {
     port: 443,
 };
 
-const decoder = new ProtobufDecode({ baking: appBaking });
+// const decoder = new ProtobufDecode({ baking: appBaking });
 
 const client = new HttpsApp(option);
 

@@ -57,8 +57,8 @@ export class HttpsApp {
             imei: sn,
         };
         Tool.printYellow(sn);
-        //console.log(data);
-        //console.log(JSON.stringify(data));
+        // console.log(data);
+        // console.log(JSON.stringify(data));
 
         this.post("/login", JSON.stringify(data), callback);
     }
@@ -80,6 +80,14 @@ export class HttpsApp {
     public updateProfile(arr: Uint8Array, token: string, callback: (err, buf) => void) {
         // comment
         this.put("/profile/device", arr, token, callback);
+    }
+
+    public updateConfig(arr: Uint8Array, token: string, callback: (err, buf) => void) {
+        this.postWithToken("/device/config", arr, token, callback);
+    }
+
+    public updateApp(sn: string, token: string, callback: (err, buf) => void) {
+        this.put("/device/app/update/" + sn, new Uint8Array(0), token, callback);
     }
 
     private put(inPath: string, objData: Uint8Array, token: string, callback: (err, buf) => void) {
@@ -114,8 +122,74 @@ export class HttpsApp {
 
             res.on("data", (d) => {
                 Tool.printMagenta("<-- PUT response from https server:");
-                //Tool.print(d);
-                //Tool.print(d.toString());
+                // Tool.print(d);
+                // Tool.print(d.toString());
+                Tool.printMagenta("----end----");
+                callback(null, d);
+            });
+
+            res.on("error", (err) => {
+                Tool.printRed(err);
+                callback(err, null);
+            });
+            res.on("end", () => {
+                Tool.print("Put end rx");
+            });
+        });
+
+        req.on("error", (e) => {
+            Tool.printRed("put req error");
+            console.log(e);
+            callback(e, null);
+        });
+
+        // Tool.printYellow(inspect(req));
+
+        Tool.printGreen("length :" + objData.length);
+        Tool.printMagenta("type :" + typeof objData);
+        // Tool.print(objData);
+
+        const bufObjData = new Buffer(objData);
+
+        console.log(bufObjData);
+        req.write(bufObjData);
+        req.end();
+    }
+
+    private postWithToken(inPath: string, objData: Uint8Array, token: string, callback: (err, buf) => void) {
+        // comment
+        Tool.printYellow("----- POST -----");
+
+        const option: IfHttpsAuth = {
+            hostname: this.HOSTNAME,
+            // port: this.PORT,
+            path: inPath,
+            method: "POST",
+            headers: {
+                "Source": "Device",
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/x-protobuf",
+                "Content-Length": objData.length,
+                "Connection": "keep-alive",
+            },
+            rejectUnauthorized: false,
+        };
+
+        Tool.printMagenta(inspect(option));
+        const req = https.request(option, (res) => {
+            Tool.printYellow("------Response from PUT-------");
+            console.log("statusCode:" + res.statusCode);
+            console.log("headers:" + res.headers);
+            // console.log(inspect(res.headers));
+
+            if (res.statusCode === 403) {
+                Tool.printRed("Forbidden path");
+            }
+
+            res.on("data", (d) => {
+                Tool.printMagenta("<-- PUT response from https server:");
+                // Tool.print(d);
+                // Tool.print(d.toString());
                 Tool.printMagenta("----end----");
                 callback(null, d);
             });
@@ -171,7 +245,7 @@ export class HttpsApp {
         const req = https.request(option, (res) => {
             console.log("statusCode:" + res.statusCode);
             console.log("headers:" + res.headers);
-            //console.log(inspect(res));
+            // console.log(inspect(res));
 
             res.on("data", (d) => {
                 Tool.printMagenta("<-- from https server:");
@@ -217,7 +291,7 @@ export class HttpsApp {
             Tool.printYellow("------Response from GET-------");
             console.log("statusCode:" + res.statusCode);
             console.log("headers:" + res.headers);
-            //console.log(inspect(res.headers));
+            // console.log(inspect(res.headers));
 
             if (res.statusCode === 403) {
                 Tool.printRed("Forbidden path");
@@ -225,7 +299,7 @@ export class HttpsApp {
 
             res.on("data", (d) => {
                 Tool.printMagenta("<-- from https server:");
-                //Tool.print(d);
+                // Tool.print(d);
                 Tool.printMagenta("----end----");
                 callback(null, d);
             });
@@ -242,7 +316,7 @@ export class HttpsApp {
             callback(e, null);
         });
 
-        //Tool.printYellow(inspect(req));
+        // Tool.printYellow(inspect(req));
 
         req.end();
     }
