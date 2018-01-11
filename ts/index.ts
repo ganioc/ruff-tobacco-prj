@@ -38,13 +38,6 @@ const gprs = new ControlGPRS();
 
 const commMCU = new ControlMcu();
 
-// const mqttApp = new MqttApp({
-//     address: "ssl://a5de16f68b2d48098d601c885a3aa444.mqtt.iot.gz.baidubce.com",
-//     port: 1884,
-//     name: "a5de16f68b2d48098d601c885a3aa444/ruff_super_test",
-//     key: "7KokioMzX17dwj0tkZ2yVJ0GRdt71aAK5bCNCs2Y8Hk=",
-//     clientId: "curing_device_ruff_test",
-// });
 const option: IfHttpsApp = {
     hostname: "api.shdingyun.com",
     port: 443,

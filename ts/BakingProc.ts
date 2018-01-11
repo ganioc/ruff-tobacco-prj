@@ -227,57 +227,6 @@ export class RunningHandle {
             Tool.print("BakingProc: reset no function in mode - " + this.runningStatus);
         }
     }
-    // public start() {
-    //     Tool.print("BakingProc: Into start()");
-
-    //     let info: IInfoCollect = LocalStorage.loadBakingStatus();
-
-    //     if (this.runningStatus === RunningStatus.WAITING) {
-    //         this.runningStatus = RunningStatus.RUNNING;
-    //         info.SysInfo.bInRunning = RunningStatus.RUNNING;
-
-    //         info.RunningCurveInfo.CurrentStage = 0;
-    //         info.RunningCurveInfo.CurrentStageRunningTime = 0;
-
-    //     } else if (this.runningStatus === RunningStatus.PAUSED) {
-    //         this.runningStatus = RunningStatus.RUNNING;
-
-    //         info.SysInfo.bInRunning = RunningStatus.RUNNING;
-    //     } else {
-    //         return;
-    //     }
-
-    //     Tool.print("BakingProc: resetStage");
-    //     Tool.print("BakingProc: stage " + info.RunningCurveInfo.CurrentStage);
-    //     Tool.print("BakingProc: elapsed time " + info.RunningCurveInfo.CurrentStageRunningTime);
-
-    //     this.bakingCurve.resetStage(
-    //         info.RunningCurveInfo.CurrentStage,
-    //         info.RunningCurveInfo.CurrentStageRunningTime,
-    //     );
-
-    //     this.bBakingFinished = false;
-
-    //     LocalStorage.saveBakingStatus(info);
-
-    //     Tool.print("timeDeltaCheckStatus: " + RunningHandle.timeDeltaCheckStatus + " seconds");
-
-    //     // Added by Yang Jun, 2017-12-14
-    //     clearInterval(this.timerHandler);
-
-    //     this.timerHandler = setInterval(() => {
-
-    //         this.checkStatus();
-
-    //         info = LocalStorage.loadBakingStatus();
-
-    //         info.RunningCurveInfo.CurrentStage = this.bakingCurve.indexBakingElement;
-    //         info.RunningCurveInfo.CurrentStageRunningTime = this.bakingCurve.getCurrentStageElapsedTime();
-
-    //         LocalStorage.saveBakingStatus(info);
-
-    //     }, RunningHandle.timeDeltaCheckStatus);
-    // }
 
     public start() {
         this.startInAsync();
@@ -318,7 +267,7 @@ export class RunningHandle {
             return new Promise((resolve, reject) => {
                 resolve("OK");
             });
-        }, (fb) => {
+        }, (fb) => { // read backup file
             return new Promise((resolve, reject) => {
                 LocalStorage.loadCurrentStageBackupAsync((err, o: IfCurrentStageInfo) => {
                     if (err) {
@@ -349,13 +298,17 @@ export class RunningHandle {
             return new Promise((resolve, reject) => {
                 LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
                     if (err) {
-                        reject("NOK");
+                        Tool.printRed(err);
+                        Tool.printRed("Wrong read bakingStatus, treat as a new baking task");
+                        info = LocalStorage.initBakingStatus();
+                        resolve("OK");
                         return;
                     }
                     try {
                         info = JSON.parse(JSON.stringify(o));
                     } catch (e) {
                         Tool.printRed(e);
+                        Tool.printRed("Treat as a new baking task");
                         info = LocalStorage.initBakingStatus();
                     }
 
@@ -365,9 +318,9 @@ export class RunningHandle {
         }).then((val) => {
             return new Promise((resolve, reject) => {
                 if (this.runningStatus === RunningStatus.WAITING) {
+
                     this.runningStatus = RunningStatus.RUNNING;
                     info.SysInfo.bInRunning = RunningStatus.RUNNING;
-
                     info.RunningCurveInfo.CurrentStage = 0; // Not used
                     info.RunningCurveInfo.CurrentStageRunningTime = 0; // Not used
 
@@ -404,6 +357,7 @@ export class RunningHandle {
                     if (err) {
                         Tool.printRed("save baking status async fail");
                         Tool.printRed(err);
+                        reject(err);
                         return;
                     }
                     resolve(data);
@@ -420,10 +374,12 @@ export class RunningHandle {
 
                 this.timerHandler = setInterval(() => {
 
+                    // main function to do the temp checking
                     this.checkStatus();
 
                     this.nSaveCounter++;
 
+                    // save current stage and elapsed time every 10*12 seconds
                     if (this.nSaveCounter >= SAVE_COUNTER_MAX) {
                         this.nSaveCounter = 0;
 
@@ -940,10 +896,13 @@ export class RunningHandle {
 
     private checkStatus() {
 
-        Tool.printYellow("\n===========CheckStatus()===========" + this.runningStatus);
+        Tool.printYellow("\n===========CheckStatus()=========== " + this.runningStatus);
 
         if (this.bakingCurve.run() === false) {
+
+            // Stop the baking
             this.stop();
+
             Tool.printYellow("######################### ");
             Tool.printYellow("BakingCurve work finished ");
             Tool.printYellow("######################### ");

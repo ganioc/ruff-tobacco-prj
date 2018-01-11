@@ -67,6 +67,7 @@ export class BakingCurve {
         const elementDry: BakingElement = this.bakingElementList[this.indexBakingElement];
 
         const elementWet: BakingElement = this.bakingWetElementList[this.indexBakingElement];
+
         let status;
 
         Tool.print("Baking Index: No " + (this.indexBakingElement + 1) + " of total "

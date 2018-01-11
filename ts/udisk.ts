@@ -122,4 +122,8 @@ export class UDisk {
             }
         });
     }
+    public static readAndCopy(cb: (err, data) => void) {
+        const fileLst = [];
+        
+    }
 }

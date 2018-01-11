@@ -278,6 +278,7 @@ export class LocalStorage {
             Tool.print("Not exist: ");
             fs.writeFileSync(LocalStorage.getCurrentStageDirec(),
                 LocalStorage.strInitCurrentStage());
+            fs.writeFileSync(LocalStorage.getCurrentStageBackupDirec(), LocalStorage.strInitCurrentStage());
         }
 
     }
@@ -458,7 +459,7 @@ export class LocalStorage {
         let files = [];
         let nameDirec: number = 0;
 
-        // 找到 data/log/ 目录下的子目录里，值最大的目录
+        // 找到 data/ 目录下的子目录里，值最大的目录
         files = fs.readdirSync(LocalStorage.getDataDirec());
 
         if (files === []) {
@@ -469,18 +470,39 @@ export class LocalStorage {
         }
 
         files.forEach((file, index) => {
-            const nName = parseInt(file, 10);
+            const nName: number = parseInt(file, 10);
             if (nName > nameDirec) {
                 nameDirec = nName;
             }
         });
         // 找到该子目录里的 *.log 文件里面， 值最大的文件值
-        const tempName: string = nameDirec + "";
+        let tempName: string = nameDirec + "";
 
-        files = fs.readdirSync(LocalStorage.getCurrentStageDirec() + tempName);
+        // files = fs.readdirSync(LocalStorage.getDataDirec() + tempName);
+
+        const logFiles = fs.readdirSync(LocalStorage.getDataDirec() + tempName + "/");
+
+        if (logFiles === []) {
+            return {
+                CurrentStage: 0,
+                CurrentStageRunningTime: 0,
+            };
+        }
+
+        nameDirec = 0;
+        logFiles.forEach((file, index) => {
+            const nName: number = parseInt(file, 10);
+            if (nName > nameDirec) {
+                nameDirec = nName;
+            }
+        });
+
+        tempName = nameDirec + ""; // latest log file name
+
+        // analyze the content of the file ... later ...
 
         return {
-            CurrentStage: files.length,
+            CurrentStage: (logFiles.length > 0) ? (logFiles.length - 1) : (0),
             CurrentStageRunningTime: 0,
         };
     }
