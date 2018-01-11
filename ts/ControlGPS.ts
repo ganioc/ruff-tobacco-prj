@@ -78,6 +78,9 @@ export class ControlGPS {
 
                 ControlPeriph.gpsLongitude = degree + minute / 60;
 
+                // ControlPeriph.gpsLatitude = 31.1798;
+                // ControlPeriph.gpsLongitude = 121.5995;
+
                 Tool.printRed("gps :" + ControlPeriph.gpsLatitude);
                 Tool.printRed("gps :" + ControlPeriph.gpsLongitude);
             }
