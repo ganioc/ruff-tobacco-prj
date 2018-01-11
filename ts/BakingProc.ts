@@ -208,6 +208,9 @@ export class RunningHandle {
 
             info.BakingInfo.HistoryCounter = RunningHandle.HistoryCounter;
 
+            // add on 2018-1-10, should synchronize with sysinfo
+            info.SysInfo.HistoryCounter = RunningHandle.HistoryCounter;
+
             // change to default upperRack position
             info.SysInfo.bTempForUpperRack = true;
             info.BakingInfo.bTempForUpperRack = true;

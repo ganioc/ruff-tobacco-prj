@@ -36,8 +36,8 @@
         "LocName": "Some-Place"
     },
     "BakingInfo": {
-        "TobaccoType": 0,
-        "HistoryCounter": 7,
+        "TobaccoType": 1,
+        "HistoryCounter": 10,
         "LoadingMethod": 1,
         "LowerWeight": 0,
         "MaturePercent1": 100,
@@ -46,24 +46,58 @@
         "MaturePercent4": 0,
         "MaturePercent5": 0,
         "MiddleWeight": 0,
-        "PieceQuantity": 109,
+        "PieceQuantity": 102,
         "PieceWeight": 0,
-        "Quality": 0,
-        "UpperWeight": 1229,
+        "Quality": 1,
+        "UpperWeight": 1230,
         "bTempForUpperRack": true
     },
     "RunningCurveInfo": {
         "CurrentStage": 0,
         "CurrentStageRunningTime": 0,
         "TempCurveDryList": [
-            [30, 30],
-            [30, 30]
+            [36, 36],
+            [36, 38],
+            [38, 38],
+            [38, 40],
+            [40, 40],
+            [40, 42],
+            [42, 42],
+            [42, 46],
+            [46, 46],
+            [46, 48],
+            [48, 48],
+            [48, 50],
+            [50, 50],
+            [50, 54],
+            [54, 54],
+            [54, 60],
+            [60, 60],
+            [60, 68],
+            [68, 68]
         ],
         "TempCurveWetList": [
-            [30, 30],
-            [30, 30]
+            [34, 34],
+            [34, 36],
+            [36, 36],
+            [36, 37],
+            [37, 37],
+            [37, 37.5],
+            [37.5, 37.5],
+            [37.5, 38],
+            [38, 38],
+            [38, 38],
+            [38, 38],
+            [38, 39],
+            [39, 39],
+            [39, 39],
+            [39, 39],
+            [39, 40],
+            [40, 40],
+            [40, 42],
+            [42, 42]
         ],
-        "TempDurationList": [1, 1]
+        "TempDurationList": [2, 2, 15, 4, 2, 4, 2, 8, 4, 4, 2, 4, 2, 5, 5, 6, 2, 8, 12]
     },
     "ResultInfo": {
         "content": [{

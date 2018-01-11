@@ -52,7 +52,6 @@ export class AppConfig {
             // };
         }
         return objConfig;
-
     }
 
     public static setAppConfig(config: IfConfigFile): void {

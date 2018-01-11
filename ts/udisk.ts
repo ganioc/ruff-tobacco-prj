@@ -1,6 +1,8 @@
 import * as fs from "fs";
+
 import Spawn = require("child_process");
 import { Tool } from "./utility";
+import { LogTransform } from "./LogTransform";
 
 const spawn = Spawn.spawn;
 
@@ -31,7 +33,8 @@ export class UDisk {
         } else if (msg.name === "umount") {
             UDisk.umount(cb);
         } else if (msg.name === "copy") {
-            UDisk.copy(cb);
+            // UDisk.copy(cb);
+            UDisk.readAndCopy(cb);
         }
     }
     public static query(cb: (err, data) => void) {
@@ -123,7 +126,10 @@ export class UDisk {
         });
     }
     public static readAndCopy(cb: (err, data) => void) {
-        const fileLst = [];
-        
+        const t = new LogTransform(file_wait_copy_path, "/tmp/" + dev_name + "/", Tool.MachineSN);
+
+        t.copy();
+
+        cb(null, { name: "copy", feedback: 1 });
     }
 }
