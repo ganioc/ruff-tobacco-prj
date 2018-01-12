@@ -15,7 +15,9 @@ import { log } from "util";
 export class LogTransform {
     constructor(private srcPath: string, private dstPath: string, private SN: string) {
         console.log("constructor()");
-        console.log(__dirname + this.dstPath + this.SN);
+        console.log("src path:" + srcPath);
+        console.log("dst path:" + dstPath);
+        console.log(this.dstPath + this.SN);
 
         if (!fs.existsSync(this.dstPath + this.SN)) {
             fs.mkdirSync(this.dstPath + this.SN);
@@ -23,6 +25,7 @@ export class LogTransform {
             Tool.printMagenta("Already exists:" + this.dstPath + this.SN);
         }
     }
+    // only for test purpose
     public hello() {
         Tool.print("hello");
         Tool.printYellow(__dirname);
@@ -33,10 +36,12 @@ export class LogTransform {
         console.log(files);
     }
     public copy() {
-        const dirs = fs.readdirSync(__dirname + this.srcPath);
+        const dirs = fs.readdirSync(this.srcPath);
+
+        Tool.printYellow("------> Begin to copy()");
 
         dirs.forEach((dirName) => {
-            const filePath = __dirname + this.srcPath + "/" + dirName;
+            const filePath = this.srcPath + "/" + dirName;
             const bDir = fs.lstatSync(filePath).isDirectory();
             console.log("");
             console.log(dirName);

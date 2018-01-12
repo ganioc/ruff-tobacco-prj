@@ -25,7 +25,7 @@ export class ControlGPS {
         $("#uart-gps").on("data", (data) => {
             // console.log("length:" + data.length);
             // Tool.printGreen(data);
-            console.log("gps :" + data.toString());
+            // console.log("gps :" + data.toString());
 
             const data_temp = data.toString();
             const index1 = data_temp.indexOf("$GPRMC");
