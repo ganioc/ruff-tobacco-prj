@@ -170,8 +170,8 @@ export class RunningHandle {
 
             LocalStorage.saveBakingStatusSync(info);
 
-            // add by yang
-            LocalStorage.resetCurrentStageSync();
+            // add by yang. It's wrong to reset it here
+            // LocalStorage.resetCurrentStageSync();
 
             // reset peripheral stage
             Tool.printYellow("Init peripheral status:");

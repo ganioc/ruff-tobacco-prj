@@ -1,0 +1,89 @@
+{
+    "SysInfo": {
+        "Date": 1514207927224,
+        "bInRunning": 3,
+        "bTempForUpperRack": true,
+        "HistoryCounter": 15,
+        "AppVersion": "1.1.17",
+        "UIVersion": "1.1",
+        "TobaccoType": [{
+            "name": "大金华",
+            "id": 1
+        }, {
+            "name": "小金华",
+            "id": 2
+        }],
+        "QualityLevel": [{
+            "name": "优等",
+            "id": 1
+        }, {
+            "name": "中等",
+            "id": 2
+        }, {
+            "name": "下等",
+            "id": 3
+        }]
+    },
+    "BaseSetting": {
+        "AirFlowPattern": "Nosetting",
+        "ControllerName": "No-Name",
+        "GPSInfo": {
+            "Altitude": 0,
+            "Longitude": 0
+        },
+        "InnerHeight": 0,
+        "WallMaterial": 3,
+        "LocName": "Some-Place"
+    },
+    "BakingInfo": {
+        "TobaccoType": 0,
+        "HistoryCounter": 15,
+        "LoadingMethod": 1,
+        "LowerWeight": 0,
+        "MaturePercent1": 100,
+        "MaturePercent2": 0,
+        "MaturePercent3": 0,
+        "MaturePercent4": 0,
+        "MaturePercent5": 0,
+        "MiddleWeight": 0,
+        "PieceQuantity": 122,
+        "PieceWeight": 0,
+        "Quality": 0,
+        "UpperWeight": 1159,
+        "bTempForUpperRack": true
+    },
+    "RunningCurveInfo": {
+        "CurrentStage": 0,
+        "CurrentStageRunningTime": 0,
+        "TempCurveDryList": [
+            [30, 30],
+            [30, 30]
+        ],
+        "TempCurveWetList": [
+            [30, 30],
+            [30, 30]
+        ],
+        "TempDurationList": [1, 1]
+    },
+    "ResultInfo": {
+        "content": [{
+            "level": 0,
+            "weight": 230
+        }, {
+            "level": 0,
+            "weight": 0
+        }, {
+            "level": 0,
+            "weight": 0
+        }, {
+            "level": 0,
+            "weight": 0
+        }, {
+            "level": 0,
+            "weight": 0
+        }, {
+            "level": 0,
+            "weight": 0
+        }]
+    }
+}
