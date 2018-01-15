@@ -72,7 +72,7 @@ $.ready((error) => {
         speed: 22, // speed of windgate
     });
 
-    // gps.start();
+    gps.start();
 
     gprs.start();
 
@@ -399,7 +399,7 @@ function main() {
                 break;
             case InfoType.Val_SettingCurveInfo:
                 Tool.printRed("SettingCurve is able to get");
-                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo());
+                commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo(data.Content));
                 break;
             case InfoType.Val_RunningCurveInfo:
                 Tool.printRed("RunningCurveInfo is able to get");
@@ -440,7 +440,7 @@ function main() {
 
                 // Read curves from cloud
                 appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
-                    commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo());
+                    commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo({ Index: 0 }));
                 });
 
                 break;

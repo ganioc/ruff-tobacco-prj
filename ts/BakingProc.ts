@@ -488,8 +488,16 @@ export class RunningHandle {
     //     const info: IInfoCollect = LocalStorage.loadBakingStatus();
     //     return info.RunningCurveInfo;
     // }
-    public loadSettingCurveInfo() {
-        return LocalStorage.loadDefaultCurve();
+    public loadSettingCurveInfo(content: any) {
+        let mIndex = 0;
+
+        if (content.Index === undefined) {
+            mIndex = 0;
+        } else {
+            mIndex = content.Index;
+        }
+
+        return LocalStorage.loadDefaultCurve(mIndex);
     }
     public updateRunningCurveInfoAsync(data: any) {
         Tool.printMagenta("update RunningCurveInfo");

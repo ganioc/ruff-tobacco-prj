@@ -87,6 +87,8 @@ export interface IBakingInfo {
 }
 // confirmed by XX, default curve
 export interface ISettingCurveInfo {
+    Index: number;
+    NumOfCurves: number;
     TempCurveDryList: number[][];
     TempCurveWetList: number[][]; // 度,23.1, 一位小数点
     TempDurationList: number[];  // 分钟单位
@@ -237,7 +239,7 @@ export interface IfAlarmThreshold {
 export interface IfConfigFile {
     devices: any;
     baking_config: {
-        default_curve: IDefaultCurve;
+        default_curves: IDefaultCurve[];
         tobacco_type: IfTobaccoType[];
         quality_level: IfQualityLevel[];
         alarm_threshold: IfAlarmThreshold;

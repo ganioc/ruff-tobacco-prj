@@ -49,11 +49,23 @@ Tool.printGreen(path.dirname(__filename));
 
 const objConfig: IfConfigFile = AppConfig.getAppConfig();
 
-const DEFAULT_CURVE: IDefaultCurve = {
-    dryList: objConfig.baking_config.default_curve.dryList,
-    wetList: objConfig.baking_config.default_curve.wetList,
-    durList: objConfig.baking_config.default_curve.durList,
-};
+// const DEFAULT_CURVE: IDefaultCurve = {
+//     dryList: objConfig.baking_config.default_curve.dryList,
+//     wetList: objConfig.baking_config.default_curve.wetList,
+//     durList: objConfig.baking_config.default_curve.durList,
+// };
+
+const DEFAULT_CURVES: IDefaultCurve[] = [];
+
+objConfig.baking_config.default_curves.forEach((item) => {
+    DEFAULT_CURVES.push({
+        dryList: item.dryList,
+        wetList: item.wetList,
+        durList: item.durList,
+    });
+});
+
+const NUM_OF_DEFAULT_CURVES = DEFAULT_CURVES.length;
 
 export class LocalStorage {
 
@@ -152,9 +164,9 @@ export class LocalStorage {
         return {
             CurrentStage: 0,          // 当前阶段
             CurrentStageRunningTime: 0, // 当前阶段已运行时间
-            TempCurveDryList: DEFAULT_CURVE.dryList,
-            TempCurveWetList: DEFAULT_CURVE.wetList,
-            TempDurationList: DEFAULT_CURVE.durList,
+            TempCurveDryList: DEFAULT_CURVES[0].dryList,
+            TempCurveWetList: DEFAULT_CURVES[0].wetList,
+            TempDurationList: DEFAULT_CURVES[0].durList,
         };
     }
     public static initResultInfo(): IResultInfo {
@@ -197,14 +209,30 @@ export class LocalStorage {
         };
         return info;
     }
-    public static loadDefaultCurve() {
-        return LocalStorage.initDefaultCurve();
+    public static loadDefaultCurve(mIndex) {
+        return LocalStorage.getDefaultCurve(mIndex);
+    }
+    public static getDefaultCurve(i: number) {
+        let mIndex = 0;
+        if (i < 0 || i >= NUM_OF_DEFAULT_CURVES) {
+            mIndex = 0;
+        } else {
+            mIndex = i;
+        }
+
+        return {
+            Index: mIndex,
+            NumOfCurves: NUM_OF_DEFAULT_CURVES,
+            TempCurveDryList: DEFAULT_CURVES[mIndex].dryList,
+            TempCurveWetList: DEFAULT_CURVES[mIndex].wetList,
+            TempDurationList: DEFAULT_CURVES[mIndex].durList,
+        };
     }
     public static initDefaultCurve() {
         return {
-            TempCurveDryList: DEFAULT_CURVE.dryList,
-            TempCurveWetList: DEFAULT_CURVE.wetList,
-            TempDurationList: DEFAULT_CURVE.durList,
+            TempCurveDryList: DEFAULT_CURVES[0].dryList,
+            TempCurveWetList: DEFAULT_CURVES[0].wetList,
+            TempDurationList: DEFAULT_CURVES[0].durList,
         };
     }
     public static initCurrentStage(): IfCurrentStageInfo {
