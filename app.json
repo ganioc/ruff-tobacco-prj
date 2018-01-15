@@ -1,6 +1,5 @@
 {
-    "devices": [
-        {
+    "devices": [{
             "id": "LED-Running",
             "model": "LED-Running",
             "driver": "gpio-output",
@@ -442,8 +441,7 @@
                 12
             ]
         },
-        "tobacco_type": [
-            {
+        "tobacco_type": [{
                 "name": "红花大金元",
                 "id": 0
             },
@@ -456,8 +454,7 @@
                 "id": 2
             }
         ],
-        "quality_level": [
-            {
+        "quality_level": [{
                 "name": "上等",
                 "id": 0
             },

@@ -26,21 +26,21 @@ const objConfig: IfConfigFile = AppConfig.getAppConfig();
 
 const alarmCfg = objConfig.baking_config.alarm_threshold;
 
-const ALARM_CHECKING_PERIOD: number = alarmCfg.alarm_checking_period; // 5000;
+const ALARM_CHECKING_PERIOD: number = 2.5; // 5000;
 
-const DRY_TEMP_ALARM_PERIOD: number = alarmCfg.dry_temp_alarm_period * 60 * 1000;
-// 30 * 60 * 1000;
+const DRY_TEMP_ALARM_PERIOD: number = alarmCfg.dry_temp_alarm_period * 10;
+// 30 * 60;
 
 const DRY_TEMP_ALARM_LIMIT: number = alarmCfg.dry_temp_alarm_limit;
 // 2;
 
-const DRY_TEMP_ALARM_PERIOD_2: number = alarmCfg.dry_temp_alarm_period_2 * 60 * 1000;
-// 10 * 60 * 1000;
+const DRY_TEMP_ALARM_PERIOD_2: number = alarmCfg.dry_temp_alarm_period_2 * 10;
+// 10 * 60;
 const DRY_TEMP_ALARM_LIMIT_2: number = alarmCfg.dry_temp_alarm_limit_2;
 // 4;
 
-const WET_TEMP_ALARM_PERIOD: number = alarmCfg.wet_temp_alarm_period * 60 * 1000;
-// 10 * 60 * 1000;
+const WET_TEMP_ALARM_PERIOD: number = alarmCfg.wet_temp_alarm_period * 10;
+// 10 * 60 ;
 const WET_TEMP_ALARM_LIMIT: number = alarmCfg.wet_temp_alarm_limit;
 // 2;
 
@@ -72,7 +72,15 @@ function isUnderTemp(t: number): boolean {
     }
 }
 function CheckTempDelta(delta: number, tLimit: number): boolean {
-    if (delta > tLimit) {
+    let a: number;
+
+    if (delta >= 0) {
+        a = delta;
+    } else {
+        a = (- delta);
+    }
+
+    if (a > tLimit) {
         return true;
     } else {
         return false;
@@ -96,26 +104,7 @@ function GetTargetTemp(option: IfTargetTemp) {
             * timeElapsed / (duration * 60));
     }
 }
-// function GetDryTargetTemp(info: IInfoCollect): number {
-//     const obj: IfTargetTemp = {
-//         index: info.RunningCurveInfo.CurrentStage,
-//         timeElapsed: info.RunningCurveInfo.CurrentStageRunningTime,
-//         lstTemp: info.RunningCurveInfo.TempCurveDryList,
-//         lstDur: info.RunningCurveInfo.TempDurationList,
-//     };
 
-//     return GetTargetTemp(obj);
-// }
-// function GetWetTargetTemp(info: IInfoCollect): number {
-//     const obj: IfTargetTemp = {
-//         index: info.RunningCurveInfo.CurrentStage,
-//         timeElapsed: info.RunningCurveInfo.CurrentStageRunningTime,
-//         lstTemp: info.RunningCurveInfo.TempCurveWetList,
-//         lstDur: info.RunningCurveInfo.TempDurationList,
-//     };
-
-//     return GetTargetTemp(obj);
-// }
 export class Alarm {
 
     public static checkPeriod: number;
@@ -142,6 +131,7 @@ export class Alarm {
     public static bPhaseLost: boolean;
 
     public static init() {
+        console.log("\nAlarm init():");
         Alarm.checkPeriod = ALARM_CHECKING_PERIOD;
 
         Alarm.dryTempCounter = 0;
@@ -151,6 +141,10 @@ export class Alarm {
 
         Alarm.wetTempCounter = 0;
         Alarm.wetTempCounterMax = WET_TEMP_ALARM_PERIOD / ALARM_CHECKING_PERIOD;
+
+        console.log("dryTemp counter max:" + Alarm.dryTempCounterMax);
+        console.log("dryTemp2 counter max:" + Alarm.dryTemp2CounterMax);
+        console.log("wetTemp counter max:" + Alarm.wetTempCounterMax);
 
         Alarm.windEnginePhaseLostCounter = 0;
         Alarm.windEngineOverloadCounter = 0;
@@ -177,19 +171,24 @@ export class Alarm {
      */
     public static checkDryTemp(bRunning: boolean, targetTemp: number, dryT: number, wetT: number): number {
         const tempDryTarget: number = targetTemp;
+        Tool.printGreen("check dry temp");
 
         // 不运行就无告警
         if (!bRunning) {
+            Tool.printYellow("Not running");
             return 0;
         }
         if (wetT > dryT) {
+            Tool.printRed("Wet temp > dry temp," + wetT + "," + dryT);
             return 1;
         }
 
         if (isOverTemp(dryT)) {
+            Tool.printRed("temp overTemp " + dryT);
             return 1;
         }
         if (isUnderTemp(dryT)) {
+            Tool.printRed("temp underTemp " + dryT);
             return 1;
         }
 
@@ -198,7 +197,11 @@ export class Alarm {
         } else {
             Alarm.dryTempCounter = 0;
         }
+        Tool.printGreen("dryTempCounter:" + Alarm.dryTempCounter);
+        Tool.printGreen("dryTempCounterMAX:" + Alarm.dryTempCounterMax);
+
         if (Alarm.dryTempCounter > Alarm.dryTempCounterMax) {
+            Alarm.dryTempCounterMax = Alarm.dryTemp2CounterMax + 1;
             return 1;
         }
 
@@ -207,7 +210,8 @@ export class Alarm {
         } else {
             Alarm.dryTemp2Counter = 0;
         }
-
+        Tool.printGreen("dryTempCounter2:" + Alarm.dryTemp2Counter);
+        Tool.printGreen("dryTemp2CounterMAX:" + Alarm.dryTemp2CounterMax);
         if (Alarm.dryTemp2Counter > Alarm.dryTemp2CounterMax) {
             return 1;
         }
@@ -217,17 +221,23 @@ export class Alarm {
     public static checkWetTemp(bRunning: boolean, targetTemp: number, wetT: number, dryT: number): number {
         const tempWetTarget: number = targetTemp;
 
+        Tool.printGreen("check wet temp");
+
         if (!bRunning) {
+            Tool.printYellow("Not running");
             return 0;
         }
         if (wetT > dryT) {
+            Tool.printRed("wetT > dryT: " + wetT + "," + dryT);
             return 1;
         }
 
         if (isOverTemp(wetT)) {
+            Tool.printRed("wet temp overTemp " + wetT);
             return 1;
         }
         if (isUnderTemp(wetT)) {
+            Tool.printRed("wet temp underTemp " + wetT);
             return 1;
         }
 
@@ -236,7 +246,11 @@ export class Alarm {
         } else {
             Alarm.wetTempCounter = 0;
         }
+        Tool.printGreen("wetTempCounter:" + Alarm.wetTempCounter);
+        Tool.printGreen("wet TempCounterMAX:" + Alarm.wetTempCounterMax);
+
         if (Alarm.dryTempCounter > Alarm.wetTempCounterMax) {
+            Alarm.dryTemp2Counter = Alarm.wetTempCounterMax + 1;
             return 1;
         }
 

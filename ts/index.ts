@@ -72,7 +72,7 @@ $.ready((error) => {
         speed: 22, // speed of windgate
     });
 
-    gps.start();
+    // gps.start();
 
     gprs.start();
 

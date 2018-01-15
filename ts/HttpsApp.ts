@@ -264,7 +264,8 @@ export class HttpsApp {
             console.log(e);
             callback(e, null);
         });
-        Tool.printYellow(inspect(req));
+
+        // Tool.printYellow(inspect(req));
         // headers: { Source: "Device" },
         Tool.printBlue(data);
         req.write(data);

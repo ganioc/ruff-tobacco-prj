@@ -134,6 +134,7 @@ export class ProtobufDecode {
                 }
                 console.log(buf.length);
                 this.TOKEN = buf.toString();
+                // console.log("TOKEN:");
                 Tool.printBlue(this.TOKEN);
                 resolve(this.TOKEN);
             });
@@ -157,13 +158,18 @@ export class ProtobufDecode {
                         let obj: any;
                         try {
                             obj = JSON.parse(data1.toString());
+                            if (JSON.stringify(obj.mqttResponse) === "{}") {
+                                throw new Error("wrong machineinfo format");
+                            }
                         } catch (e) {
                             Tool.printRed("parse MachineInfo data error");
                             Tool.printRed(e);
                             reject("NOEXIST");
+                         
                             return;
                         }
                         this.info = JSON.parse(JSON.stringify(obj));
+                        console.log(this.info);
                         resolve("OK");
                     });
 
@@ -197,6 +203,7 @@ export class ProtobufDecode {
                         Tool.printRed(e);
 
                         reject("NOK");
+                        return;
                     }
                     const objAll = {
                         mqttResponse: objRegisterResponse,
@@ -208,8 +215,6 @@ export class ProtobufDecode {
                     this.info = JSON.parse(JSON.stringify(objAll));
                     console.log("objAll");
                     console.log(objAll);
-                    console.log("Info");
-                    console.log(this.info);
                     resolve("OK");
                 });
             });
@@ -246,10 +251,13 @@ export class ProtobufDecode {
                 });
             }, 24 * 3600 * 1000);
 
-            this.mqttTimer = setInterval(() => {
-                this.mqtt.updateReport();
-            }, 5000);
-        }).then((d) => {
+            // 要根据工作状态来决定什么时候上报
+            // this.mqttTimer = setInterval(() => {
+            //     this.mqtt.updateReport();
+            // }, 20000);
+        });
+        /*
+        .then((d) => {
             return new Promise((resolve, reject) => {
                 LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
                     if (err) {
@@ -303,10 +311,10 @@ export class ProtobufDecode {
                         });
                     });
                     config.default_curve.dry_list.forEach((element) => {
-                        dryList.push([element.start_temperature, element.end_temperature])
+                        dryList.push([element.start_temperature, element.end_temperature]);
                     });
                     config.default_curve.wet_list.forEach((element) => {
-                        wetList.push([element.start_temperature, element.end_temperature])
+                        wetList.push([element.start_temperature, element.end_temperature]);
                     });
                     config.default_curve.during_list.forEach((element) => {
                         duringList.push(element);
@@ -348,6 +356,7 @@ export class ProtobufDecode {
                 });
             });
         });
+        */
     }
 
     public createBatch(bakingData: any): void {
