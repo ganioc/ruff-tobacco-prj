@@ -201,7 +201,7 @@ export class Alarm {
         Tool.printGreen("dryTempCounterMAX:" + Alarm.dryTempCounterMax);
 
         if (Alarm.dryTempCounter > Alarm.dryTempCounterMax) {
-            Alarm.dryTempCounterMax = Alarm.dryTemp2CounterMax + 1;
+            Alarm.dryTempCounter = Alarm.dryTempCounterMax + 1;
             return 1;
         }
 
@@ -212,7 +212,9 @@ export class Alarm {
         }
         Tool.printGreen("dryTempCounter2:" + Alarm.dryTemp2Counter);
         Tool.printGreen("dryTemp2CounterMAX:" + Alarm.dryTemp2CounterMax);
+
         if (Alarm.dryTemp2Counter > Alarm.dryTemp2CounterMax) {
+            Alarm.dryTemp2Counter = Alarm.dryTemp2CounterMax + 1;
             return 1;
         }
 
@@ -245,12 +247,13 @@ export class Alarm {
             Alarm.wetTempCounter++;
         } else {
             Alarm.wetTempCounter = 0;
+
         }
         Tool.printGreen("wetTempCounter:" + Alarm.wetTempCounter);
         Tool.printGreen("wet TempCounterMAX:" + Alarm.wetTempCounterMax);
 
-        if (Alarm.dryTempCounter > Alarm.wetTempCounterMax) {
-            Alarm.dryTemp2Counter = Alarm.wetTempCounterMax + 1;
+        if (Alarm.wetTempCounter > Alarm.wetTempCounterMax) {
+            Alarm.wetTempCounter = Alarm.wetTempCounterMax + 1;
             return 1;
         }
 
