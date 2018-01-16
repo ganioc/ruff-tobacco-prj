@@ -4,6 +4,7 @@
 import * as fs from "fs";
 import { Promise } from "promise";
 import { DecodePB } from "./DecodePB";
+
 import { MqttApp } from "./MqttApp";
 import { Tool } from "./utility";
 import { AppConfig } from "./AppConfig";

@@ -22,6 +22,7 @@ import {
     ISysInfo,
     RunningStatus,
     IfCurrentStageInfo,
+    IfMachineInfo,
 } from "./BakingCfg";
 // export interface IfDefaultCurve {
 //     dryList: number[][];
@@ -533,6 +534,16 @@ export class LocalStorage {
             CurrentStage: (logFiles.length > 0) ? (logFiles.length - 1) : (0),
             CurrentStageRunningTime: 0,
         };
+    }
+
+    public static saveMachineInfo(m: IfMachineInfo) {
+        fs.writeFile(LocalStorage.getMachineFile(), JSON.stringify(m), (err) => {
+            if (err) {
+                Tool.printRed("savecurrent MachineInfo error");
+                return;
+            }
+            Tool.printBlue("saveMachineInfo OK");
+        });
     }
 }
 
