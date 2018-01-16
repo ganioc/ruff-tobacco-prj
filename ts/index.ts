@@ -475,7 +475,9 @@ function main() {
                 commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                 break;
             case InfoType.Val_BakingInfo:
-                appBaking.updateBakingInfoAsync(data.Content);
+                appBaking.updateBakingInfoAsync(data.Content, () => {
+                    console.log("create batch id");
+                });
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             case InfoType.Val_BaseSetting:

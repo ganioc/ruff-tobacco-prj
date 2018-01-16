@@ -595,7 +595,7 @@ export class RunningHandle {
     //     return info.BakingInfo;
     // }
 
-    public updateBakingInfoAsync(data: any) {
+    public updateBakingInfoAsync(data: any, cb) {
         Tool.printMagenta("Update BakingInfo");
         let info: IInfoCollect;
 
@@ -618,9 +618,11 @@ export class RunningHandle {
                     Tool.printRed("updateBakingInfoAsync fail save");
                     return;
                 }
+                cb();
             });
         });
 
+        // create batch according to info.bakingInfo
     }
 
     public loadInfoCollectAsync(callback: (obj: IInfoCollect) => void) {
