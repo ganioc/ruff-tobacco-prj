@@ -1,10 +1,9 @@
 /**
- * A wrapper for ProtobufDecode function
+ * 
  */
 import * as fs from "fs";
 import { Promise } from "promise";
 import { DecodePB } from "./DecodePB";
-
 import { MqttApp } from "./MqttApp";
 import { Tool } from "./utility";
 import { AppConfig } from "./AppConfig";
@@ -50,6 +49,8 @@ export class ProtobufDecode {
     private info: IfMachineInfo;
     private timer: NodeJS.Timer;
     private mqttTimer: NodeJS.Timer;
+    private version: string;
+    private data: IfConfigFile;
 
     constructor(option) {
         this.decodeRegisterResponse = new DecodePB({
@@ -120,8 +121,6 @@ export class ProtobufDecode {
     }
 
     public init(options): void {
-        let version: string;
-        let data: IfConfigFile;
 
         const proc = new Promise((resolve, reject) => {
             Tool.printGreen("Protobu decoder init()==>");
@@ -133,17 +132,24 @@ export class ProtobufDecode {
                     reject("NONETWORK");
                     return;
                 }
+                // should I check the content of buf?
                 console.log(buf.length);
                 this.TOKEN = buf.toString();
-                // console.log("TOKEN:");
+                console.log("TOKEN:");
                 Tool.printBlue(this.TOKEN);
-                resolve(this.TOKEN);
+
+                if (buf.length <= 16) {
+                    console.log("Wrong TOKEN format");
+                    reject("NONETWORK");
+                } else {
+                    resolve(this.TOKEN);
+                }
             });
 
             // create mqtt client
         }).then((d) => {
             // read local storage for machine Info
-            Tool.printBlue("There is network, TOKEN:" + d);
+            Tool.print("There is network, TOKEN:" + d);
             ProtobufDecode.bOnline = true;
 
             return new Promise((resolve, reject) => {
@@ -166,7 +172,6 @@ export class ProtobufDecode {
                             Tool.printRed("parse MachineInfo data error");
                             Tool.printRed(e);
                             reject("NOEXIST");
-
                             return;
                         }
                         this.info = JSON.parse(JSON.stringify(obj));
@@ -236,7 +241,10 @@ export class ProtobufDecode {
             this.mqtt.start();
 
             return Promise.resolve("OK");
-        }).then((d) => {
+        });
+
+        /*
+        .then((d) => {
             // backgorund work
             this.timer = setInterval(() => {
                 this.client.login(Tool.MachineSN, (err, buf) => {
@@ -256,9 +264,7 @@ export class ProtobufDecode {
             // this.mqttTimer = setInterval(() => {
             //     this.mqtt.updateReport();
             // }, 20000);
-        });
-        /*
-        .then((d) => {
+        }).then((d) => {
             return new Promise((resolve, reject) => {
                 LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
                     if (err) {
@@ -266,20 +272,20 @@ export class ProtobufDecode {
                         return;
                     }
                     const infoCollect: IInfoCollect = JSON.parse(JSON.stringify(o));
-                    version = infoCollect.SysInfo.AppVersion;
+                    this.version = infoCollect.SysInfo.AppVersion;
                     resolve("OK");
                 });
             });
         }).then((d) => {
             return new Promise((resolve, reject) => {
-                data = AppConfig.getAppConfig();
+                this.data = AppConfig.getAppConfig();
                 resolve("OK");
             });
         }).then((d) => {
             return new Promise((resolve, reject) => {
                 const update = {
                     deviceId: this.info.mqttResponse.dyId,
-                    appVersion: version,
+                    appVersion: this.version,
                 };
                 this.client.updateConfig(this.decodeUpdateRequest.encode(update), this.TOKEN, (err, buf) => {
                     if (err) {
@@ -356,12 +362,19 @@ export class ProtobufDecode {
                     }
                 });
             });
+        }, (e) => {
+            return new Promise((resolve, reject) => {
+                console.log("End of promise");
+            });
         });
-        */
+    */
     }
-
-    public createBatch(bakingData: any): void {
+    // bakingData: any
+    public createBatch(): void {
         let data: IInfoCollect;
+
+        Tool.printYellow("CreateBatch()");
+
         const proc = new Promise((resolve, reject) => {
             LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
                 if (err) {
@@ -375,13 +388,16 @@ export class ProtobufDecode {
             Tool.printGreen("Create batch");
 
             const currentTime: number = new Date().getTime();
+
             let type: string;
             let quality: string;
             this.info.batchStartTime = currentTime;
+
             this.info.loadWeatherTemperature = ControlPeriph.temp4;
             this.info.loadWeatherHumidity = ControlPeriph.temp2;
+
             // type to be added
-            switch (bakingData.TobaccoType) {
+            switch (data.BakingInfo.TobaccoType) {
                 case 0:
                     type = "K326";
                     break;
@@ -389,7 +405,7 @@ export class ProtobufDecode {
                     type = "K326";
                     break;
             }
-            switch (bakingData.Quality) {
+            switch (data.BakingInfo.Quality) {
                 case 0:
                     quality = "优";
                     break;
@@ -416,22 +432,23 @@ export class ProtobufDecode {
                 barnAirflowDirection: data.BaseSetting.AirFlowPattern,
                 barnWallTexture: data.BaseSetting.WallMaterial === 0 ? "板式" : "砖混",
                 loadWeatherTemperature: ControlPeriph.temp4, // top_dry_bulb_temp
-                loadTopWeight: bakingData.UpperWeight,
+                loadTopWeight: data.BakingInfo.UpperWeight,
                 loadWeatherHumidity: ControlPeriph.temp2, // top_wet_bulb_temp
-                loadMiddleWeight: bakingData.MiddleWeight,
-                loadBottomWeight: bakingData.LowerWeight,
-                loadTool: bakingData.LoadingMethod === 1 ? "烟竿" : "烟夹",
-                loadToolCount: bakingData.PieceQuantity.toString(),
-                loadToolWeight: bakingData.PieceWeight.toString(),
+                loadMiddleWeight: data.BakingInfo.MiddleWeight,
+                loadBottomWeight: data.BakingInfo.LowerWeight,
+                loadTool: data.BakingInfo.LoadingMethod === 1 ? "烟竿" : "烟夹",
+                loadToolCount: data.BakingInfo.PieceQuantity.toString(),
+                loadToolWeight: data.BakingInfo.PieceWeight.toString(),
                 loadQuality: quality,
-                loadMaturityLv_0Percentage: bakingData.MaturePercent1,
-                loadMaturityLv_1Percentage: bakingData.MaturePercent2,
-                loadMaturityLv_2Percentage: bakingData.MaturePercent3,
-                loadMaturityLv_3Percentage: bakingData.MaturePercent4,
-                loadMaturityLv_4Percentage: bakingData.MaturePercent5,
+                loadMaturityLv_0Percentage: data.BakingInfo.MaturePercent1,
+                loadMaturityLv_1Percentage: data.BakingInfo.MaturePercent2,
+                loadMaturityLv_2Percentage: data.BakingInfo.MaturePercent3,
+                loadMaturityLv_3Percentage: data.BakingInfo.MaturePercent4,
+                loadMaturityLv_4Percentage: data.BakingInfo.MaturePercent5,
             };
 
             console.log(batch);
+
             this.client.createBatch(this.decodeBatchDetail.encode(batch), this.TOKEN, (err, buf) => {
                 if (err) {
                     console.log(err);
@@ -441,8 +458,13 @@ export class ProtobufDecode {
 
                 ProtobufDecode.bOnline = true;
                 const batchSummary = this.decodeBatchSummary.decode(new Uint8Array(buf));
+                Tool.printYellow("batchSummary:");
                 console.log(batchSummary);
                 this.info.currentBatchId = batchSummary.batchId;
+
+                // save it to the machine.json, added by Yang
+                LocalStorage.saveMachineInfo(this.info);
+
                 return;
             });
         });
@@ -558,12 +580,13 @@ export class ProtobufDecode {
         });
     }
 
-    public getRecoProfile(callback: (d: any) => void) {
+    public getRecoProfile(callback: (err, d: any) => void) {
         let data: IInfoCollect;
         const proc = new Promise((resolve, reject) => {
             LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
                 if (err) {
                     reject("NOK");
+                    callback("error", null);
                     return;
                 }
                 data = JSON.parse(JSON.stringify(o));
@@ -627,6 +650,7 @@ export class ProtobufDecode {
                 if (err) {
                     console.log(err);
                     ProtobufDecode.bOnline = false;
+                    callback("network error", null);
                     return;
                 }
 
@@ -651,11 +675,13 @@ export class ProtobufDecode {
                     }
                 }
                 const curve = {
+                    Index: 0,
+                    NumOfCurves: 1,
                     TempCurveDryList: curveDryList,
                     TempCurveWetList: curveWetList,
                     TempDurationList: curvedurList,
                 };
-                callback(curve);
+                callback(null, curve);
             });
         });
     }
