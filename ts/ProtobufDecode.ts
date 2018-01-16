@@ -166,7 +166,7 @@ export class ProtobufDecode {
                             Tool.printRed("parse MachineInfo data error");
                             Tool.printRed(e);
                             reject("NOEXIST");
-                         
+
                             return;
                         }
                         this.info = JSON.parse(JSON.stringify(obj));
@@ -692,5 +692,9 @@ export class ProtobufDecode {
             ProtobufDecode.bOnline = true;
             return;
         });
+    }
+
+    public fake() {
+        console.log("to get the cloud curve");
     }
 }

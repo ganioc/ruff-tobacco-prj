@@ -439,9 +439,11 @@ function main() {
                 Tool.printBlue("Get CloudCurveInfo received");
 
                 // Read curves from cloud
-                appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
-                    commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo({ Index: 0 }));
-                });
+                // appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
+                //     commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo({ Index: 0 }));
+                // });
+
+                decoder.fake();
 
                 break;
             default:
