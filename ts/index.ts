@@ -72,12 +72,12 @@ $.ready((error) => {
         speed: 22, // speed of windgate
     });
 
-    gps.start();
+    // gps.start();
 
-    gprs.start();
+    // gprs.start();
 
     // 云端交互初始化
-    // decoder.init({});
+    decoder.init({});
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
@@ -443,7 +443,20 @@ function main() {
                 //     commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo({ Index: 0 }));
                 // });
 
-                decoder.fake();
+                decoder.getRecoProfile((err, fb) => {
+                    if (err) {
+                        Tool.printRed(err);
+                        commQT.sendGetResp(data.PacketId, data.Obj, {
+                            Index: 0,  // 0, 1, 2
+                            NumOfCurves: 0,  // 3
+                            TempCurveDryList: [],
+                            TempCurveWetList: [], // 度,23.1, 一位小数点
+                            TempDurationList: [],
+                        });
+                        return;
+                    }
+                    commQT.sendGetResp(data.PacketId, data.Obj, fb);
+                });
 
                 break;
             default:
@@ -478,9 +491,11 @@ function main() {
                 break;
             case InfoType.Val_BakingInfo:
                 appBaking.updateBakingInfoAsync(data.Content, () => {
-                    console.log("create batch id");
+                    // create Batch ID
+                    decoder.createBatch();
                 });
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+
                 break;
             case InfoType.Val_BaseSetting:
                 appBaking.updateBaseSettingAsync(data.Content);

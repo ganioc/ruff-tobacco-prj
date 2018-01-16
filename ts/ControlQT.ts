@@ -251,7 +251,6 @@ export class CommQT {
             case InfoType.Val_ResultInfo:
             case InfoType.Val_TrapInfo:
             case InfoType.Val_TrapBaking:
-            case InfoType.Val_CloudCurveInfo:
             case InfoType.Val_UDisk:
                 this.emitter.emit("set", data);
                 break;
@@ -276,6 +275,7 @@ export class CommQT {
             case InfoType.Val_TrapBaking:
             case InfoType.Val_RunningState:
             case InfoType.Val_BakingInfo:
+            case InfoType.Val_CloudCurveInfo:
             case InfoType.Val_BaseSetting:
                 this.emitter.emit("get", data);
                 break;
