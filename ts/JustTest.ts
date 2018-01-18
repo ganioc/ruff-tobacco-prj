@@ -535,4 +535,30 @@ export class JustTest {
             });
         }, 150);
     }
+    public testPromise() {
+        console.log("test promise");
+        const proc = new Promise((resolve, reject) => {
+            setTimeout(() => {
+                reject("OK");
+            }, 1000);
+        }).then((d) => {
+            Tool.printGreen("2nd then OK");
+            console.log(d);
+            return Promise.resolve("NOK");
+        }, (e) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log("2nd then NOK");
+                    reject("NOK");
+                    console.log("2nd then NOK after");
+
+                }, 1000);
+            });
+        }).then((d) => {
+            Tool.printYellow("3rd then OK");
+            console.log(d);
+        }, (e) => {
+            Tool.printYellow("3rd then NOK");
+        });
+    }
 }

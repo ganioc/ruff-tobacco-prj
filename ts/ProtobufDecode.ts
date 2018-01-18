@@ -199,12 +199,13 @@ export class ProtobufDecode {
                 this.client.register(Tool.MachineSN, this.TOKEN, (err, buf) => {
                     if (err) {
                         reject("NOK");
+                        return;
                     }
 
                     if (buf.length <= 25) {
-                        Tool.printRed("wrong register feedback");
+                        Tool.printRed("wrong register feedback " + buf.length);
                         reject("NOK");
-
+                        return;
                     }
 
                     let objRegisterResponse: IfMqttResponse;
@@ -217,8 +218,6 @@ export class ProtobufDecode {
                         reject("NOK");
                         return;
                     }
-
-
 
                     const objAll = {
                         mqttResponse: objRegisterResponse,
@@ -250,6 +249,10 @@ export class ProtobufDecode {
             this.mqtt.start();
 
             return Promise.resolve("OK");
+        }).then((d) => {
+            console.log("happy ending");
+        }, (error) => {
+            console.log("wrong ending");
         });
 
         /*
