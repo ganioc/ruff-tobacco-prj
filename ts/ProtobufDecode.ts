@@ -200,6 +200,13 @@ export class ProtobufDecode {
                     if (err) {
                         reject("NOK");
                     }
+
+                    if (buf.length <= 25) {
+                        Tool.printRed("wrong register feedback");
+                        reject("NOK");
+
+                    }
+
                     let objRegisterResponse: IfMqttResponse;
                     try {
                         objRegisterResponse = this.decodeRegisterResponse.decode(new Uint8Array(buf));
@@ -210,6 +217,9 @@ export class ProtobufDecode {
                         reject("NOK");
                         return;
                     }
+
+
+
                     const objAll = {
                         mqttResponse: objRegisterResponse,
                         currentBatchId: "",
