@@ -193,44 +193,45 @@ export class ProtobufDecode {
             return new Promise((resolve, reject) => {
                 if (d === "NONETWORK") {
                     reject(d);
-                    return;
+
+                } else {
+                    // register to the server
+                    this.client.register(Tool.MachineSN, this.TOKEN, (err, buf) => {
+                        if (err) {
+                            reject("NOK");
+                        } else if (buf.length <= 25) {
+                            Tool.printRed("Wrong register fb length:" + buf.length);
+                            reject("NOK");
+                        } else {
+                            let objRegisterResponse: IfMqttResponse;
+                            let bError = false;
+                            try {
+                                objRegisterResponse = this.decodeRegisterResponse.decode(new Uint8Array(buf));
+                            } catch (e) {
+                                Tool.printRed("parse registerresponse data error");
+                                Tool.printRed(e);
+
+                                bError = true;
+                            }
+                            if (bError) {
+                                reject("NOK");
+                            } else {
+                                const objAll = {
+                                    mqttResponse: objRegisterResponse,
+                                    currentBatchId: "",
+                                };
+                                // save it to local file
+                                fs.writeFileSync(LocalStorage.getMachineFile(), JSON.stringify(objAll));
+                                Tool.print("Save to machine file");
+                                this.info = JSON.parse(JSON.stringify(objAll));
+                                console.log("objAll");
+                                console.log(objAll);
+                                resolve("OK");
+                            }
+
+                        }
+                    });
                 }
-                // register to the server
-                this.client.register(Tool.MachineSN, this.TOKEN, (err, buf) => {
-                    if (err) {
-                        reject("NOK");
-                        return;
-                    }
-
-                    if (buf.length <= 25) {
-                        Tool.printRed("wrong register feedback " + buf.length);
-                        reject("NOK");
-                        return;
-                    }
-
-                    let objRegisterResponse: IfMqttResponse;
-                    try {
-                        objRegisterResponse = this.decodeRegisterResponse.decode(new Uint8Array(buf));
-                    } catch (e) {
-                        Tool.printRed("parse registerresponse data error");
-                        Tool.printRed(e);
-
-                        reject("NOK");
-                        return;
-                    }
-
-                    const objAll = {
-                        mqttResponse: objRegisterResponse,
-                        currentBatchId: "",
-                    };
-                    // save it to local file
-                    fs.writeFileSync(LocalStorage.getMachineFile(), JSON.stringify(objAll));
-                    Tool.print("Save to machine file");
-                    this.info = JSON.parse(JSON.stringify(objAll));
-                    console.log("objAll");
-                    console.log(objAll);
-                    resolve("OK");
-                });
             });
         }).then((obj: any) => {
 

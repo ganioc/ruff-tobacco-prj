@@ -72,12 +72,12 @@ $.ready((error) => {
         speed: 22, // speed of windgate
     });
 
-    // gps.start();
+    gps.start();
 
-    // gprs.start();
+    gprs.start();
 
     // 云端交互初始化
-    // decoder.init({});
+    decoder.init({});
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");

@@ -546,16 +546,19 @@ export class JustTest {
             console.log(d);
             return Promise.resolve("NOK");
         }, (e) => {
+            const a = 3;
             return new Promise((resolve, reject) => {
-                Tool.printGreen("2nd then NOK");
-                resolve("OK");
+                Tool.printGreen("2nd then OK");
+                if (a === 3) {
+                    resolve("OK");
+                } else {
+                    setTimeout(() => {
+                        console.log("2nd then NOK");
+                        reject("NOK");
+                        console.log("2nd then NOK after");
 
-                setTimeout(() => {
-                    console.log("2nd then NOK");
-                    reject("NOK");
-                    console.log("2nd then NOK after");
-
-                }, 1000);
+                    }, 1000);
+                }
             });
         }).then((d) => {
             Tool.printYellow("3rd then OK");
