@@ -150,6 +150,7 @@ export class ProtobufDecode {
             // read local storage for machine Info
             Tool.print("There is network, TOKEN:" + d);
             ProtobufDecode.bOnline = true;
+            let bError = false;
 
             return new Promise((resolve, reject) => {
                 if (fs.existsSync(LocalStorage.getMachineFile())) {
@@ -159,23 +160,27 @@ export class ProtobufDecode {
                         if (err) {
                             Tool.printRed("Read MachineInfo file fail");
                             reject("NOEXIST");
-                            return;
-                        }
-                        let obj: any;
-                        try {
-                            obj = JSON.parse(data1.toString());
-                            if (JSON.stringify(obj.mqttResponse) === "{}") {
-                                throw new Error("wrong machineinfo format");
+
+                        } else {
+                            let obj: any;
+                            try {
+                                obj = JSON.parse(data1.toString());
+                                if (JSON.stringify(obj.mqttResponse) === "{}") {
+                                    throw new Error("wrong machineinfo format");
+                                }
+                            } catch (e) {
+                                Tool.printRed("parse MachineInfo data error");
+                                Tool.printRed(e);
+                                bError = true;
                             }
-                        } catch (e) {
-                            Tool.printRed("parse MachineInfo data error");
-                            Tool.printRed(e);
-                            reject("NOEXIST");
-                            return;
+                            if (bError) {
+                                reject("NOEXIST");
+                            } else {
+                                this.info = JSON.parse(JSON.stringify(obj));
+                                console.log(this.info);
+                                resolve("OK");
+                            }
                         }
-                        this.info = JSON.parse(JSON.stringify(obj));
-                        console.log(this.info);
-                        resolve("OK");
                     });
 
                 } else {

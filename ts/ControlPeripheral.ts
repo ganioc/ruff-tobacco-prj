@@ -332,30 +332,30 @@ export class ControlPeriph {
 
                     Tool.printRed("GetTempError error");
                     resolve("OK");
+                } else {
+                    Tool.printGreen("GetTemp");
+                    Tool.print(data.content.toString());
+
+                    const temp1 = parseFloat(data.content.slice(0, 8).toString());
+                    const temp2 = parseFloat(data.content.slice(8, 16).toString());
+                    const temp3 = parseFloat(data.content.slice(16, 24).toString());
+                    const temp4 = parseFloat(data.content.slice(24, 32).toString());
+
+                    ControlPeriph.temp1 = (temp1 > 100) ? ControlPeriph.temp1 : temp1;
+                    ControlPeriph.temp2 = (temp2 > 100) ? ControlPeriph.temp2 : temp2;
+                    ControlPeriph.temp3 = (temp3 > 100) ? ControlPeriph.temp3 : temp3;
+                    ControlPeriph.temp4 = (temp4 > 100) ? ControlPeriph.temp4 : temp4;
+
+                    Tool.printYellow(ControlPeriph.temp1);
+                    Tool.printYellow(ControlPeriph.temp2);
+                    Tool.printYellow(ControlPeriph.temp3);
+                    Tool.printYellow(ControlPeriph.temp4);
+
+                    // It's a proper time to check the temp values
+                    // Or let bakingTask to handle it
+
+                    resolve("OK");
                 }
-
-                Tool.printGreen("GetTemp");
-                Tool.print(data.content.toString());
-
-                const temp1 = parseFloat(data.content.slice(0, 8).toString());
-                const temp2 = parseFloat(data.content.slice(8, 16).toString());
-                const temp3 = parseFloat(data.content.slice(16, 24).toString());
-                const temp4 = parseFloat(data.content.slice(24, 32).toString());
-
-                ControlPeriph.temp1 = (temp1 > 100) ? ControlPeriph.temp1 : temp1;
-                ControlPeriph.temp2 = (temp2 > 100) ? ControlPeriph.temp2 : temp2;
-                ControlPeriph.temp3 = (temp3 > 100) ? ControlPeriph.temp3 : temp3;
-                ControlPeriph.temp4 = (temp4 > 100) ? ControlPeriph.temp4 : temp4;
-
-                Tool.printYellow(ControlPeriph.temp1);
-                Tool.printYellow(ControlPeriph.temp2);
-                Tool.printYellow(ControlPeriph.temp3);
-                Tool.printYellow(ControlPeriph.temp4);
-
-                // It's a proper time to check the temp values
-                // Or let bakingTask to handle it
-
-                resolve("OK");
             });
         }).then((val) => {
             return new Promise((resolve, reject) => {
@@ -378,45 +378,46 @@ export class ControlPeriph {
                         // ControlPeriph.ADC7 = 0;
                         Tool.printRed("GetADC error");
                         resolve("OK");
-                        return;
+
+                    } else {
+                        Tool.printGreen("GetADC");
+                        Tool.print(data.content.toString());
+
+                        const ADC1: number = parseFloat(data.content.slice(0, 8).toString());
+                        const ADC2: number = parseFloat(data.content.slice(8, 16).toString());
+                        const ADC3: number = parseFloat(data.content.slice(16, 24).toString());
+                        const ADC4: number = parseFloat(data.content.slice(24, 32).toString());
+                        const ADC5: number = parseFloat(data.content.slice(32, 40).toString());
+                        const ADC6: number = parseFloat(data.content.slice(40, 48).toString());
+                        const ADC7: number = parseFloat(data.content.slice(48, 56).toString());
+
+                        ControlPeriph.ADC1 = (ADC1 >= 0.00 && ADC1 < 3.4) ? ADC1 : ControlPeriph.ADC1; // phaseA
+                        ControlPeriph.ADC2 = (ADC2 >= 0.00 && ADC2 < 3.4) ? ADC2 : ControlPeriph.ADC2; // phaseB
+                        ControlPeriph.ADC3 = (ADC3 >= 0.00 && ADC3 < 3.4) ? ADC3 : ControlPeriph.ADC3; // A+B
+                        ControlPeriph.ADC4 = (ADC4 > 0.00 && ADC4 < 3.4) ? ADC4 : ControlPeriph.ADC4; // 220V voltage
+                        ControlPeriph.ADC5 = (ADC5 >= 0.00 && ADC5 < 3.4) ? ADC5 : ControlPeriph.ADC5; // windgate I
+                        ControlPeriph.ADC6 = (ADC6 >= 0.00 && ADC6 < 3.4) ? ADC6 : ControlPeriph.ADC6; // MB 5V
+                        ControlPeriph.ADC7 = (ADC7 >= 0.00 && ADC7 < 3.4) ? ADC7 : ControlPeriph.ADC7; // Batt 4.5V
+
+                        // ControlPeriph.ADC1 = ADC1;
+                        // ControlPeriph.ADC2 = ADC2;
+                        // ControlPeriph.ADC3 = ADC3;
+                        // ControlPeriph.ADC4 = ADC4;
+                        // ControlPeriph.ADC5 = ADC5;
+                        // ControlPeriph.ADC6 = ADC6;
+                        // ControlPeriph.ADC7 = ADC7;
+
+                        Tool.printYellow(ControlPeriph.ADC1);
+                        Tool.printYellow(ControlPeriph.ADC2);
+                        Tool.printYellow(ControlPeriph.ADC3);
+                        Tool.printYellow(ControlPeriph.ADC4);
+                        Tool.printYellow(ControlPeriph.ADC5);
+                        Tool.printYellow(ControlPeriph.ADC6);
+                        Tool.printYellow(ControlPeriph.ADC7);
+
+                        // It's a proper time to check if the voltage is out of limit
+                        resolve("OK");
                     }
-                    Tool.printGreen("GetADC");
-                    Tool.print(data.content.toString());
-
-                    const ADC1: number = parseFloat(data.content.slice(0, 8).toString());
-                    const ADC2: number = parseFloat(data.content.slice(8, 16).toString());
-                    const ADC3: number = parseFloat(data.content.slice(16, 24).toString());
-                    const ADC4: number = parseFloat(data.content.slice(24, 32).toString());
-                    const ADC5: number = parseFloat(data.content.slice(32, 40).toString());
-                    const ADC6: number = parseFloat(data.content.slice(40, 48).toString());
-                    const ADC7: number = parseFloat(data.content.slice(48, 56).toString());
-
-                    ControlPeriph.ADC1 = (ADC1 >= 0.00 && ADC1 < 3.4) ? ADC1 : ControlPeriph.ADC1; // phaseA
-                    ControlPeriph.ADC2 = (ADC2 >= 0.00 && ADC2 < 3.4) ? ADC2 : ControlPeriph.ADC2; // phaseB
-                    ControlPeriph.ADC3 = (ADC3 >= 0.00 && ADC3 < 3.4) ? ADC3 : ControlPeriph.ADC3; // A+B
-                    ControlPeriph.ADC4 = (ADC4 > 0.00 && ADC4 < 3.4) ? ADC4 : ControlPeriph.ADC4; // 220V voltage
-                    ControlPeriph.ADC5 = (ADC5 >= 0.00 && ADC5 < 3.4) ? ADC5 : ControlPeriph.ADC5; // windgate I
-                    ControlPeriph.ADC6 = (ADC6 >= 0.00 && ADC6 < 3.4) ? ADC6 : ControlPeriph.ADC6; // MB 5V
-                    ControlPeriph.ADC7 = (ADC7 >= 0.00 && ADC7 < 3.4) ? ADC7 : ControlPeriph.ADC7; // Batt 4.5V
-
-                    // ControlPeriph.ADC1 = ADC1;
-                    // ControlPeriph.ADC2 = ADC2;
-                    // ControlPeriph.ADC3 = ADC3;
-                    // ControlPeriph.ADC4 = ADC4;
-                    // ControlPeriph.ADC5 = ADC5;
-                    // ControlPeriph.ADC6 = ADC6;
-                    // ControlPeriph.ADC7 = ADC7;
-
-                    Tool.printYellow(ControlPeriph.ADC1);
-                    Tool.printYellow(ControlPeriph.ADC2);
-                    Tool.printYellow(ControlPeriph.ADC3);
-                    Tool.printYellow(ControlPeriph.ADC4);
-                    Tool.printYellow(ControlPeriph.ADC5);
-                    Tool.printYellow(ControlPeriph.ADC6);
-                    Tool.printYellow(ControlPeriph.ADC7);
-
-                    // It's a proper time to check if the voltage is out of limit
-                    resolve("OK");
                 });
             });
         }).then((val) => {
@@ -433,11 +434,11 @@ export class ControlPeriph {
                         Tool.printRed("GetTimeError error");
                         resolve("OK");
                         return;
+                    } else {
+                        resolve("OK");
                     }
-
                     // Tool.printGreen("GetTime");
                     // Tool.print(data.content.toString());
-                    resolve("OK");
                 });
             });
         });
