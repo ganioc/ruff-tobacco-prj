@@ -81,14 +81,14 @@ $.ready((error) => {
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
-        // main();
+        main();
         // test.test();
         // test.testHttps();
         // test.testSN();
         // test.testGPRS(gprs);
         // test.testWindGate(commMCU);
         // test.testWindGateProtect(commMCU);
-        test.testPromise();
+        // test.testPromise();
     }, 5000);
 
 });
