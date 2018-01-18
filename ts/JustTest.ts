@@ -547,6 +547,9 @@ export class JustTest {
             return Promise.resolve("NOK");
         }, (e) => {
             return new Promise((resolve, reject) => {
+                Tool.printGreen("2nd then NOK");
+                resolve("OK");
+
                 setTimeout(() => {
                     console.log("2nd then NOK");
                     reject("NOK");
