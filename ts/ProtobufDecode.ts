@@ -127,25 +127,25 @@ export class ProtobufDecode {
             // check token, network connectivity at the same time
             this.client.login(Tool.MachineSN, (err, buf) => {
                 if (err) {
+                    Tool.printRed("login failure:");
                     console.log(err);
                     reject("NONETWORK");
-                    return;
-                }
-                // should I check the content of buf?
-                console.log(buf.length);
-                this.TOKEN = buf.toString();
-                console.log("TOKEN:");
-                Tool.printBlue(this.TOKEN);
-
-                if (buf.length <= 16) {
-                    console.log("Wrong TOKEN format");
-                    reject("NONETWORK");
                 } else {
-                    resolve(this.TOKEN);
-                }
-            });
+                    // should I check the content of buf?
+                    console.log(buf.length);
+                    this.TOKEN = buf.toString();
+                    console.log("TOKEN:");
+                    Tool.printBlue(this.TOKEN);
 
-            // create mqtt client
+                    if (buf.length <= 16) {
+                        console.log("Wrong TOKEN format");
+                        reject("NONETWORK");
+                    } else {
+                        resolve(this.TOKEN);
+                    }
+                }
+
+            });
         }).then((d) => {
             // read local storage for machine Info
             Tool.print("There is network, TOKEN:" + d);
@@ -184,7 +184,7 @@ export class ProtobufDecode {
                     });
 
                 } else {
-                    Tool.print("Not exist: ");
+                    Tool.print("Machine info Not exist: ");
                     reject("NOEXIST");
                 }
             });
@@ -193,14 +193,18 @@ export class ProtobufDecode {
             Tool.printRed("There is no network");
             return Promise.reject(d);
         }).then((obj: any) => {
+            Tool.printBlue("Intermediate OK");
             return Promise.resolve(obj);
         }, (d: any) => {
+            Tool.printBlue("Check if need to register");
             return new Promise((resolve, reject) => {
                 if (d === "NONETWORK") {
+                    Tool.printBlue("NO network here");
                     reject(d);
 
                 } else {
                     // register to the server
+                    Tool.print("Register to network");
                     this.client.register(Tool.MachineSN, this.TOKEN, (err, buf) => {
                         if (err) {
                             reject("NOK");
@@ -221,9 +225,12 @@ export class ProtobufDecode {
                             if (bError) {
                                 reject("NOK");
                             } else {
-                                const objAll = {
+                                const objAll: IfMachineInfo = {
                                     mqttResponse: objRegisterResponse,
                                     currentBatchId: "",
+                                    batchStartTime: 0,
+                                    loadWeatherTemperature: 0,
+                                    loadWeatherHumidity: 0,
                                 };
                                 // save it to local file
                                 fs.writeFileSync(LocalStorage.getMachineFile(), JSON.stringify(objAll));
@@ -398,9 +405,11 @@ export class ProtobufDecode {
                 if (err) {
                     reject("NOK");
                     return;
+                } else {
+                    data = JSON.parse(JSON.stringify(o));
+                    resolve("OK");
                 }
-                data = JSON.parse(JSON.stringify(o));
-                resolve("OK");
+
             });
         }).then((val) => {
             Tool.printGreen("Create batch");
@@ -495,9 +504,11 @@ export class ProtobufDecode {
                 if (err) {
                     reject("NOK");
                     return;
+                } else {
+                    data = JSON.parse(JSON.stringify(o));
+                    resolve("OK");
                 }
-                data = JSON.parse(JSON.stringify(o));
-                resolve("OK");
+
             });
         }).then((val) => {
             Tool.printGreen("Update batch");
@@ -589,11 +600,9 @@ export class ProtobufDecode {
                 if (err) {
                     console.log(err);
                     ProtobufDecode.bOnline = false;
-                    return;
+                } else {
+                    ProtobufDecode.bOnline = true;
                 }
-
-                ProtobufDecode.bOnline = true;
-                return;
             });
         });
     }
