@@ -124,6 +124,9 @@ export class ProtobufDecode {
         const proc = new Promise((resolve, reject) => {
             Tool.printGreen("Protobu decoder init()==>");
 
+            this.version = LocalStorage.getAppVersion();
+            this.data = AppConfig.getAppConfig();
+
             // check token, network connectivity at the same time
             this.client.login(Tool.MachineSN, (err, buf) => {
                 if (err) {
@@ -201,7 +204,6 @@ export class ProtobufDecode {
                 if (d === "NONETWORK") {
                     Tool.printBlue("NO network here");
                     reject(d);
-
                 } else {
                     // register to the server
                     Tool.print("Register to network");
@@ -394,6 +396,90 @@ export class ProtobufDecode {
         });
     */
     }
+
+    // public updateConfig(): void {
+
+    //     const update = {
+    //         deviceId: this.info.mqttResponse.dyId,
+    //         appVersion: this.version,
+    //     };
+    //     this.client.updateConfig(this.decodeUpdateRequest.encode(update), this.TOKEN, (err, buf) => {
+    //         if (err) {
+    //             console.log(err);
+    //             ProtobufDecode.bOnline = false;
+    //             return;
+    //         }
+
+    //         ProtobufDecode.bOnline = true;
+    //         const config: any = this.decodeConfig.decode(new Uint8Array(buf));
+
+    //         console.log(config);
+    //         const types: IfTobaccoType[] = [];
+    //         const levels: IfQualityLevel[] = [];
+    //         const dryList: number[][] = [];
+    //         const wetList: number[][] = [];
+    //         const duringList: number[] = [];
+    //         // should it use '_'?
+    //         config.tobacco_type.forEach((element) => {
+    //             types.push({
+    //                 name: element.name,
+    //                 id: element.id,
+    //             });
+    //         });
+    //         config.quality_level.forEach((element) => {
+    //             levels.push({
+    //                 name: element.name,
+    //                 id: element.id,
+    //             });
+    //         });
+    //         config.default_curve.dry_list.forEach((element) => {
+    //             dryList.push([element.start_temperature, element.end_temperature]);
+    //         });
+    //         config.default_curve.wet_list.forEach((element) => {
+    //             wetList.push([element.start_temperature, element.end_temperature]);
+    //         });
+    //         config.default_curve.during_list.forEach((element) => {
+    //             duringList.push(element);
+    //         });
+
+    //         data.baking_config.quality_level = levels;
+    //         data.baking_config.tobacco_type = types;
+    //         data.baking_config.default_curve = {
+    //             dryList: dryList,
+    //             wetList: wetList,
+    //             durList: duringList,
+    //         };
+    //         data.baking_config.alarm_threshold.max_temp = config.alarm_threshold.max_temperature;
+    //         data.baking_config.alarm_threshold.min_temp = config.alarm_threshold.max_temperature;
+    //         data.baking_config.alarm_threshold.dry_temp_alarm_limit = config.alarm_threshold.dry_temperature_alarm_limit;
+    //         data.baking_config.alarm_threshold.dry_temp_alarm_period = config.alarm_threshold.dry_temperature_alarm_period;
+    //         data.baking_config.alarm_threshold.dry_temp_alarm_limit_2 = config.alarm_threshold.dry_temperature_alarm_limit2;
+    //         data.baking_config.alarm_threshold.dry_temp_alarm_period_2 = config.alarm_threshold.dry_temperature_alarm_period2;
+    //         data.baking_config.alarm_threshold.wet_temp_alarm_limit = config.alarm_threshold.wet_temperature_alarm_limit;
+    //         data.baking_config.alarm_threshold.wet_temp_alarm_period = config.alarm_threshold.wet_temperature_alarm_period;
+    //         data.baking_config.alarm_threshold.alarm_checking_period = config.alarm_threshold.alarm_checking_period;
+    //         data.baking_config.base_setting.AirFlowPattern = config.base_setting.airflow_pattern;
+    //         data.baking_config.base_setting.ControllerName = config.base_setting.controller_name;
+    //         data.baking_config.base_setting.GPSInfo.Latitude = ControlPeriph.gpsLatitude;
+    //         data.baking_config.base_setting.GPSInfo.Longitude = ControlPeriph.gpsLongitude;
+    //         data.baking_config.base_setting.InnerHeight = config.base_setting.inner_height;
+    //         data.baking_config.base_setting.LocName = config.base_setting.location_name;
+    //         data.baking_config.base_setting.WallMaterial = config.base_setting.wall_material;
+
+    //         // 默认的参数曲线不能够随便存的。
+    //         // AppConfig.setAppConfig(data);
+
+    //         if (config.update_tag === 1) {
+    //             this.client.updateApp(Tool.MachineSN, this.TOKEN, (err1, buf1) => {
+    //                 console.log(err1);
+    //                 ProtobufDecode.bOnline = false;
+    //                 return;
+    //             });
+
+    //             ProtobufDecode.bOnline = true;
+    //         }
+    //     });
+    // }
     // bakingData: any
     public createBatch(): void {
         let data: IInfoCollect;
