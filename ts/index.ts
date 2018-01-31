@@ -15,6 +15,7 @@ import { ControlMcu } from "./ControlMcu";
 import { ControlPeriph } from "./ControlPeripheral";
 import { CommQT, IfMsgCmd, IfPacket, InfoType } from "./ControlQT";
 import { HttpsApp, IfHttpsApp } from "./HttpsApp";
+import { MqttApp } from "./MqttApp";
 import { JustTest } from "./JustTest";
 import { LocalStorage } from "./LocalStorage";
 
@@ -49,6 +50,8 @@ const client = new HttpsApp(option);
 
 const test = new JustTest(commMCU);
 
+const mqtt: MqttApp = new MqttApp({});
+
 $.ready((error) => {
     if (error) {
         console.log(error);
@@ -64,8 +67,6 @@ $.ready((error) => {
     Tool.readMachineSNFromRuffd();
     LocalStorage.loadAppVersion();
 
-    Alarm.init();
-
     ControlPeriph.init({
         max_angle: 90,
         min_angle: 0,
@@ -77,7 +78,9 @@ $.ready((error) => {
     gprs.start();
 
     // 云端交互初始化
-    decoder.init({});
+    decoder.init({baking: appBaking});
+
+    Alarm.init();
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
@@ -480,10 +483,14 @@ function main() {
                 break;
             case InfoType.Val_RunningCurveInfo:
                 appBaking.updateRunningCurveInfoAsync(data.Content);
+                //Update profile
+                decoder.updateProfile(data.Content);
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             case InfoType.Val_ResultInfo:
                 appBaking.updateResult(data.Content);
+                //Update batch
+                decoder.updateBatch(data.Content);
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             case InfoType.Val_TrapInfo:

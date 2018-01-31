@@ -44,6 +44,12 @@ message Profile {
     repeated ProfileItem items = 1;
 }
 
+message ScoredProfile {
+	double distance = 1;
+	double score = 2;
+	Profile series = 3;
+}
+
 message BatchProfile {
     int64 batchId = 1;
     string deviceId = 2;
@@ -146,7 +152,7 @@ message ConfigBaseSetting {
 
 message Config {
 	int32 update_tag = 1;
-	ConfigCurve default_curve = 2;
+	repeated ConfigCurve default_curve = 2;
 	repeated ConfigTobaccoType tobacco_type = 3;
 	repeated ConfigTobaccoQuality quality_level = 4;
 	ConfigAlarmThreshold alarm_threshold = 5;

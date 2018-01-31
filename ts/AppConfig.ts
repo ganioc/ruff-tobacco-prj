@@ -15,7 +15,7 @@ import { Tool } from "./utility";
 export class AppConfig {
     public static getAppConfig(): IfConfigFile {
 
-        const C_CONFIG_FILE_NAME = path.dirname(__filename) + "/../../app.data/app.json";
+        const C_CONFIG_FILE_NAME = path.dirname(__filename) + "/../../app.data/app_config.json";
 
         const data = fs.readFileSync(C_CONFIG_FILE_NAME);
 
@@ -56,7 +56,7 @@ export class AppConfig {
     }
 
     public static setAppConfig(config: IfConfigFile): void {
-        const C_CONFIG_FILE_NAME = path.dirname(__filename) + "/../../app.data/app.json";
+        const C_CONFIG_FILE_NAME = path.dirname(__filename) + "/../../app.data/app_config.json";
         fs.writeFileSync(C_CONFIG_FILE_NAME, JSON.stringify(config));
         console.log("run setAppConfig()");
     }

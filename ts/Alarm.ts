@@ -22,31 +22,31 @@ export interface IfTargetTemp {
 let gpsLastLatitude: number = 0;
 let gpsLastLongitude: number = 0;
 
-const objConfig: IfConfigFile = AppConfig.getAppConfig();
+let objConfig: IfConfigFile = AppConfig.getAppConfig();
 
-const alarmCfg = objConfig.baking_config.alarm_threshold;
+let alarmCfg = objConfig.baking_config.alarm_threshold;
 
-const ALARM_CHECKING_PERIOD: number = 2.5; // 5000;
+let ALARM_CHECKING_PERIOD: number = 2.5; // 5000;
 
-const DRY_TEMP_ALARM_PERIOD: number = alarmCfg.dry_temp_alarm_period * 10;
+let DRY_TEMP_ALARM_PERIOD: number = alarmCfg.dry_temp_alarm_period * 10;
 // 30 * 60;
 
-const DRY_TEMP_ALARM_LIMIT: number = alarmCfg.dry_temp_alarm_limit;
+let DRY_TEMP_ALARM_LIMIT: number = alarmCfg.dry_temp_alarm_limit;
 // 2;
 
-const DRY_TEMP_ALARM_PERIOD_2: number = alarmCfg.dry_temp_alarm_period_2 * 10;
+let DRY_TEMP_ALARM_PERIOD_2: number = alarmCfg.dry_temp_alarm_period_2 * 10;
 // 10 * 60;
-const DRY_TEMP_ALARM_LIMIT_2: number = alarmCfg.dry_temp_alarm_limit_2;
+let DRY_TEMP_ALARM_LIMIT_2: number = alarmCfg.dry_temp_alarm_limit_2;
 // 4;
 
-const WET_TEMP_ALARM_PERIOD: number = alarmCfg.wet_temp_alarm_period * 10;
+let WET_TEMP_ALARM_PERIOD: number = alarmCfg.wet_temp_alarm_period * 10;
 // 10 * 60 ;
-const WET_TEMP_ALARM_LIMIT: number = alarmCfg.wet_temp_alarm_limit;
+let WET_TEMP_ALARM_LIMIT: number = alarmCfg.wet_temp_alarm_limit;
 // 2;
 
-const MAX_TEMP: number = alarmCfg.max_temp;
+let MAX_TEMP: number = alarmCfg.max_temp;
 // 70;
-const MIN_TEMP: number = alarmCfg.min_temp;
+let MIN_TEMP: number = alarmCfg.min_temp;
 // 0;
 
 function isRunning(info: IInfoCollect): boolean {
@@ -132,6 +132,19 @@ export class Alarm {
 
     public static init() {
         console.log("\nAlarm init():");
+
+        objConfig = AppConfig.getAppConfig();
+        alarmCfg = objConfig.baking_config.alarm_threshold;
+        ALARM_CHECKING_PERIOD = 2.5;
+        DRY_TEMP_ALARM_PERIOD = alarmCfg.dry_temp_alarm_period * 10;
+        DRY_TEMP_ALARM_LIMIT = alarmCfg.dry_temp_alarm_limit;
+        DRY_TEMP_ALARM_PERIOD_2 = alarmCfg.dry_temp_alarm_period_2 * 10;
+        DRY_TEMP_ALARM_LIMIT_2 = alarmCfg.dry_temp_alarm_limit_2;
+        WET_TEMP_ALARM_PERIOD = alarmCfg.wet_temp_alarm_period * 10;
+        WET_TEMP_ALARM_LIMIT = alarmCfg.wet_temp_alarm_limit;
+        MAX_TEMP = alarmCfg.max_temp;
+        MIN_TEMP = alarmCfg.min_temp;
+
         Alarm.checkPeriod = ALARM_CHECKING_PERIOD;
 
         Alarm.dryTempCounter = 0;

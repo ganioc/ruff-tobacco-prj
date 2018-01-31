@@ -48,7 +48,7 @@ const C_FILE_CURRENT_STAGE_BACKUP = "/home/root/baking/currentStageBackup.json";
 
 Tool.printGreen(path.dirname(__filename));
 
-const objConfig: IfConfigFile = AppConfig.getAppConfig();
+let objConfig: IfConfigFile = AppConfig.getAppConfig();
 
 // const DEFAULT_CURVE: IDefaultCurve = {
 //     dryList: objConfig.baking_config.default_curve.dryList,
@@ -56,7 +56,7 @@ const objConfig: IfConfigFile = AppConfig.getAppConfig();
 //     durList: objConfig.baking_config.default_curve.durList,
 // };
 
-const DEFAULT_CURVES: IDefaultCurve[] = [];
+let DEFAULT_CURVES: IDefaultCurve[] = [];
 
 objConfig.baking_config.default_curves.forEach((item) => {
     DEFAULT_CURVES.push({
@@ -66,7 +66,7 @@ objConfig.baking_config.default_curves.forEach((item) => {
     });
 });
 
-const NUM_OF_DEFAULT_CURVES = DEFAULT_CURVES.length;
+let NUM_OF_DEFAULT_CURVES = DEFAULT_CURVES.length;
 
 export class LocalStorage {
 
@@ -544,6 +544,20 @@ export class LocalStorage {
             }
             Tool.printBlue("saveMachineInfo OK");
         });
+    }
+
+    public static updateDefaultCurves() {
+        console.log("update default curve");
+        objConfig = AppConfig.getAppConfig();
+        DEFAULT_CURVES = [];
+        objConfig.baking_config.default_curves.forEach((item) => {
+            DEFAULT_CURVES.push({
+                dryList: item.dryList,
+                wetList: item.wetList,
+                durList: item.durList,
+            });
+        });
+        NUM_OF_DEFAULT_CURVES = DEFAULT_CURVES.length;
     }
 }
 

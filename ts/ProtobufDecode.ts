@@ -40,6 +40,7 @@ export class ProtobufDecode {
     public decodeBatchProfile: DecodePB;
     public decodeUpdateRequest: DecodePB;
     public decodeConfig: DecodePB;
+    public decodeScoredProfile: DecodePB;
 
     public appBaking: RunningHandle;
     public mqtt: MqttApp; // Mqtt Client
@@ -92,6 +93,16 @@ export class ProtobufDecode {
             className: "awesomepackage.Profile",
         });
 
+        this.decodeConfig = new DecodePB({
+            path: protoFile,
+            className: "awesomepackage.Config",
+        });
+
+        this.decodeScoredProfile = new DecodePB({
+            path: protoFile,
+            className: "awesomepackage.ScoredProfile",
+        });
+
         this.appBaking = option.baking;
 
         ProtobufDecode.bOnline = false;
@@ -123,9 +134,6 @@ export class ProtobufDecode {
 
         const proc = new Promise((resolve, reject) => {
             Tool.printGreen("Protobu decoder init()==>");
-
-            this.version = LocalStorage.getAppVersion();
-            this.data = AppConfig.getAppConfig();
 
             // check token, network connectivity at the same time
             this.client.login(Tool.MachineSN, (err, buf) => {
@@ -268,10 +276,7 @@ export class ProtobufDecode {
             console.log("happy ending");
         }, (error) => {
             console.log("wrong ending");
-        });
-
-        /*
-        .then((d) => {
+        }).then((d) => {
             // backgorund work
             this.timer = setInterval(() => {
                 this.client.login(Tool.MachineSN, (err, buf) => {
@@ -288,10 +293,13 @@ export class ProtobufDecode {
             }, 24 * 3600 * 1000);
 
             // 要根据工作状态来决定什么时候上报
-            // this.mqttTimer = setInterval(() => {
-            //     this.mqtt.updateReport();
-            // }, 20000);
-        }).then((d) => {
+            this.mqttTimer = setInterval(() => {
+                if (this.appBaking.runningStatus === RunningStatus.RUNNING || this.appBaking.runningStatus === RunningStatus.PAUSED) {
+                    this.mqtt.updateReport();
+                }
+            }, 20000);
+        })
+        .then((d) => {
             return new Promise((resolve, reject) => {
                 LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
                     if (err) {
@@ -310,176 +318,106 @@ export class ProtobufDecode {
             });
         }).then((d) => {
             return new Promise((resolve, reject) => {
-                const update = {
-                    deviceId: this.info.mqttResponse.dyId,
-                    appVersion: this.version,
-                };
-                this.client.updateConfig(this.decodeUpdateRequest.encode(update), this.TOKEN, (err, buf) => {
-                    if (err) {
-                        console.log(err);
-                        ProtobufDecode.bOnline = false;
-                        reject("NOK");
-                        return;
-                    }
-
-                    ProtobufDecode.bOnline = true;
-                    const config: any = this.decodeConfig.decode(new Uint8Array(buf));
-
-                    console.log(config);
-                    const types: IfTobaccoType[] = [];
-                    const levels: IfQualityLevel[] = [];
-                    const dryList: number[][] = [];
-                    const wetList: number[][] = [];
-                    const duringList: number[] = [];
-                    // should it use '_'?
-                    config.tobacco_type.forEach((element) => {
-                        types.push({
-                            name: element.name,
-                            id: element.id,
-                        });
-                    });
-                    config.quality_level.forEach((element) => {
-                        levels.push({
-                            name: element.name,
-                            id: element.id,
-                        });
-                    });
-                    config.default_curve.dry_list.forEach((element) => {
-                        dryList.push([element.start_temperature, element.end_temperature]);
-                    });
-                    config.default_curve.wet_list.forEach((element) => {
-                        wetList.push([element.start_temperature, element.end_temperature]);
-                    });
-                    config.default_curve.during_list.forEach((element) => {
-                        duringList.push(element);
-                    });
-                    data.baking_config.quality_level = levels;
-                    data.baking_config.tobacco_type = types;
-                    data.baking_config.default_curve = {
-                        dryList: dryList,
-                        wetList: wetList,
-                        durList: duringList,
-                    };
-                    data.baking_config.alarm_threshold.max_temp = config.alarm_threshold.max_temperature;
-                    data.baking_config.alarm_threshold.min_temp = config.alarm_threshold.max_temperature;
-                    data.baking_config.alarm_threshold.dry_temp_alarm_limit = config.alarm_threshold.dry_temperature_alarm_limit;
-                    data.baking_config.alarm_threshold.dry_temp_alarm_period = config.alarm_threshold.dry_temperature_alarm_period;
-                    data.baking_config.alarm_threshold.dry_temp_alarm_limit_2 = config.alarm_threshold.dry_temperature_alarm_limit2;
-                    data.baking_config.alarm_threshold.dry_temp_alarm_period_2 = config.alarm_threshold.dry_temperature_alarm_period2;
-                    data.baking_config.alarm_threshold.wet_temp_alarm_limit = config.alarm_threshold.wet_temperature_alarm_limit;
-                    data.baking_config.alarm_threshold.wet_temp_alarm_period = config.alarm_threshold.wet_temperature_alarm_period;
-                    data.baking_config.alarm_threshold.alarm_checking_period = config.alarm_threshold.alarm_checking_period;
-                    data.baking_config.base_setting.AirFlowPattern = config.base_setting.airflow_pattern;
-                    data.baking_config.base_setting.ControllerName = config.base_setting.controller_name;
-                    data.baking_config.base_setting.GPSInfo.Latitude = ControlPeriph.gpsLatitude;
-                    data.baking_config.base_setting.GPSInfo.Longitude = ControlPeriph.gpsLongitude;
-                    data.baking_config.base_setting.InnerHeight = config.base_setting.inner_height;
-                    data.baking_config.base_setting.LocName = config.base_setting.location_name;
-                    data.baking_config.base_setting.WallMaterial = config.base_setting.wall_material;
-
-                    AppConfig.setAppConfig(data);
-                    if (config.update_tag === 1) {
-                        this.client.updateApp(Tool.MachineSN, this.TOKEN, (err1, buf1) => {
-                            console.log(err1);
-                            ProtobufDecode.bOnline = false;
-                            return;
-                        });
-
-                        ProtobufDecode.bOnline = true;
-                    }
-                });
+                this.updateConfig();
             });
         }, (e) => {
             return new Promise((resolve, reject) => {
                 console.log("End of promise");
             });
         });
-    */
     }
 
-    // public updateConfig(): void {
+    public updateConfig(): void {
 
-    //     const update = {
-    //         deviceId: this.info.mqttResponse.dyId,
-    //         appVersion: this.version,
-    //     };
-    //     this.client.updateConfig(this.decodeUpdateRequest.encode(update), this.TOKEN, (err, buf) => {
-    //         if (err) {
-    //             console.log(err);
-    //             ProtobufDecode.bOnline = false;
-    //             return;
-    //         }
+        const update = {
+            deviceId: this.info.mqttResponse.dyId,
+            appVersion: LocalStorage.getAppVersion(),
+        };
+        this.client.updateConfig(this.decodeUpdateRequest.encode(update), this.TOKEN, (err, buf) => {
+            if (err) {
+                console.log(err);
+                ProtobufDecode.bOnline = false;
+                return;
+            }
+            ProtobufDecode.bOnline = true;
+            const config: any = this.decodeConfig.decode(new Uint8Array(buf));
 
-    //         ProtobufDecode.bOnline = true;
-    //         const config: any = this.decodeConfig.decode(new Uint8Array(buf));
+            console.log(config);
+            const types: IfTobaccoType[] = [];
+            const levels: IfQualityLevel[] = [];
+            const curves: {
+                dryList: number[][],
+                wetList: number[][],
+                durList: number[],
+            }[] = [];
+            config.tobaccoType.forEach((element) => {
+                types.push({
+                    name: element.name,
+                    id: element.id,
+                });
+            });
+            config.qualityLevel.forEach((element) => {
+                levels.push({
+                    name: element.name,
+                    id: element.id,
+                });
+            });
+            config.defaultCurve.forEach((curve) => {
+                const dryList: number[][] = [];
+                const wetList: number[][] = [];
+                const duringList: number[] = [];
+                curve.dryList.forEach((drytemp) => {
+                    dryList.push([drytemp.startTemperature, drytemp.endTemperature]);
+                });
+                curve.wetList.forEach((wettemp) => {
+                    wetList.push([wettemp.startTemperature, wettemp.endTemperature]);
+                });
+                curve.duringList.forEach((time) => {
+                    duringList.push(time);
+                });
+                curves.push({
+                    dryList: dryList,
+                    wetList: wetList,
+                    durList: duringList,
+                });
+            });
 
-    //         console.log(config);
-    //         const types: IfTobaccoType[] = [];
-    //         const levels: IfQualityLevel[] = [];
-    //         const dryList: number[][] = [];
-    //         const wetList: number[][] = [];
-    //         const duringList: number[] = [];
-    //         // should it use '_'?
-    //         config.tobacco_type.forEach((element) => {
-    //             types.push({
-    //                 name: element.name,
-    //                 id: element.id,
-    //             });
-    //         });
-    //         config.quality_level.forEach((element) => {
-    //             levels.push({
-    //                 name: element.name,
-    //                 id: element.id,
-    //             });
-    //         });
-    //         config.default_curve.dry_list.forEach((element) => {
-    //             dryList.push([element.start_temperature, element.end_temperature]);
-    //         });
-    //         config.default_curve.wet_list.forEach((element) => {
-    //             wetList.push([element.start_temperature, element.end_temperature]);
-    //         });
-    //         config.default_curve.during_list.forEach((element) => {
-    //             duringList.push(element);
-    //         });
+            this.data.baking_config.quality_level = levels;
+            this.data.baking_config.tobacco_type = types;
+            this.data.baking_config.default_curves = curves;
+            this.data.baking_config.alarm_threshold.max_temp = config.alarmThreshold.maxTemperature;
+            this.data.baking_config.alarm_threshold.min_temp = config.alarmThreshold.maxTemperature;
+            this.data.baking_config.alarm_threshold.dry_temp_alarm_limit = config.alarmThreshold.dryTemperatureAlarmLimit;
+            this.data.baking_config.alarm_threshold.dry_temp_alarm_period = config.alarmThreshold.dryTemperatureAlarmPeriod;
+            this.data.baking_config.alarm_threshold.dry_temp_alarm_limit_2 = config.alarmThreshold.dryTemperatureAlarmLimit2;
+            this.data.baking_config.alarm_threshold.dry_temp_alarm_period_2 = config.alarmThreshold.dryTemperatureAlarmPeriod2;
+            this.data.baking_config.alarm_threshold.wet_temp_alarm_limit = config.alarmThreshold.wetTemperatureAlarmLimit;
+            this.data.baking_config.alarm_threshold.wet_temp_alarm_period = config.alarmThreshold.wetTemperatureAlarmPeriod;
+            this.data.baking_config.alarm_threshold.alarm_checking_period = config.alarmThreshold.alarmCheckingPeriod;
+            // this.data.baking_config.base_setting.AirFlowPattern = config.baseSetting.airflowPattern;
+            // this.data.baking_config.base_setting.ControllerName = config.baseSetting.controllerName;
+            // this.data.baking_config.base_setting.GPSInfo.Latitude = ControlPeriph.gpsLatitude;
+            // this.data.baking_config.base_setting.GPSInfo.Longitude = ControlPeriph.gpsLongitude;
+            // this.data.baking_config.base_setting.InnerHeight = config.baseSetting.innerHeight;
+            // this.data.baking_config.base_setting.LocName = config.baseSetting.locationName;
+            // this.data.baking_config.base_setting.WallMaterial = config.baseSetting.wallMaterial;
 
-    //         data.baking_config.quality_level = levels;
-    //         data.baking_config.tobacco_type = types;
-    //         data.baking_config.default_curve = {
-    //             dryList: dryList,
-    //             wetList: wetList,
-    //             durList: duringList,
-    //         };
-    //         data.baking_config.alarm_threshold.max_temp = config.alarm_threshold.max_temperature;
-    //         data.baking_config.alarm_threshold.min_temp = config.alarm_threshold.max_temperature;
-    //         data.baking_config.alarm_threshold.dry_temp_alarm_limit = config.alarm_threshold.dry_temperature_alarm_limit;
-    //         data.baking_config.alarm_threshold.dry_temp_alarm_period = config.alarm_threshold.dry_temperature_alarm_period;
-    //         data.baking_config.alarm_threshold.dry_temp_alarm_limit_2 = config.alarm_threshold.dry_temperature_alarm_limit2;
-    //         data.baking_config.alarm_threshold.dry_temp_alarm_period_2 = config.alarm_threshold.dry_temperature_alarm_period2;
-    //         data.baking_config.alarm_threshold.wet_temp_alarm_limit = config.alarm_threshold.wet_temperature_alarm_limit;
-    //         data.baking_config.alarm_threshold.wet_temp_alarm_period = config.alarm_threshold.wet_temperature_alarm_period;
-    //         data.baking_config.alarm_threshold.alarm_checking_period = config.alarm_threshold.alarm_checking_period;
-    //         data.baking_config.base_setting.AirFlowPattern = config.base_setting.airflow_pattern;
-    //         data.baking_config.base_setting.ControllerName = config.base_setting.controller_name;
-    //         data.baking_config.base_setting.GPSInfo.Latitude = ControlPeriph.gpsLatitude;
-    //         data.baking_config.base_setting.GPSInfo.Longitude = ControlPeriph.gpsLongitude;
-    //         data.baking_config.base_setting.InnerHeight = config.base_setting.inner_height;
-    //         data.baking_config.base_setting.LocName = config.base_setting.location_name;
-    //         data.baking_config.base_setting.WallMaterial = config.base_setting.wall_material;
+            // 默认的参数曲线不能够随便存的。
+            AppConfig.setAppConfig(this.data);
+            LocalStorage.updateDefaultCurves();
 
-    //         // 默认的参数曲线不能够随便存的。
-    //         // AppConfig.setAppConfig(data);
+            // 执行以下代码前应有对话框弹出，确认后再执行
+            if (config.updateTag === 1) {
+                this.client.updateApp(this.info.mqttResponse.dyId, this.TOKEN, (err1, buf1) => {
+                    console.log(err1);
+                    ProtobufDecode.bOnline = false;
+                    return;
+                });
 
-    //         if (config.update_tag === 1) {
-    //             this.client.updateApp(Tool.MachineSN, this.TOKEN, (err1, buf1) => {
-    //                 console.log(err1);
-    //                 ProtobufDecode.bOnline = false;
-    //                 return;
-    //             });
-
-    //             ProtobufDecode.bOnline = true;
-    //         }
-    //     });
-    // }
+                ProtobufDecode.bOnline = true;
+            }
+        });
+    }
     // bakingData: any
     public createBatch(): void {
         let data: IInfoCollect;
@@ -502,22 +440,13 @@ export class ProtobufDecode {
 
             const currentTime: number = new Date().getTime();
 
-            let type: string;
+            let type: string = this.data.baking_config.tobacco_type[data.BakingInfo.TobaccoType].name;
             let quality: string;
             this.info.batchStartTime = currentTime;
 
             this.info.loadWeatherTemperature = ControlPeriph.temp4;
             this.info.loadWeatherHumidity = ControlPeriph.temp2;
 
-            // type to be added
-            switch (data.BakingInfo.TobaccoType) {
-                case 0:
-                    type = "K326";
-                    break;
-                default:
-                    type = "K326";
-                    break;
-            }
             switch (data.BakingInfo.Quality) {
                 case 0:
                     quality = "优";
@@ -553,9 +482,9 @@ export class ProtobufDecode {
                 loadToolCount: data.BakingInfo.PieceQuantity.toString(),
                 loadToolWeight: data.BakingInfo.PieceWeight.toString(),
                 loadQuality: quality,
-                loadMaturityLv_0Percentage: data.BakingInfo.MaturePercent1,
+                loadMaturityLv_0Percentage: data.BakingInfo.MaturePercent3,
                 loadMaturityLv_1Percentage: data.BakingInfo.MaturePercent2,
-                loadMaturityLv_2Percentage: data.BakingInfo.MaturePercent3,
+                loadMaturityLv_2Percentage: data.BakingInfo.MaturePercent1,
                 loadMaturityLv_3Percentage: data.BakingInfo.MaturePercent4,
                 loadMaturityLv_4Percentage: data.BakingInfo.MaturePercent5,
             };
@@ -599,17 +528,8 @@ export class ProtobufDecode {
         }).then((val) => {
             Tool.printGreen("Update batch");
 
-            let type: string;
+            let type: string = this.data.baking_config.tobacco_type[data.BakingInfo.TobaccoType].name;
             let quality: string;
-            // type to be added
-            switch (data.BakingInfo.TobaccoType) {
-                case 0:
-                    type = "K326";
-                    break;
-                default:
-                    type = "K326";
-                    break;
-            }
             switch (data.BakingInfo.Quality) {
                 case 0:
                     quality = "优";
@@ -628,24 +548,9 @@ export class ProtobufDecode {
                     break;
             }
 
-            // after weights will be calculated from types
             const rating: any[] = [];
             resultData.forEach((element) => {
-                let name: string;
-                switch (element.level) {
-                    case 0:
-                        name = "优等";
-                        break;
-                    case 1:
-                        name = "中等";
-                        break;
-                    case 2:
-                        name = "下等";
-                        break;
-                    default:
-                        name = "未评级";
-                        break;
-                }
+                let name: string = this.data.baking_config.quality_level[element.level].name;
                 if (element.weight !== 0) {
                     rating.push({
                         rating: name,
@@ -674,9 +579,9 @@ export class ProtobufDecode {
                 loadToolCount: data.BakingInfo.PieceQuantity.toString(),
                 loadToolWeight: data.BakingInfo.PieceWeight.toString(),
                 loadQuality: quality,
-                loadMaturityLv_0Percentage: data.BakingInfo.MaturePercent1,
+                loadMaturityLv_0Percentage: data.BakingInfo.MaturePercent3,
                 loadMaturityLv_1Percentage: data.BakingInfo.MaturePercent2,
-                loadMaturityLv_2Percentage: data.BakingInfo.MaturePercent3,
+                loadMaturityLv_2Percentage: data.BakingInfo.MaturePercent1,
                 loadMaturityLv_3Percentage: data.BakingInfo.MaturePercent4,
                 loadMaturityLv_4Percentage: data.BakingInfo.MaturePercent5,
             };
@@ -708,17 +613,9 @@ export class ProtobufDecode {
         }).then((val) => {
             Tool.printGreen("Get recommend profile");
 
-            let type: string;
+            let type: string = this.data.baking_config.tobacco_type[data.BakingInfo.TobaccoType].name;
+            type = "K326";
             let quality: string;
-            // type to be added
-            switch (data.BakingInfo.TobaccoType) {
-                case 0:
-                    type = "K326";
-                    break;
-                default:
-                    type = "K326";
-                    break;
-            }
             switch (data.BakingInfo.Quality) {
                 case 0:
                     quality = "优";
@@ -752,9 +649,9 @@ export class ProtobufDecode {
                 loadToolCount: data.BakingInfo.PieceQuantity,
                 loadToolWeight: data.BakingInfo.PieceWeight.toString(),
                 loadQuality: quality,
-                loadMaturityLv_0Percentage: data.BakingInfo.MaturePercent1,
+                loadMaturityLv_0Percentage: data.BakingInfo.MaturePercent3,
                 loadMaturityLv_1Percentage: data.BakingInfo.MaturePercent2,
-                loadMaturityLv_2Percentage: data.BakingInfo.MaturePercent3,
+                loadMaturityLv_2Percentage: data.BakingInfo.MaturePercent1,
                 loadMaturityLv_3Percentage: data.BakingInfo.MaturePercent4,
                 loadMaturityLv_4Percentage: data.BakingInfo.MaturePercent5,
             };
@@ -768,9 +665,11 @@ export class ProtobufDecode {
                 }
 
                 ProtobufDecode.bOnline = true;
-                const profile: any = this.decodeProfile.decode(new Uint8Array(buf));
+                const profile: any = this.decodeScoredProfile.decode(new Uint8Array(buf));
                 console.log(profile);
-                const items: any[] = profile.items;
+                const distance = profile.distance;
+                const score = profile.score;
+                const items: any[] = profile.series.items;
 
                 const curveDryList: number[][] = [];
                 const curveWetList: number[][] = [];

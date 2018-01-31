@@ -86,8 +86,8 @@ export class HttpsApp {
         this.postWithToken("/device/config", arr, token, callback);
     }
 
-    public updateApp(sn: string, token: string, callback: (err, buf) => void) {
-        this.put("/device/app/update/" + sn, new Uint8Array(0), token, callback);
+    public updateApp(Id: string, token: string, callback: (err, buf) => void) {
+        this.put("/device/app/update/" + Id, new Uint8Array(0), token, callback);
     }
 
     private put(inPath: string, objData: Uint8Array, token: string, callback: (err, buf) => void) {

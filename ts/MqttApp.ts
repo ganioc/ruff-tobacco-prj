@@ -172,7 +172,7 @@ export class MqttApp {
                     voltage: ControlPeriph.ADC4 * 87.2, // AC power source voltage, 247
                     phase_loss: Alarm.bPhaseLost ? 1 : 0, // 0 normal, 1 abnormal
                     combustion_fan: ControlPeriph.CheckBurningGate() === true ? 1 : 0, // 0 stop, 1 running
-                    GPS: info.BaseSetting.GPSInfo.Latitude + "," + info.BaseSetting.GPSInfo.Longitude, // "xxxx, xxxx"
+                    GPS: ControlPeriph.gpsLatitude + "," + ControlPeriph.gpsLongitude, // "xxxx, xxxx"
                 },
             };
             Tool.print(JSON.stringify(data));
