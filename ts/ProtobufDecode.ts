@@ -176,7 +176,7 @@ export class ProtobufDecode {
                             let obj: any;
                             try {
                                 obj = JSON.parse(data1.toString());
-                                if (JSON.stringify(obj.mqttResponse) === "{}") {
+                                if (JSON.stringify(obj.mqttResponse) === "{}" || obj.mqttResponse.dyId === "") {
                                     throw new Error("wrong machineinfo format");
                                 }
                             } catch (e) {

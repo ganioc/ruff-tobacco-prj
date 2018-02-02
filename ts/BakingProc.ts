@@ -276,8 +276,9 @@ export class RunningHandle {
                     if (err) {
                         Tool.printRed("Read current stage backup file failure");
                         const stageInfo = LocalStorage.getStageFromDirec();
+                        // Temporarily, should read length from config
                         currentObj = {
-                            CurrentStage: stageInfo.CurrentStage,  // Or read the directory number under data/
+                            CurrentStage: stageInfo.CurrentStage > 19 ? 0 : stageInfo.CurrentStage,  // Or read the directory number under data/
                             CurrentStageRunningTime: 0,
                         };
                         resolve("OK");
@@ -290,7 +291,7 @@ export class RunningHandle {
                         Tool.printRed(e);
                         const stageInfo = LocalStorage.getStageFromDirec();
                         currentObj = {
-                            CurrentStage: stageInfo.CurrentStage,  // Or read the directory number under data/
+                            CurrentStage: stageInfo.CurrentStage > 19 ? 0 : stageInfo.CurrentStage,  // Or read the directory number under data/
                             CurrentStageRunningTime: 0,
                         };
                     }
