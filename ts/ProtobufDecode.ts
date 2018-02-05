@@ -294,6 +294,7 @@ export class ProtobufDecode {
 
             // 要根据工作状态来决定什么时候上报
             this.mqttTimer = setInterval(() => {
+                console.log("app status: " + this.appBaking.runningStatus);
                 if (this.appBaking.runningStatus === RunningStatus.RUNNING || this.appBaking.runningStatus === RunningStatus.PAUSED) {
                     this.mqtt.updateReport();
                 }
@@ -318,7 +319,15 @@ export class ProtobufDecode {
             });
         }).then((d) => {
             return new Promise((resolve, reject) => {
-                this.updateConfig();
+                this.updateConfig((err) => {
+                    if (err) {
+                        this.updateConfig((err1) => {
+                            if (err1) {
+                                this.updateConfig(() => {});
+                            }
+                        })
+                    }
+                });
             });
         }, (e) => {
             return new Promise((resolve, reject) => {
@@ -327,7 +336,7 @@ export class ProtobufDecode {
         });
     }
 
-    public updateConfig(): void {
+    public updateConfig(callback: (err?: Error) => void): void {
 
         const update = {
             deviceId: this.info.mqttResponse.dyId,
@@ -341,8 +350,13 @@ export class ProtobufDecode {
             }
             ProtobufDecode.bOnline = true;
             const config: any = this.decodeConfig.decode(new Uint8Array(buf));
-
             console.log(config);
+
+            if (JSON.stringify(config) === "{}") {
+                callback(new Error("Update config retry..."));
+                return;
+            }
+
             const types: IfTobaccoType[] = [];
             const levels: IfQualityLevel[] = [];
             const curves: {
