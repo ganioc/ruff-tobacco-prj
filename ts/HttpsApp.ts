@@ -90,6 +90,10 @@ export class HttpsApp {
         this.put("/device/app/update/" + Id, new Uint8Array(0), token, callback);
     }
 
+    public resume(Id: string, token: string, callback: (err, buf) => void) {
+        this.get("/resumePoint/" + Id, token, callback);
+    }
+
     private put(inPath: string, objData: Uint8Array, token: string, callback: (err, buf) => void) {
         // comment
         Tool.printYellow("----- PUT -----");

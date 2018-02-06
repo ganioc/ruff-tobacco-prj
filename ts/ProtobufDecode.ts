@@ -41,6 +41,7 @@ export class ProtobufDecode {
     public decodeUpdateRequest: DecodePB;
     public decodeConfig: DecodePB;
     public decodeScoredProfile: DecodePB;
+    public decodeResume: DecodePB;
 
     public appBaking: RunningHandle;
     public mqtt: MqttApp; // Mqtt Client
@@ -101,6 +102,11 @@ export class ProtobufDecode {
         this.decodeScoredProfile = new DecodePB({
             path: protoFile,
             className: "awesomepackage.ScoredProfile",
+        });
+
+        this.decodeResume = new DecodePB({
+            path: protoFile,
+            className: "awesomepackage.ResumeResponse",
         });
 
         this.appBaking = option.baking;
@@ -748,5 +754,27 @@ export class ProtobufDecode {
 
     public fake() {
         console.log("to get the cloud curve");
+    }
+
+    public resume(callback: (err, stage, minutes) => void) {
+        Tool.printGreen("Cloud resume stat");
+
+        this.client.resume(this.info.mqttResponse.dyId, this.TOKEN, (err, buf) => {
+            if (err) {
+                console.log(err);
+                ProtobufDecode.bOnline = false;
+                callback(err, 0 ,0);
+                return;
+            }
+
+            ProtobufDecode.bOnline = true;
+            const resumeStat = this.decodeResume.decode(new Uint8Array(buf))
+            console.log(resumeStat);
+            const stage: number = resumeStat.stage;
+            const minutes: number = resumeStat.remainMinutes;
+            
+            callback(null, stage, minutes);
+            return;
+        })
     }
 }
