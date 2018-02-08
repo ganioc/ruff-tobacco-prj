@@ -100,13 +100,12 @@ export class MqttApp {
             },
         );
         this.client.on("close", () => {
+            this.lost = true;
             Tool.printRed("MQTT to baidu closed");
-            if (this.lost === false) {
-                setTimeout(() => {
-                    this.reconnect();
-                }, 100000);
-                this.lost = true;
-            }
+            
+            setTimeout(() => {
+                 this.reconnect();
+            }, 100000);
         });
         this.client.on("error", (err) => {
             Tool.printRed("MQTT baidu, error");
