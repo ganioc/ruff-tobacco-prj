@@ -301,10 +301,10 @@ export class ProtobufDecode {
             // 要根据工作状态来决定什么时候上报
             this.mqttTimer = setInterval(() => {
                 console.log("app status: " + this.appBaking.runningStatus);
-                if (this.appBaking.runningStatus === RunningStatus.RUNNING || this.appBaking.runningStatus === RunningStatus.PAUSED) {
+//                if (this.appBaking.runningStatus === RunningStatus.RUNNING || this.appBaking.runningStatus === RunningStatus.PAUSED) {
                     this.mqtt.updateReport();
-                }
-            }, 20000);
+//                }
+            }, 60000);
         })
         .then((d) => {
             return new Promise((resolve, reject) => {

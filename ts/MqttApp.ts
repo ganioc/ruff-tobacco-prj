@@ -3,6 +3,7 @@
  */
 import Mqtt = require("mqtt");
 import { Promise } from "promise";
+import { clearInterval } from "timers";
 import { Tool } from "./utility";
 import { LocalStorage } from "./LocalStorage";
 import { RunningHandle } from "./BakingProc";
@@ -102,10 +103,11 @@ export class MqttApp {
         this.client.on("close", () => {
             this.lost = true;
             Tool.printRed("MQTT to baidu closed");
-            
+
             setTimeout(() => {
-                 this.reconnect();
-            }, 100000);
+                this.reconnect();
+           }, 60000);
+            
         });
         this.client.on("error", (err) => {
             Tool.printRed("MQTT baidu, error");
@@ -114,7 +116,7 @@ export class MqttApp {
             this.counterError++;
 
             if (this.counterError > 100) {
-                this.reconnect();
+                this.lost = true;
             }
         });
         this.client.on("connect", () => {
@@ -183,7 +185,7 @@ export class MqttApp {
     public downloadCurve() {
         Tool.print("Download cuve from cloud server");
     }
-    private reconnect() {
+    public reconnect() {
         this.start();
     }
 }
