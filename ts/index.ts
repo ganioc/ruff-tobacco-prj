@@ -456,7 +456,6 @@ function main() {
                             TempCurveDryList: [],
                             TempCurveWetList: [], // 度,23.1, 一位小数点
                             TempDurationList: [],
-                            distance: 0,
                             score: 0,
                         });
                         return;
