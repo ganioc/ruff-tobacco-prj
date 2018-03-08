@@ -117,6 +117,7 @@ export class MqttApp {
 
             if (this.counterError > 100) {
                 this.lost = true;
+                this.reconnect();
             }
         });
         this.client.on("connect", () => {

@@ -712,6 +712,7 @@ export class ProtobufDecode {
                     TempCurveDryList: curveDryList,
                     TempCurveWetList: curveWetList,
                     TempDurationList: curvedurList,
+                    score: score,
                 };
                 callback(null, curve);
             });
