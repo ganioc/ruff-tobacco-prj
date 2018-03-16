@@ -64,29 +64,39 @@ message BatchRating {
 message BatchDetail {
     int64 batchId = 1;
     string deviceId = 2;
-    repeated BatchRating ratings = 3;
-    int64 start_time = 4;
-    int64 end_time = 5;
-    double after_top_weight = 6;
-    double after_middle_weight = 7;
-    double after_bottom_weight = 8;
-    string variety = 9;
-    string barn_airflow_direction = 10;
-    string barn_wall_texture = 11;
-    double load_weather_temperature = 12;
-    double load_top_weight = 13;
-    double load_weather_humidity = 14;
-    double load_middle_weight = 15;
-    double load_bottom_weight = 16;
-    string load_tool = 17;
-    string load_tool_count = 18;
-    string load_tool_weight = 19;
-    string load_quality = 20;
-    double load_maturity_lv_0_percentage = 21;
-    double load_maturity_lv_1_percentage = 22;
-    double load_maturity_lv_2_percentage = 23;
-    double load_maturity_lv_3_percentage = 24;
-    double load_maturity_lv_4_percentage = 25;
+    int32 curingDeviceBatchOrder = 3;
+    repeated BatchRating ratings = 4;
+    int64 start_time = 5;
+    int64 end_time = 6;
+    double after_top_weight = 7;
+    double after_middle_weight = 8;
+    double after_bottom_weight = 9;
+    string variety = 10;
+    string barn_airflow_direction = 11;
+    string barn_wall_texture = 12;
+    double load_weather_temperature = 13;
+    double load_top_weight = 14;
+    double load_weather_humidity = 15;
+    double load_middle_weight = 16;
+    double load_bottom_weight = 17;
+    string load_tool = 18;
+    string load_tool_count = 19;
+    string load_tool_weight = 20;
+    string load_quality = 21;
+    double load_maturity_lv_0_percentage = 22;
+    double load_maturity_lv_1_percentage = 23;
+    double load_maturity_lv_2_percentage = 24;
+    double load_maturity_lv_3_percentage = 25;
+    double load_maturity_lv_4_percentage = 26;
+    Profile profile =  27;
+    repeated ProfileUpdate profileUpdate = 28;
+}
+
+message ProfileUpdate {
+    string type =  1;
+    int32 position =  2;
+    double value =  3;
+    int64 time =  4;
 }
 
 message BatchSummary {
@@ -101,6 +111,14 @@ message ResumeResponse {
 	Profile profile = 2;
 	int32 stage = 3;
 	int32 remainMinutes = 4;
+}
+
+message Alarm {
+    string deviceId = 1;
+    int32 type = 2;
+    float wet_temperature = 3;
+    float dry_temperature = 4;
+    float voltage = 5;
 }
 
 message ConfigTemperaturePair {

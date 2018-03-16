@@ -187,6 +187,7 @@ export class MqttApp {
         Tool.print("Download cuve from cloud server");
     }
     public reconnect() {
+        this.client.end();
         this.start();
     }
 }

@@ -23,6 +23,7 @@ import { ProtobufDecode } from "./ProtobufDecode";
 import { UDisk } from "./udisk";
 import { Tool } from "./utility";
 import { basename } from "path";
+import { decode } from "punycode";
 
 const TRAP_PERIOD = 2500;
 
@@ -44,7 +45,7 @@ const option: IfHttpsApp = {
     port: 443,
 };
 
-const decoder = new ProtobufDecode({ baking: appBaking });
+const decoder = new ProtobufDecode({ baking: appBaking, QT: commQT });
 
 const client = new HttpsApp(option);
 
@@ -80,7 +81,7 @@ $.ready((error) => {
     // 云端交互初始化
     decoder.init({ baking: appBaking });
 
-    Alarm.init();
+    Alarm.init({ decoder: decoder });
 
     setTimeout(() => {
         Tool.printYellow("Go to main()");
@@ -556,4 +557,16 @@ function main() {
         });
     }, 1500);
 
+    setTimeout(() => {
+        if (decoder.getUpdateTag() === true) {
+            commQT.sendQueryYesNo("更新", "有新版本，是否要更新", (err, data: IfPacket) => {
+                if (err) {
+                    Tool.printRed("session timeout");
+                    return;
+                }
+                Tool.printBlink(JSON.stringify(data));
+                decoder.update();
+            });
+        }
+    }, 1000);
 }
