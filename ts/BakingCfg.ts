@@ -258,7 +258,7 @@ export interface IfMqttResponse {
 }
 export interface IfMachineInfo {
     mqttResponse: IfMqttResponse;
-    currentBatchId: string;
+    currentBatchId: number;
     batchStartTime: number;
     loadWeatherTemperature: number;
     loadWeatherHumidity: number;

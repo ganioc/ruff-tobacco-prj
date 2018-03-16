@@ -42,6 +42,7 @@ export class ProtobufDecode {
     public decodeConfig: DecodePB;
     public decodeScoredProfile: DecodePB;
     public decodeResume: DecodePB;
+    public decodeAlarm: DecodePB;
 
     public appBaking: RunningHandle;
     public mqtt: MqttApp; // Mqtt Client
@@ -52,6 +53,8 @@ export class ProtobufDecode {
     private mqttTimer: NodeJS.Timer;
     private version: string;
     private data: IfConfigFile;
+    private updateTag: boolean;
+    private alarmTags: boolean[];
 
     constructor(option) {
         this.decodeRegisterResponse = new DecodePB({
@@ -109,7 +112,15 @@ export class ProtobufDecode {
             className: "awesomepackage.ResumeResponse",
         });
 
+        this.decodeAlarm = new DecodePB({
+            path: protoFile,
+            className: "awesomepackage.Alarm",
+        });
+
         this.appBaking = option.baking;
+        for (let i = 0; i < 10; i++) {
+            this.alarmTags.push(true);
+        }
 
         ProtobufDecode.bOnline = false;
         this.mqtt = undefined;
@@ -129,7 +140,7 @@ export class ProtobufDecode {
                 mqttUsername: "",
                 mqttKey: "",
             },
-            currentBatchId: "",
+            currentBatchId: 0,
             batchStartTime: 0,
             loadWeatherTemperature: 0,
             loadWeatherHumidity: 0,
@@ -243,7 +254,7 @@ export class ProtobufDecode {
                             } else {
                                 const objAll: IfMachineInfo = {
                                     mqttResponse: objRegisterResponse,
-                                    currentBatchId: "",
+                                    currentBatchId: 0,
                                     batchStartTime: 0,
                                     loadWeatherTemperature: 0,
                                     loadWeatherHumidity: 0,
@@ -425,19 +436,25 @@ export class ProtobufDecode {
             // 默认的参数曲线不能够随便存的。
             AppConfig.setAppConfig(this.data);
             LocalStorage.updateDefaultCurves();
+            this.updateTag = config.updateTag === 1 ? true : false;
 
-            // 执行以下代码前应有对话框弹出，确认后再执行
-            if (config.updateTag === 1) {
-                this.client.updateApp(this.info.mqttResponse.dyId, this.TOKEN, (err1, buf1) => {
-                    console.log(err1);
-                    ProtobufDecode.bOnline = false;
-                    return;
-                });
-
-                ProtobufDecode.bOnline = true;
-            }
         });
     }
+
+    public getUpdateTag(): boolean {
+        return this.updateTag;
+    }
+
+    public update() {
+        this.client.updateApp(this.info.mqttResponse.dyId, this.TOKEN, (err, buf) => {
+            console.log(err);
+            ProtobufDecode.bOnline = false;
+            return;
+        });
+
+        ProtobufDecode.bOnline = true;
+    }
+
     // bakingData: any
     public createBatch(): void {
         let data: IInfoCollect;
@@ -675,6 +692,7 @@ export class ProtobufDecode {
                 loadMaturityLv_3Percentage: data.BakingInfo.MaturePercent4,
                 loadMaturityLv_4Percentage: data.BakingInfo.MaturePercent5,
             };
+            console.log(profileRequest);
 
             this.client.getRecoProfile(this.decodeRecoProfile.encode(profileRequest), this.TOKEN, (err, buf) => {
                 if (err) {
@@ -687,6 +705,9 @@ export class ProtobufDecode {
                 ProtobufDecode.bOnline = true;
                 const profile: any = this.decodeScoredProfile.decode(new Uint8Array(buf));
                 console.log(profile);
+                if (profile.series === undefined) {
+                    callback("Parse error", null);
+                }
                 const distance = profile.distance;
                 const score = profile.score;
                 const items: any[] = profile.series.items;
@@ -757,14 +778,14 @@ export class ProtobufDecode {
         console.log("to get the cloud curve");
     }
 
-    public resume(callback: (err, stage, minutes) => void) {
+    public resume(callback: (err, stage, minutes, curve) => void) {
         Tool.printGreen("Cloud resume stat");
 
         this.client.resume(this.info.mqttResponse.dyId, this.TOKEN, (err, buf) => {
             if (err) {
                 console.log(err);
                 ProtobufDecode.bOnline = false;
-                callback(err, 0 ,0);
+                callback(err, 0 ,0, null);
                 return;
             }
 
@@ -773,9 +794,76 @@ export class ProtobufDecode {
             console.log(resumeStat);
             const stage: number = resumeStat.stage;
             const minutes: number = resumeStat.remainMinutes;
-            
-            callback(null, stage, minutes);
+            const items: any[] = resumeStat.profile.items;
+            const curveDryList: number[][] = [];
+            const curveWetList: number[][] = [];
+            const curvedurList: number[] = [];
+
+            for (let i = 0; i < items.length; i++) {
+                if (i === 0) {
+                    curveDryList.push([items[0].targetDryBulbTemp, items[0].targetDryBulbTemp]);
+                    curveWetList.push([items[0].targetWetBulbTemp, items[0].targetWetBulbTemp]);
+                    curvedurList.push(items[0].minutes / 60);
+                } else {
+                    curveDryList.push([items[i - 1].targetDryBulbTemp, items[i].targetDryBulbTemp]);
+                    curveWetList.push([items[i - 1].targetWetBulbTemp, items[i].targetWetBulbTemp]);
+                    curvedurList.push(items[i].minutes / 60);
+                }
+            }
+            const curve = {
+                TempCurveDryList: curveDryList,
+                TempCurveWetList: curveWetList,
+                TempDurationList: curvedurList,
+            };
+
+            callback(null, stage, minutes, curve);
             return;
         })
+    }
+
+    public alarm(type, val1, val2, alarmTag) {
+        if (this.info.mqttResponse.dyId === "") {
+            return ;
+        }
+        // let wetTemp = 0;
+        // let dryTemp = 0;
+        // let voltage = 0;
+        // let report: boolean;
+        // if (alarmTag === true && this.alarmTags[type] === true) {
+        //     report = true;
+        //     this.alarmTags[type] = false;
+        // } else if (alarmTag === true && this.alarmTags[type] === false) {
+        //     report = false;
+        // } else if (alarmTag === false && this.alarmTags[type] === true) {
+        //     report = false;
+        // } else if (alarmTag === false && this.alarmTags[type] === false) {
+        //     report = false;
+        //     this.alarmTags[type] = true;
+        // }
+        // if (report === true) {
+        //     if (type === 7) {
+        //         voltage = val1;
+        //     } else {
+        //         wetTemp = val1;
+        //         dryTemp = val2;
+        //     }
+        //     const data = {
+        //         deviceId: this.info.mqttResponse.dyId,
+        //         type: type,
+        //         wetTemperature: wetTemp,
+        //         dryTemperature: dryTemp,
+        //         voltage: voltage,
+        //     }
+        //     this.client.alert(this.decodeAlarm.encode(data), this.TOKEN, (err, buf) => {
+        //         if (err) {
+        //             console.log(err);
+        //             ProtobufDecode.bOnline = false;
+        //             return;
+        //         }
+    
+        //         ProtobufDecode.bOnline = true;
+        //         return;
+        //     });
+        // }
     }
 }

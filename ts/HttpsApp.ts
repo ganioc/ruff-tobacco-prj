@@ -94,6 +94,10 @@ export class HttpsApp {
         this.get("/resumePoint/" + Id, token, callback);
     }
 
+    public alert(arr: Uint8Array, token: string, callback: (err, buf) => void) {
+        this.put("/alert", arr, token, callback);
+    }
+
     private put(inPath: string, objData: Uint8Array, token: string, callback: (err, buf) => void) {
         // comment
         Tool.printYellow("----- PUT -----");
