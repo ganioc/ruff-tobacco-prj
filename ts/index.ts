@@ -78,7 +78,7 @@ $.ready((error) => {
     gprs.start();
 
     // 云端交互初始化
-    decoder.init({baking: appBaking});
+    decoder.init({ baking: appBaking });
 
     Alarm.init();
 
@@ -463,6 +463,21 @@ function main() {
                     commQT.sendGetResp(data.PacketId, data.Obj, fb);
                 });
 
+                break;
+            case InfoType.Val_CloudContinueBaking:
+                Tool.printRed("CloudContinueBaking is able to get");
+
+                // get info from cloud
+                appBaking.fetchInfoFromCloudAsync((err) => {
+
+                    if (err) {
+                        commQT.sendGetResp(data.PacketId, data.Obj, "NOK");
+                        return;
+                    }
+                    appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
+                        commQT.sendGetResp(data.PacketId, data.Obj, d.RunningCurveInfo);
+                    });
+                });
                 break;
             default:
                 Tool.print("Wrong Get packet obj type:" + data.Obj);

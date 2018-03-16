@@ -3,7 +3,7 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.1.19";
+const APP_VERSION = "1.1.20";
 // require("../package.json").version;
 
 const UI_VERSION = "1.1";
@@ -359,6 +359,14 @@ export class LocalStorage {
             Tool.printBlue("saveCurrentStage OK");
             callback(null, "OK");
         });
+    }
+    public static saveCurrentStageSync(obj: IfCurrentStageInfo) {
+        Tool.printYellow("saveCurrentStage");
+        fs.writeFileSync(LocalStorage.getCurrentStageDirec(), JSON.stringify(obj));
+    }
+    public static saveCurrentStageBackupSync(obj: IfCurrentStageInfo) {
+        Tool.printYellow("saveCurrentStageBackup");
+        fs.writeFileSync(LocalStorage.getCurrentStageBackupDirec(), JSON.stringify(obj));
     }
     public static resetCurrentStageSync() {
         const obj: IfCurrentStageInfo = {

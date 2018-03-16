@@ -890,6 +890,55 @@ export class RunningHandle {
         // throw new Error("Reset to Default State");
     }
 
+    // add by yangjun 2018-3-16
+    // for continue baking from cloud info
+    // data is from commQT.emitter.on("get", (data:IfPacket))
+    public fetchInfoFromCloudAsync(callback) {
+
+        // fetch from server
+
+        // if(error){
+        //    callback("Fail to fetch");
+        // }
+
+        // curve
+        // currentStage
+        // remaining time
+        // Please correct it
+        const curveInfo = {
+            dryList: [],
+            wetList: [],
+            durList: [],
+        };
+
+        function saveContinueInfoFromCloud(curve, currentStage, currentStageRunningTime) {
+            const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
+            info.RunningCurveInfo.CurrentStage = currentStage;
+            info.RunningCurveInfo.CurrentStageRunningTime = currentStageRunningTime;
+            info.RunningCurveInfo.TempCurveDryList = curve.dryList;
+            info.RunningCurveInfo.TempCurveWetList = curve.wetList;
+            info.RunningCurveInfo.TempDurationList = curve.durList;
+
+            LocalStorage.saveBakingStatusSync(info);
+
+            const stageInfo = {
+                CurrentStage: currentStage,
+                CurrentStageRunningTime: currentStageRunningTime, // 分钟
+            };
+
+            LocalStorage.saveCurrentStageSync(stageInfo);
+            LocalStorage.saveCurrentStageBackupSync(stageInfo);
+        }
+
+        this.runningStatus = RunningStatus.PAUSED;
+        this.bBakingFinished = false;
+
+        // saveContinueInfoFromCloud(...)
+
+        callback(undefined);
+
+    }
+
     private getBakingElementList() {
         return this.bakingCurve.getBakingElementList();
     }
@@ -940,4 +989,6 @@ export class RunningHandle {
             Tool.printYellow(" ------ BakingCurve is running -----");
         }
     }
+
+
 }
