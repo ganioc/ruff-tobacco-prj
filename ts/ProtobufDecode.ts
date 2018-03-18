@@ -157,42 +157,40 @@ export class ProtobufDecode {
             ProtobufDecode.bOnline = true;
             let bError = false;
 
-            return new Promise((resolve, reject) => {
-                if (fs.existsSync(LocalStorage.getMachineFile())) {
-                    Tool.print("Machine Already exist: ");
-                    // read out the machine info
-                    fs.readFile(LocalStorage.getMachineFile(), (err, data1) => {
-                        if (err) {
-                            Tool.printRed("Read MachineInfo file fail");
-                            reject("NOEXIST");
+            if (fs.existsSync(LocalStorage.getMachineFile())) {
+                Tool.print("Machine Already exist: ");
+                // read out the machine info
+                fs.readFile(LocalStorage.getMachineFile(), (err, data1) => {
+                    if (err) {
+                        Tool.printRed("Read MachineInfo file fail");
+                        reject("NOEXIST");
 
-                        } else {
-                            let obj: any;
-                            try {
-                                obj = JSON.parse(data1.toString());
-                                if (JSON.stringify(obj.mqttResponse) === "{}" || obj.mqttResponse.dyId === "") {
-                                    throw new Error("wrong machineinfo format");
-                                }
-                            } catch (e) {
-                                Tool.printRed("parse MachineInfo data error");
-                                Tool.printRed(e);
-                                bError = true;
+                    } else {
+                        let obj: any;
+                        try {
+                            obj = JSON.parse(data1.toString());
+                            if (JSON.stringify(obj.mqttResponse) === "{}" || obj.mqttResponse.dyId === "") {
+                                throw new Error("wrong machineinfo format");
                             }
-                            if (bError) {
-                                reject("NOEXIST");
-                            } else {
-                                this.info = JSON.parse(JSON.stringify(obj));
-                                console.log(this.info);
-                                resolve("OK");
-                            }
+                        } catch (e) {
+                            Tool.printRed("parse MachineInfo data error");
+                            Tool.printRed(e);
+                            bError = true;
                         }
-                    });
+                        if (bError) {
+                            reject("NOEXIST");
+                        } else {
+                            this.info = JSON.parse(JSON.stringify(obj));
+                            console.log(this.info);
+                            resolve("OK");
+                        }
+                    }
+                });
 
-                } else {
-                    Tool.print("Machine info Not exist: ");
-                    reject("NOEXIST");
-                }
-            });
+            } else {
+                Tool.print("Machine info Not exist: ");
+                reject("NOEXIST");
+            }
         }).then((obj: any) => {
             Tool.printBlue("Intermediate OK");
             return Promise.resolve(obj);
@@ -363,7 +361,7 @@ export class ProtobufDecode {
             const config: any = this.decodeConfig.decode(new Uint8Array(buf));
             console.log(config);
 
-            if (JSON.stringify(config) === "{}") {
+            if (JSON.stringify(config) === "{}" || config.tobaccoType === undefined) {
                 callback(new Error("Update config retry..."));
                 return;
             }
@@ -698,8 +696,9 @@ export class ProtobufDecode {
                 ProtobufDecode.bOnline = true;
                 const profile: any = this.decodeScoredProfile.decode(new Uint8Array(buf));
                 console.log(profile);
-                if (profile.series === undefined) {
+                if (JSON.stringify(profile) === "{}" || profile.series === undefined) {
                     callback("Parse error", null);
+                    return;
                 }
                 const distance = profile.distance;
                 const score = profile.score;
@@ -815,7 +814,7 @@ export class ProtobufDecode {
     }
 
     public alarm(type, wet, dry, target, alarmTag) {
-        if (this.info.mqttResponse.dyId === "") {
+        if (this.info.mqttResponse.dyId === "" || this.TOKEN.length < 15) {
             return ;
         }
         let report: boolean;
