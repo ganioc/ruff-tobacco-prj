@@ -128,7 +128,7 @@ export class ProtobufDecode {
 
         this.client = new HttpsApp(httpoption);
         this.timer = undefined;
-        this.TOKEN = "";
+        this.TOKEN = "undefined";
 
         this.info = {
             mqttResponse: {
@@ -151,33 +151,9 @@ export class ProtobufDecode {
     public init(): void {
 
         const proc = new Promise((resolve, reject) => {
-            Tool.printGreen("Protobu decoder init()==>");
+            Tool.printGreen("Protobu decoder init()==>");     
 
-            // check token, network connectivity at the same time
-            this.client.login(Tool.MachineSN, (err, buf) => {
-                if (err) {
-                    Tool.printRed("login failure:");
-                    console.log(err);
-                    reject("NONETWORK");
-                } else {
-                    // should I check the content of buf?
-                    console.log(buf.length);
-                    this.TOKEN = buf.toString();
-                    console.log("TOKEN:");
-                    Tool.printBlue(this.TOKEN);
-
-                    if (buf.length <= 16) {
-                        console.log("Wrong TOKEN format");
-                        reject("NONETWORK");
-                    } else {
-                        resolve(this.TOKEN);
-                    }
-                }
-
-            });
-        }).then((d) => {
             // read local storage for machine Info
-            Tool.print("There is network, TOKEN:" + d);
             ProtobufDecode.bOnline = true;
             let bError = false;
 
@@ -217,10 +193,6 @@ export class ProtobufDecode {
                     reject("NOEXIST");
                 }
             });
-        }, (d) => {
-            ProtobufDecode.bOnline = false;
-            Tool.printRed("There is no network");
-            return Promise.reject(d);
         }).then((obj: any) => {
             Tool.printBlue("Intermediate OK");
             return Promise.resolve(obj);
@@ -273,6 +245,27 @@ export class ProtobufDecode {
                     });
                 }
             });
+        }).then((obj: any) => {
+            return new Promise((resolve, reject) => {
+                this.client.login(Tool.MachineSN, (err, buf) => {
+                    if (err) {
+                        Tool.printRed("login failure:");
+                        console.log(err);
+                    } else {
+                        // should I check the content of buf?
+                        console.log(buf.length);
+                        this.TOKEN = buf.toString();
+                        console.log("TOKEN:");
+                        Tool.printBlue(this.TOKEN);
+
+                        if (buf.length <= 16) {
+                            console.log("Wrong TOKEN format");
+                        } else {
+                            resolve(this.TOKEN);
+                        }
+                    }
+                });
+            })
         }).then((obj: any) => {
 
             Tool.printBlue("Machine info");

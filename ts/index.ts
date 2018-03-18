@@ -558,7 +558,6 @@ function main() {
     }, 1500);
 
     setTimeout(() => {
-        console.log("need to update");
         if (decoder.getUpdateTag() === true) {
             console.log("updatable")
             commQT.sendQueryYesNo("更新", "有新版本，是否要更新", (err, data: IfPacket) => {
