@@ -42,7 +42,7 @@ export class ProtobufDecode {
     public decodeConfig: DecodePB;
     public decodeScoredProfile: DecodePB;
     public decodeResume: DecodePB;
-    public decodeAlarm: DecodePB;
+    public decodeAlertDetail: DecodePB;
 
     public appBaking: RunningHandle;
     public mqtt: MqttApp; // Mqtt Client
@@ -112,12 +112,13 @@ export class ProtobufDecode {
             className: "awesomepackage.ResumeResponse",
         });
 
-        this.decodeAlarm = new DecodePB({
+        this.decodeAlertDetail = new DecodePB({
             path: protoFile,
-            className: "awesomepackage.Alarm",
+            className: "awesomepackage.AlertDetail",
         });
 
         this.appBaking = option.baking;
+        this.alarmTags = [];
         for (let i = 0; i < 10; i++) {
             this.alarmTags.push(true);
         }
@@ -147,7 +148,7 @@ export class ProtobufDecode {
         };
     }
 
-    public init(options): void {
+    public init(): void {
 
         const proc = new Promise((resolve, reject) => {
             Tool.printGreen("Protobu decoder init()==>");
@@ -651,7 +652,6 @@ export class ProtobufDecode {
             Tool.printGreen("Get recommend profile");
 
             let type: string = this.data.baking_config.tobacco_type[data.BakingInfo.TobaccoType].name;
-            type = "K326";
             let quality: string;
             switch (data.BakingInfo.Quality) {
                 case 0:
@@ -811,9 +811,9 @@ export class ProtobufDecode {
                 }
             }
             const curve = {
-                TempCurveDryList: curveDryList,
-                TempCurveWetList: curveWetList,
-                TempDurationList: curvedurList,
+                dryList: curveDryList,
+                wetList: curveWetList,
+                durList: curvedurList,
             };
 
             callback(null, stage, minutes, curve);
@@ -821,49 +821,112 @@ export class ProtobufDecode {
         })
     }
 
-    public alarm(type, val1, val2, alarmTag) {
+    public alarm(type, wet, dry, target, alarmTag) {
         if (this.info.mqttResponse.dyId === "") {
             return ;
         }
-        // let wetTemp = 0;
-        // let dryTemp = 0;
-        // let voltage = 0;
-        // let report: boolean;
-        // if (alarmTag === true && this.alarmTags[type] === true) {
-        //     report = true;
-        //     this.alarmTags[type] = false;
-        // } else if (alarmTag === true && this.alarmTags[type] === false) {
-        //     report = false;
-        // } else if (alarmTag === false && this.alarmTags[type] === true) {
-        //     report = false;
-        // } else if (alarmTag === false && this.alarmTags[type] === false) {
-        //     report = false;
-        //     this.alarmTags[type] = true;
-        // }
-        // if (report === true) {
-        //     if (type === 7) {
-        //         voltage = val1;
-        //     } else {
-        //         wetTemp = val1;
-        //         dryTemp = val2;
-        //     }
-        //     const data = {
-        //         deviceId: this.info.mqttResponse.dyId,
-        //         type: type,
-        //         wetTemperature: wetTemp,
-        //         dryTemperature: dryTemp,
-        //         voltage: voltage,
-        //     }
-        //     this.client.alert(this.decodeAlarm.encode(data), this.TOKEN, (err, buf) => {
-        //         if (err) {
-        //             console.log(err);
-        //             ProtobufDecode.bOnline = false;
-        //             return;
-        //         }
+        let report: boolean;
+        let reportType;
+        let detail;
+        if (alarmTag === true && this.alarmTags[type] === true) {
+            report = true;
+            this.alarmTags[type] = false;
+        } else if (alarmTag === true && this.alarmTags[type] === false) {
+            report = false;
+        } else if (alarmTag === false && this.alarmTags[type] === true) {
+            report = false;
+        } else if (alarmTag === false && this.alarmTags[type] === false) {
+            report = false;
+            this.alarmTags[type] = true;
+        }
+        if (report === true) {
+            switch (type) {
+                case 1: 
+                    reportType = "HumidityExceed";
+                    detail = {
+                        type: "wet_exceed",
+                        dry_temperature: dry,
+                        wet_temperature: wet,
+                    }
+                    break;
+                case 2:
+                    reportType = "TemperatureLimit";
+                    detail = {
+                        type: "dry_limit",
+                        actual_temperature: dry,
+                    }
+                    break;
+                case 3: 
+                    reportType = "Temperature2";
+                    detail = {
+                        type: "dry_deviation",
+                        target_temperature: target,
+                        actual_temperature: dry,
+                    }
+                    break;
+                case 4:
+                    reportType = "Temperature4";
+                    detail = {
+                        type: "dry_deviation",
+                        target_temperature: target,
+                        actual_temperature: dry,
+                    }
+                    break;
+                case 5:
+                    reportType = "HumidityLimit";
+                    detail = {
+                        type: "wet_limit",
+                        actual_temperature: wet,
+                    }
+                    break;
+                case 6:
+                    reportType = "Humidity2";
+                    detail = {
+                        type: "wet_deviation",
+                        target_temperature: target,
+                        actual_temperature: wet,
+                    }
+                    break;
+                case 7:
+                    reportType = "Voltage";
+                    detail = {
+                        type: "voltage",
+                        voltage: wet,
+                    }
+                    break;
+                case 8:
+                    reportType = "PhaseLost";
+                    detail = {
+                        type: "phase_lost",
+                    }
+                    break;
+                case 9:
+                    reportType = "Overload";
+                    detail = {
+                        type: "overload",
+                    }
+                    break;
+            }
+            const data = {
+                alertId: 0,
+                deviceId: this.info.mqttResponse.dyId,
+                type: reportType,
+                triggerTime: 0,
+                resolveTime: 0,
+                lastAlertTime: 0,
+                state: "ALERT",
+                detail: JSON.stringify(detail),
+            }
+            this.client.alert(this.decodeAlertDetail.encode(data), this.TOKEN, (err, buf) => {
+                if (err) {
+                    console.log(err);
+                    ProtobufDecode.bOnline = false;
+                    return;
+                }
     
-        //         ProtobufDecode.bOnline = true;
-        //         return;
-        //     });
-        // }
+                ProtobufDecode.bOnline = true;
+                return;
+            });
+        }
     }
 }

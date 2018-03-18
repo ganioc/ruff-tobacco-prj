@@ -45,7 +45,7 @@ const option: IfHttpsApp = {
     port: 443,
 };
 
-const decoder = new ProtobufDecode({ baking: appBaking, QT: commQT });
+const decoder = new ProtobufDecode({ baking: appBaking });
 
 const client = new HttpsApp(option);
 
@@ -79,7 +79,7 @@ $.ready((error) => {
     gprs.start();
 
     // 云端交互初始化
-    decoder.init({ baking: appBaking });
+    decoder.init();
 
     Alarm.init({ decoder: decoder });
 
@@ -136,7 +136,7 @@ function main() {
     // Tool.printRed("Delete:" + LocalStorage.getRootDir());
     // deleteFolderRecursive(LocalStorage.getRootDir());
 
-    appBaking.init({});
+    appBaking.init({ decoder: decoder });
 
     // Task init, very important
     /***************************

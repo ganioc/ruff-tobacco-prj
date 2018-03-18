@@ -113,12 +113,15 @@ message ResumeResponse {
 	int32 remainMinutes = 4;
 }
 
-message Alarm {
-    string deviceId = 1;
-    int32 type = 2;
-    float wet_temperature = 3;
-    float dry_temperature = 4;
-    float voltage = 5;
+message AlertDetail {
+    int64 alertId = 1;
+    string deviceId = 2;
+    string type = 3;
+    int64 triggerTime = 4;
+    int64 resolveTime = 5;
+    int64 lastAlertTime = 6;
+    string state = 7;
+    string detail = 8;
 }
 
 message ConfigTemperaturePair {

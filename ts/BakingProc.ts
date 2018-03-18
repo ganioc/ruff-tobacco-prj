@@ -44,6 +44,7 @@ export class RunningHandle {
     private bBakingFinished: boolean; // work done
     private callback: () => void;  // ?
     private nSaveCounter: number;
+    private decoder: ProtobufDecode;
 
     constructor(options) {
         // Set temp chekcing cycle
@@ -76,6 +77,7 @@ export class RunningHandle {
     public init(options) {
         Tool.print("AppBaking init({})");
         Tool.print("\nCheck local storage");
+        this.decoder = options.decoder;
 
         // Read parameters from local storage file
         // Create it with default value if not exist
@@ -895,48 +897,37 @@ export class RunningHandle {
     // data is from commQT.emitter.on("get", (data:IfPacket))
     public fetchInfoFromCloudAsync(callback) {
 
-        // fetch from server
-
-        // if(error){
-        //    callback("Fail to fetch");
-        // }
-
-        // curve
-        // currentStage
-        // remaining time
-        // Please correct it
-        const curveInfo = {
-            dryList: [],
-            wetList: [],
-            durList: [],
-        };
-
-        function saveContinueInfoFromCloud(curve, currentStage, currentStageRunningTime) {
-            const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
-            info.RunningCurveInfo.CurrentStage = currentStage;
-            info.RunningCurveInfo.CurrentStageRunningTime = currentStageRunningTime;
-            info.RunningCurveInfo.TempCurveDryList = curve.dryList;
-            info.RunningCurveInfo.TempCurveWetList = curve.wetList;
-            info.RunningCurveInfo.TempDurationList = curve.durList;
-
-            LocalStorage.saveBakingStatusSync(info);
-
-            const stageInfo = {
-                CurrentStage: currentStage,
-                CurrentStageRunningTime: currentStageRunningTime, // 分钟
-            };
-
-            LocalStorage.saveCurrentStageSync(stageInfo);
-            LocalStorage.saveCurrentStageBackupSync(stageInfo);
-        }
-
-        this.runningStatus = RunningStatus.PAUSED;
-        this.bBakingFinished = false;
-
-        // saveContinueInfoFromCloud(...)
-
-        callback(undefined);
-
+        this.decoder.resume((err, stage, minutes, curve) => {
+            if(err){
+                callback("Fail to fetch");
+            }
+    
+            function saveContinueInfoFromCloud(curve, currentStage, currentStageRunningTime) {
+                const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
+                info.RunningCurveInfo.CurrentStage = currentStage;
+                info.RunningCurveInfo.CurrentStageRunningTime = currentStageRunningTime;
+                info.RunningCurveInfo.TempCurveDryList = curve.dryList;
+                info.RunningCurveInfo.TempCurveWetList = curve.wetList;
+                info.RunningCurveInfo.TempDurationList = curve.durList;
+    
+                LocalStorage.saveBakingStatusSync(info);
+    
+                const stageInfo = {
+                    CurrentStage: currentStage,
+                    CurrentStageRunningTime: currentStageRunningTime, // 分钟
+                };
+    
+                LocalStorage.saveCurrentStageSync(stageInfo);
+                LocalStorage.saveCurrentStageBackupSync(stageInfo);
+            }
+    
+            this.runningStatus = RunningStatus.PAUSED;
+            this.bBakingFinished = false;
+    
+            saveContinueInfoFromCloud(curve, stage, curve.durList[stage] * 60 - minutes);
+    
+            callback(undefined);
+        });
     }
 
     private getBakingElementList() {

@@ -197,22 +197,22 @@ export class Alarm {
         }
         if (wetT > dryT) {
             Tool.printRed("Wet temp > dry temp," + wetT + "," + dryT);
-            this.decoder.alarm(1, wetT, dryT, true);
+            this.decoder.alarm(1, wetT, dryT, 0, true);
             return 1;
         } else {
-            this.decoder.alarm(1, wetT, dryT, false);
+            this.decoder.alarm(1, wetT, dryT, 0, false);
         }
 
         if (isOverTemp(dryT)) {
             Tool.printRed("temp overTemp " + dryT);
-            this.decoder.alarm(2, 0, dryT, true);
+            this.decoder.alarm(2, 0, dryT, 0, true);
             return 1;
         } else if (isUnderTemp(dryT)) {
             Tool.printRed("temp underTemp " + dryT);
-            this.decoder.alarm(2, 0, dryT, true);
+            this.decoder.alarm(2, 0, dryT, 0, true);
             return 1;
         } else {
-            this.decoder.alarm(2, 0, dryT, false);
+            this.decoder.alarm(2, 0, dryT, 0, false);
         }
 
         if (CheckTempDelta(dryT - tempDryTarget, DRY_TEMP_ALARM_LIMIT)) {
@@ -225,10 +225,10 @@ export class Alarm {
 
         if (Alarm.dryTempCounter > Alarm.dryTempCounterMax) {
             Alarm.dryTempCounter = Alarm.dryTempCounterMax + 1;
-            this.decoder.alarm(3, 0, dryT, true);
+            this.decoder.alarm(3, 0, dryT, tempDryTarget, true);
             return 1;
         } else {
-            this.decoder.alarm(3, 0, dryT ,false);
+            this.decoder.alarm(3, 0, dryT, tempDryTarget, false);
         }
 
         if (CheckTempDelta(dryT - tempDryTarget, DRY_TEMP_ALARM_LIMIT_2)) {
@@ -241,10 +241,10 @@ export class Alarm {
 
         if (Alarm.dryTemp2Counter > Alarm.dryTemp2CounterMax) {
             Alarm.dryTemp2Counter = Alarm.dryTemp2CounterMax + 1;
-            this.decoder.alarm(4, 0, dryT, true);
+            this.decoder.alarm(4, 0, dryT, tempDryTarget, true);
             return 1;
         } else {
-            this.decoder.alarm(4, 0, dryT, false);
+            this.decoder.alarm(4, 0, dryT, tempDryTarget, false);
         }
 
         return 0;
@@ -260,22 +260,22 @@ export class Alarm {
         }
         if (wetT > dryT) {
             Tool.printRed("wetT > dryT: " + wetT + "," + dryT);
-            this.decoder.alarm(1, wetT, dryT, true);
+            this.decoder.alarm(1, wetT, dryT, 0, true);
             return 1;
         } else {
-            this.decoder.alarm(1, wetT, dryT, false);
+            this.decoder.alarm(1, wetT, dryT, 0, false);
         }
 
         if (isOverTemp(wetT)) {
             Tool.printRed("wet temp overTemp " + wetT);
-            this.decoder.alarm(5, wetT, 0, true);
+            this.decoder.alarm(5, wetT, 0, 0, true);
             return 1;
         } else if (isUnderTemp(wetT)) {
             Tool.printRed("wet temp underTemp " + wetT);
-            this.decoder.alarm(5, wetT, 0, true);
+            this.decoder.alarm(5, wetT, 0, 0, true);
             return 1;
         } else {
-            this.decoder.alarm(5, wetT, 0, false);
+            this.decoder.alarm(5, wetT, 0, 0, false);
         }
 
         if (CheckTempDelta(wetT - tempWetTarget, WET_TEMP_ALARM_LIMIT)) {
@@ -289,20 +289,20 @@ export class Alarm {
 
         if (Alarm.wetTempCounter > Alarm.wetTempCounterMax) {
             Alarm.wetTempCounter = Alarm.wetTempCounterMax + 1;
-            this.decoder.alarm(6, wetT, 0, true);
+            this.decoder.alarm(6, wetT, 0, tempWetTarget, true);
             return 1;
         } else {
-            this.decoder.alarm(6, wetT, 0, false);
+            this.decoder.alarm(6, wetT, 0, tempWetTarget, false);
         }
 
         return 0;
     }
     public static checkVoltageLow(v: number): number {
         if (v > 220 * 1.1 || v < 220 * 0.9) {
-            this.decoder.alarm(7, v, 0, true);
+            this.decoder.alarm(7, v, 0, 0, true);
             return 1;
         } else {
-            this.decoder.alarm(7, v, 0, false);
+            this.decoder.alarm(7, v, 0, 0, false);
             return 0;
         }
     }
@@ -414,11 +414,11 @@ export class Alarm {
 
             Alarm.bPhaseLost = true;
 
-            this.decoder.alarm(8, 0, 0, true);
+            this.decoder.alarm(8, 0, 0, 0, true);
 
             return 1;
         } else {
-            this.decoder.alarm(8, 0, 0, false);
+            this.decoder.alarm(8, 0, 0, 0, false);
         }
 
         if (Alarm.windEngineOverloadCounter >= Alarm.windEngineCounterMax) {
@@ -432,11 +432,11 @@ export class Alarm {
 
             Alarm.bOverload = true;
 
-            this.decoder.alarm(9, 0, 0, true);
+            this.decoder.alarm(9, 0, 0, 0, true);
 
             return 1;
         } else {
-            this.decoder.alarm(9, 0, 0, false);
+            this.decoder.alarm(9, 0, 0, 0, false);
         }
 
         if (Alarm.windEnginePhaseLostCounter === 0 && Alarm.windEngineOverloadCounter === 0 && Alarm.windEngineState === false) {
