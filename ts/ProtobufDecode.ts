@@ -55,6 +55,8 @@ export class ProtobufDecode {
     private data: IfConfigFile;
     private updateTag: boolean;
     private alarmTags: boolean[];
+    private batchProfile: any;
+    private batchInfo: any;
 
     constructor(option) {
         this.decodeRegisterResponse = new DecodePB({
@@ -142,9 +144,6 @@ export class ProtobufDecode {
                 mqttKey: "",
             },
             currentBatchId: 0,
-            batchStartTime: 0,
-            loadWeatherTemperature: 0,
-            loadWeatherHumidity: 0,
         };
     }
 
@@ -226,9 +225,6 @@ export class ProtobufDecode {
                                 const objAll: IfMachineInfo = {
                                     mqttResponse: objRegisterResponse,
                                     currentBatchId: 0,
-                                    batchStartTime: 0,
-                                    loadWeatherTemperature: 0,
-                                    loadWeatherHumidity: 0,
                                 };
                                 // save it to local file
                                 fs.writeFileSync(LocalStorage.getMachineFile(), JSON.stringify(objAll));
@@ -376,13 +372,13 @@ export class ProtobufDecode {
             config.tobaccoType.forEach((element) => {
                 types.push({
                     name: element.name,
-                    id: element.id,
+                    id: element.id === undefined ? 0 : element.id,
                 });
             });
             config.qualityLevel.forEach((element) => {
                 levels.push({
                     name: element.name,
-                    id: element.id,
+                    id: element.id === undefined ? 0 : element.id,
                 });
             });
             config.defaultCurve.forEach((curve) => {
@@ -447,8 +443,7 @@ export class ProtobufDecode {
         ProtobufDecode.bOnline = true;
     }
 
-    // bakingData: any
-    public createBatch(): void {
+    public saveBatch(): void {
         let data: IInfoCollect;
 
         Tool.printYellow("CreateBatch()");
@@ -465,16 +460,10 @@ export class ProtobufDecode {
 
             });
         }).then((val) => {
-            Tool.printGreen("Create batch");
-
             const currentTime: number = new Date().getTime();
 
             let type: string = this.data.baking_config.tobacco_type[data.BakingInfo.TobaccoType].name;
             let quality: string;
-            this.info.batchStartTime = currentTime;
-
-            this.info.loadWeatherTemperature = ControlPeriph.temp4;
-            this.info.loadWeatherHumidity = ControlPeriph.temp2;
 
             switch (data.BakingInfo.Quality) {
                 case 0:
@@ -494,7 +483,7 @@ export class ProtobufDecode {
                     break;
             }
 
-            const batch = {
+            this.batchInfo = {
                 batchId: 0,
                 deviceId: this.info.mqttResponse.dyId,
                 startTime: new Date().getTime(),
@@ -517,27 +506,46 @@ export class ProtobufDecode {
                 loadMaturityLv_3Percentage: data.BakingInfo.MaturePercent4,
                 loadMaturityLv_4Percentage: data.BakingInfo.MaturePercent5,
             };
+        });
+    }
 
-            console.log(batch);
+    // bakingData: any
+    public createBatch(): void {
 
-            this.client.createBatch(this.decodeBatchDetail.encode(batch), this.TOKEN, (err, buf) => {
+        Tool.printYellow("CreateBatch()");
+
+        console.log(this.batchInfo);
+
+        this.client.createBatch(this.decodeBatchDetail.encode(this.batchInfo), this.TOKEN, (err, buf) => {
+            if (err) {
+                console.log(err);
+                ProtobufDecode.bOnline = false;
+                return;
+            }
+
+            ProtobufDecode.bOnline = true;
+            const batchSummary = this.decodeBatchSummary.decode(new Uint8Array(buf));
+            Tool.printYellow("batchSummary:");
+            console.log(batchSummary);
+            this.info.currentBatchId = batchSummary.batchId;
+
+            // save it to the machine.json, added by Yang
+            LocalStorage.saveMachineInfo(this.info);
+ 
+            Tool.printGreen("Create profile");
+            this.batchProfile.batchId = this.info.currentBatchId;
+            console.log(this.batchProfile);
+
+            this.client.updateProfile(this.decodeBatchProfile.encode(this.batchProfile), this.TOKEN, (err, buf) => {
                 if (err) {
                     console.log(err);
                     ProtobufDecode.bOnline = false;
                     return;
                 }
-
                 ProtobufDecode.bOnline = true;
-                const batchSummary = this.decodeBatchSummary.decode(new Uint8Array(buf));
-                Tool.printYellow("batchSummary:");
-                console.log(batchSummary);
-                this.info.currentBatchId = batchSummary.batchId;
 
-                // save it to the machine.json, added by Yang
-                LocalStorage.saveMachineInfo(this.info);
-
-                return;
             });
+            return;
         });
     }
 
@@ -591,7 +599,7 @@ export class ProtobufDecode {
                 batchId: this.info.currentBatchId,
                 deviceId: this.info.mqttResponse.dyId,
                 ratings: rating,
-                startTime: this.info.batchStartTime,
+                startTime: 0,
                 endTime: new Date().getTime(),
                 afterTopWeight: 0,
                 afterMiddleWeight: 0,
@@ -599,9 +607,9 @@ export class ProtobufDecode {
                 variety: type,
                 barnAirflowDirection: data.BaseSetting.AirFlowPattern,
                 barnWallTexture: data.BaseSetting.WallMaterial === 0 ? "板式" : "砖混",
-                loadWeatherTemperature: this.info.loadWeatherTemperature,
+                loadWeatherTemperature: 0,
                 loadTopWeight: data.BakingInfo.UpperWeight,
-                loadWeatherHumidity: this.info.loadWeatherHumidity,
+                loadWeatherHumidity: 0,
                 loadMiddleWeight: data.BakingInfo.MiddleWeight,
                 loadBottomWeight: data.BakingInfo.LowerWeight,
                 loadTool: data.BakingInfo.LoadingMethod === 1 ? "烟竿" : "烟夹",
@@ -624,6 +632,28 @@ export class ProtobufDecode {
                     ProtobufDecode.bOnline = true;
                 }
             });
+        });
+    }
+
+    public getRecoProfileRetry(callback: (err, d:any) => void) {
+        this.getRecoProfile((err, d) => {
+            if (err) {
+                this.getRecoProfile((err1, d1) => {
+                    if (err1) {
+                        this.getRecoProfile((err2, fb2) => {
+                            if (err2) {
+                                callback(err2, null);
+                                return;
+                            }
+                            callback(null, fb2);
+                        });
+                        return;
+                    }
+                    callback(null ,d1)
+                });
+                return;
+            }
+            callback(null, d);
         });
     }
 
@@ -668,9 +698,9 @@ export class ProtobufDecode {
                 variety: type,
                 barnAirflowDirection: data.BaseSetting.AirFlowPattern,
                 barnWallTexture: data.BaseSetting.WallMaterial === 0 ? "板式" : "砖混",
-                loadWeatherTemperature: this.info.loadWeatherTemperature,
+                loadWeatherTemperature: ControlPeriph.temp4,
                 loadTopWeight: data.BakingInfo.UpperWeight,
-                loadWeatherHumidity: this.info.loadWeatherHumidity,
+                loadWeatherHumidity: ControlPeriph.temp2,
                 loadMiddleWeight: data.BakingInfo.MiddleWeight,
                 loadBottomWeight: data.BakingInfo.LowerWeight,
                 loadTool: data.BakingInfo.LoadingMethod === 1 ? "烟竿" : "烟夹",
@@ -732,6 +762,25 @@ export class ProtobufDecode {
         });
     }
 
+    public saveProfile(data: any) {
+        const items: any[] = [];
+        for (let i = 0; i < data.TempDurationList.length; i++) {
+            items.push({
+                targetDryBulbTemp: data.TempCurveDryList[i][1],
+                targetWetBulbTemp: data.TempCurveWetList[i][1],
+                minutes: data.TempDurationList[i] * 60,
+            });
+        }
+        const profile = {
+            items: items,
+        };
+        this.batchProfile = {
+            batchId: this.info.currentBatchId,
+            deviceId: this.info.mqttResponse.dyId,
+            profile: profile,
+        };
+    }
+
     public updateProfile(data: any) {
         Tool.printGreen("Update profile");
 
@@ -770,6 +819,29 @@ export class ProtobufDecode {
         console.log("to get the cloud curve");
     }
 
+    public resumeRetry(callback:(err, stage, minutes, curve) => void) {
+        this.resume((err, stage, minutes, curve) => {
+            if (err) {
+                this.resume((err1, stage1, minutes1, curve1) => {
+                    if (err1) {
+                        this.resume((err2, stage2, minutes2, curve2) => {
+                            if (err2) {
+                                callback(err2, 0, 0, null);
+                                return;
+                            }
+                            callback(null, stage2, minutes2, curve2);
+                        });
+                        return;
+                    }
+                    callback(null ,stage1, minutes1, curve1)
+                });
+                return;
+            }
+            callback(null, stage, minutes, curve);
+        });
+    }
+
+
     public resume(callback: (err, stage, minutes, curve) => void) {
         Tool.printGreen("Cloud resume stat");
 
@@ -784,8 +856,12 @@ export class ProtobufDecode {
             ProtobufDecode.bOnline = true;
             const resumeStat = this.decodeResume.decode(new Uint8Array(buf))
             console.log(resumeStat);
-            const stage: number = resumeStat.stage;
-            const minutes: number = resumeStat.remainMinutes;
+            if (JSON.stringify(resumeStat) == "{}" || resumeStat.profile === undefined) {
+                callback("protobuf err", 0, 0, null);
+                return;
+            }
+            const stage: number = resumeStat.stage === undefined ? 0 : resumeStat.stage;
+            const minutes: number = resumeStat.remainMinutes === undefined ? 0 : resumeStat.remainMinutes;
             const items: any[] = resumeStat.profile.items;
             const curveDryList: number[][] = [];
             const curveWetList: number[][] = [];

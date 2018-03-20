@@ -3,7 +3,7 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.2.2";
+const APP_VERSION = "1.2.4";
 // require("../package.json").version;
 
 const UI_VERSION = "1.1";
@@ -24,6 +24,7 @@ import {
     IfCurrentStageInfo,
     IfMachineInfo,
 } from "./BakingCfg";
+import { inspect } from "util";
 // export interface IfDefaultCurve {
 //     dryList: number[][];
 //     wetList: number[][];
@@ -442,6 +443,7 @@ export class LocalStorage {
     }
     public static saveBakingStatusSync(obj: IInfoCollect) {
         Tool.print("saveBakingStatus");
+        inspect(obj);
         fs.writeFileSync(LocalStorage.getStatusFileDirec(),
             JSON.stringify(obj));
     }

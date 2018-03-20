@@ -123,6 +123,7 @@ export class HttpsApp {
             console.log("statusCode:" + res.statusCode);
             console.log("headers:" + res.headers);
             // console.log(inspect(res.headers));
+            let resp;
 
             if (res.statusCode === 403) {
                 Tool.printRed("Forbidden path");
@@ -133,7 +134,7 @@ export class HttpsApp {
                 // Tool.print(d);
                 // Tool.print(d.toString());
                 Tool.printMagenta("----end----");
-                callback(null, d);
+                resp = resp === undefined ? d : resp + d;
             });
 
             res.on("error", (err) => {
@@ -141,6 +142,7 @@ export class HttpsApp {
                 callback(err, null);
             });
             res.on("end", () => {
+                callback(null, resp);
                 Tool.print("Put end rx");
             });
         });
@@ -189,24 +191,27 @@ export class HttpsApp {
             console.log("statusCode:" + res.statusCode);
             console.log("headers:" + res.headers);
             // console.log(inspect(res.headers));
+            let resp;
 
             if (res.statusCode === 403) {
                 Tool.printRed("Forbidden path");
             }
 
             res.on("data", (d) => {
-                Tool.printMagenta("<-- PUT response from https server:");
+                Tool.printMagenta("<-- POSTWITHTOKEN response from https server:");
                 // Tool.print(d);
                 // Tool.print(d.toString());
                 Tool.printMagenta("----end----");
-                callback(null, d);
+                resp = resp === undefined ? d : resp + d;
             });
 
             res.on("error", (err) => {
                 Tool.printRed(err);
                 callback(err, null);
             });
+
             res.on("end", () => {
+                callback(null, resp);
                 Tool.print("Put end rx");
             });
         });
@@ -255,15 +260,17 @@ export class HttpsApp {
             console.log("headers:" + res.headers);
             // console.log(inspect(res));
 
+            let resp;
             res.on("data", (d) => {
                 Tool.printMagenta("<-- from https server:");
-                // Tool.print(d);
+                Tool.print(d);
                 Tool.printYellow("to object");
                 Tool.printMagenta("----end----");
-                callback(null, d);
+                resp = resp === undefined ? d : resp + d;
             });
             res.on("end", () => {
-                Tool.print("Post end rx");
+                Tool.print("Post end rx");                
+                callback(null, resp);
             });
         });
 
@@ -302,6 +309,7 @@ export class HttpsApp {
             console.log("headers:" + res.headers);
             // console.log(inspect(res.headers));
 
+            let resp;
             if (res.statusCode === 403) {
                 Tool.printRed("Forbidden path");
             }
@@ -310,7 +318,12 @@ export class HttpsApp {
                 Tool.printMagenta("<-- from https server:");
                 // Tool.print(d);
                 Tool.printMagenta("----end----");
-                callback(null, d);
+                resp = resp === undefined ? d : resp + d;
+            });
+
+            res.on("end", () => {
+                Tool.print("Post end rx");                
+                callback(null, resp);
             });
 
             res.on("error", (err) => {

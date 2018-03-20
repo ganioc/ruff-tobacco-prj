@@ -74,10 +74,13 @@ export class RunningHandle {
         this.nSaveCounter = 0;
     }
 
-    public init(options) {
+    public init(option) {
         Tool.print("AppBaking init({})");
         Tool.print("\nCheck local storage");
-        this.decoder = options.decoder;
+        if (this.decoder === undefined) {
+            this.decoder = option.decoder;
+        }
+        Tool.print("\nCheck local storage");
 
         // Read parameters from local storage file
         // Create it with default value if not exist
@@ -897,10 +900,14 @@ export class RunningHandle {
     // data is from commQT.emitter.on("get", (data:IfPacket))
     public fetchInfoFromCloudAsync(callback) {
 
-        this.decoder.resume((err, stage, minutes, curve) => {
+        this.decoder.resumeRetry((err, stage, minutes, curve) => {
             if(err){
                 callback("Fail to fetch");
+                return;
             }
+            Tool.print("Info from cloud");
+            Tool.print("stage:" + stage);
+            Tool.print("minutes:" + minutes);
     
             function saveContinueInfoFromCloud(curve, currentStage, currentStageRunningTime) {
                 const info: IInfoCollect = LocalStorage.loadBakingStatusSync();

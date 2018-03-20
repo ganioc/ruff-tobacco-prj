@@ -246,6 +246,8 @@ function main() {
                         Tool.print("Turn on LED");
                     });
 
+                    decoder.createBatch();
+
                     commQT.sendSetResp(data.PacketId, data.Obj, "OK");
 
                 } else {
@@ -361,7 +363,7 @@ function main() {
                     });
 
                     setTimeout(() => {
-                        appBaking.init({});
+                        appBaking.init({ decoder: decoder });
 
                         Tool.print("App init");
                         commQT.sendTrap(InfoType.Val_SysInfo, appBaking.loadSysInfo());
@@ -443,12 +445,7 @@ function main() {
             case InfoType.Val_CloudCurveInfo:
                 Tool.printBlue("Get CloudCurveInfo received");
 
-                // Read curves from cloud
-                // appBaking.loadInfoCollectAsync((d: IInfoCollect) => {
-                //     commQT.sendGetResp(data.PacketId, data.Obj, appBaking.loadSettingCurveInfo({ Index: 0 }));
-                // });
-
-                decoder.getRecoProfile((err, fb) => {
+                decoder.getRecoProfileRetry((err, fb) => {
                     if (err) {
                         Tool.printRed(err);
                         commQT.sendGetResp(data.PacketId, data.Obj, {
@@ -500,8 +497,12 @@ function main() {
                 break;
             case InfoType.Val_RunningCurveInfo:
                 appBaking.updateRunningCurveInfoAsync(data.Content);
-                //Update profile
-                decoder.updateProfile(data.Content);
+                //save profile
+                if (appBaking.runningStatus === RunningStatus.WAITING) {
+                    decoder.saveProfile(data.Content);
+                } else {
+                    decoder.updateProfile(data.Content);
+                }
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
                 break;
             case InfoType.Val_ResultInfo:
@@ -517,7 +518,7 @@ function main() {
             case InfoType.Val_BakingInfo:
                 appBaking.updateBakingInfoAsync(data.Content, () => {
                     // create Batch ID
-                    decoder.createBatch();
+                    decoder.saveBatch();
                 });
                 commQT.sendSetResp(data.PacketId, data.Obj, "OK");
 
