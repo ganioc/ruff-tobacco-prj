@@ -30,7 +30,7 @@ export class ControlMcu {
     public static turnOffVentingGate() {
         console.log("Turn off Venting");
     }
-    private static readonly WIRTE_TIMEOUT = 2000;
+    private static readonly WIRTE_TIMEOUT = 1200;
     public emitter: Events.EventEmitter;
 
     private callback: (err, data) => void;
