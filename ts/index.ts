@@ -550,7 +550,7 @@ function main() {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
-    }, 5000);
+    }, 8000);
 
     setInterval(() => {
         ControlPeriph.fetchFastParamsWithPromise(() => {
