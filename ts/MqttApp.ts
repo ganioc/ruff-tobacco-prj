@@ -78,7 +78,7 @@ export class MqttApp {
 
         this.counterError = 0;
 
-        Tool.printBlue(this.address + ":" + this.port);
+        Tool.printBlue(this.address);
 
         console.log({
             keepalive: 1000,
@@ -90,7 +90,7 @@ export class MqttApp {
         });
 
         this.client = Mqtt.connect(
-            this.address + ":" + this.port,
+            this.address,
             {
                 keepalive: 1000,
                 protocolId: "MQIsdp",
@@ -104,21 +104,21 @@ export class MqttApp {
             this.lost = true;
             Tool.printRed("MQTT to baidu closed");
 
-            setTimeout(() => {
-                this.reconnect();
-            }, 60000);
+            // setTimeout(() => {
+            //     this.reconnect();
+            // }, 60000);
 
         });
         this.client.on("error", (err) => {
             Tool.printRed("MQTT baidu, error");
             console.log(err);
 
-            this.counterError++;
+            // this.counterError++;
 
-            if (this.counterError > 100) {
-                this.lost = true;
-                this.reconnect();
-            }
+            // if (this.counterError > 100) {
+            //     this.lost = true;
+            //     this.reconnect();
+            // }
         });
         this.client.on("connect", () => {
             this.lost = false;
@@ -187,11 +187,11 @@ export class MqttApp {
         Tool.print("Download cuve from cloud server");
     }
     public reconnect() {
-        const that = this;
-        this.client.end(() => {
-            setTimeout(() => {
-                that.start();
-            }, 30000);
-        });
+        // const that = this;
+        // this.client.end(() => {
+        //     setTimeout(() => {
+        //         that.start();
+        //     }, 30000);
+        // });
     }
 }

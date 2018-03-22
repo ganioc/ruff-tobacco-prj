@@ -267,8 +267,8 @@ export class ProtobufDecode {
             console.log(this.info);
             // create the mqtt client
             this.mqtt = new MqttApp({
-                address: this.info.mqttResponse.mqttSslEndpoint,
-                port: 1884,
+                address: this.info.mqttResponse.mqttTcpEndpoint,
+                port: 1883,
                 name: this.info.mqttResponse.mqttUsername,
                 key: this.info.mqttResponse.mqttKey,
                 clientId: this.info.mqttResponse.dyId,
