@@ -167,7 +167,7 @@ function main() {
                 });
 
             }, TRAP_PERIOD);
-        }, 5000);
+        }, 5390);
 
         // setTimeout(() => {
         //     commQT.sendQueryYesNo("Test Dlg", "测试对话框功能，5秒钟消失", (err, data) => {
@@ -550,13 +550,13 @@ function main() {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
-    }, 8000);
+    }, 6070);
 
     setInterval(() => {
         ControlPeriph.fetchFastParamsWithPromise(() => {
             Tool.print("Fetch fast params");
         });
-    }, 1500);
+    }, 1900);
 
     setTimeout(() => {
         if (decoder.getUpdateTag() === true) {
@@ -570,5 +570,5 @@ function main() {
                 decoder.update();
             });
         }
-    }, 5000);
+    }, 5700);
 }

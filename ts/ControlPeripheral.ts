@@ -347,6 +347,8 @@ export class ControlPeriph {
                         ControlPeriph.temp2 = (temp2 > 100) ? ControlPeriph.temp2 : temp2;
                         ControlPeriph.temp3 = (temp3 > 100) ? ControlPeriph.temp3 : temp3;
                         ControlPeriph.temp4 = (temp4 > 100) ? ControlPeriph.temp4 : temp4;
+                    } else {
+                        Tool.printRed("Wrong type rx:" + data.type.toString());
                     }
 
 
@@ -414,6 +416,8 @@ export class ControlPeriph {
                             // ControlPeriph.ADC5 = ADC5;
                             // ControlPeriph.ADC6 = ADC6;
                             // ControlPeriph.ADC7 = ADC7;
+                        } else {
+                            Tool.printRed("Wrong type rx:" + data.type.toString());
                         }
                         Tool.printYellow(ControlPeriph.ADC1);
                         Tool.printYellow(ControlPeriph.ADC2);
