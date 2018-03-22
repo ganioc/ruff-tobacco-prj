@@ -134,7 +134,11 @@ export class HttpsApp {
                 // Tool.print(d);
                 // Tool.print(d.toString());
                 Tool.printMagenta("----end----");
-                resp = resp === undefined ? d : resp + d;
+                if (resp === undefined) {
+                    resp = d;
+                } else {
+                    resp = typeof resp === 'string' ? resp + d : Buffer.concat([resp,d]);
+                }
             });
 
             res.on("error", (err) => {
@@ -202,7 +206,11 @@ export class HttpsApp {
                 // Tool.print(d);
                 // Tool.print(d.toString());
                 Tool.printMagenta("----end----");
-                resp = resp === undefined ? d : resp + d;
+                if (resp === undefined) {
+                    resp = d;
+                } else {
+                    resp = typeof resp === 'string' ? resp + d : Buffer.concat([resp,d]);
+                }            
             });
 
             res.on("error", (err) => {
@@ -266,8 +274,13 @@ export class HttpsApp {
                 Tool.print(d);
                 Tool.printYellow("to object");
                 Tool.printMagenta("----end----");
-                resp = resp === undefined ? d : resp + d;
+                if (resp === undefined) {
+                    resp = d;
+                } else {
+                    resp = typeof resp === 'string' ? resp + d : Buffer.concat([resp,d]);
+                }
             });
+
             res.on("end", () => {
                 Tool.print("Post end rx");                
                 callback(null, resp);
@@ -318,7 +331,11 @@ export class HttpsApp {
                 Tool.printMagenta("<-- from https server:");
                 // Tool.print(d);
                 Tool.printMagenta("----end----");
-                resp = resp === undefined ? d : resp + d;
+                if (resp === undefined) {
+                    resp = d;
+                } else {
+                    resp = typeof resp === 'string' ? resp + d : Buffer.concat([resp,d]);
+                }            
             });
 
             res.on("end", () => {
