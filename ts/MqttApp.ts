@@ -106,8 +106,8 @@ export class MqttApp {
 
             setTimeout(() => {
                 this.reconnect();
-           }, 60000);
-            
+            }, 60000);
+
         });
         this.client.on("error", (err) => {
             Tool.printRed("MQTT baidu, error");
@@ -187,7 +187,11 @@ export class MqttApp {
         Tool.print("Download cuve from cloud server");
     }
     public reconnect() {
-        this.client.end();
-        this.start();
+        const that = this;
+        this.client.end(() => {
+            setTimeout(() => {
+                that.start();
+            }, 10000);
+        });
     }
 }
