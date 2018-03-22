@@ -187,11 +187,11 @@ export class MqttApp {
         Tool.print("Download cuve from cloud server");
     }
     public reconnect() {
-        // const that = this;
-        // this.client.end(() => {
-        //     setTimeout(() => {
-        //         that.start();
-        //     }, 10000);
-        // });
+        const that = this;
+        this.client.end(() => {
+            setTimeout(() => {
+                that.start();
+            }, 30000);
+        });
     }
 }
