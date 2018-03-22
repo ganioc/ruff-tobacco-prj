@@ -427,21 +427,22 @@ export class ControlPeriph {
                     resolve("OK");
                 }, 100);
             });
-        }).then((val) => {
-            return new Promise((resolve, reject) => {
-                commMCU.GetTime((err, data) => {
-                    if (err !== null) {
-                        Tool.printRed("GetTimeError error");
-                        resolve("OK");
-                        return;
-                    } else {
-                        resolve("OK");
-                    }
-                    // Tool.printGreen("GetTime");
-                    // Tool.print(data.content.toString());
-                });
-            });
         });
+        // .then((val) => {
+        //     return new Promise((resolve, reject) => {
+        //         commMCU.GetTime((err, data) => {
+        //             if (err !== null) {
+        //                 Tool.printRed("GetTimeError error");
+        //                 resolve("OK");
+        //                 return;
+        //             } else {
+        //                 resolve("OK");
+        //             }
+        //             // Tool.printGreen("GetTime");
+        //             // Tool.print(data.content.toString());
+        //         });
+        //     });
+        // });
 
     }
 
