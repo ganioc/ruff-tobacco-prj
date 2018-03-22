@@ -550,7 +550,7 @@ function main() {
         ControlPeriph.fetchParamsWithPromise(commMCU, () => {
             Tool.print("Fetch Params");
         });
-    }, 6070);
+    }, 5070);
 
     setInterval(() => {
         ControlPeriph.fetchFastParamsWithPromise(() => {
@@ -570,5 +570,5 @@ function main() {
                 decoder.update();
             });
         }
-    }, 5700);
+    }, 9700);
 }
