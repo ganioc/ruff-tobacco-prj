@@ -907,7 +907,7 @@ export class RunningHandle {
             }
             Tool.print("Info from cloud");
             Tool.print("stage:" + stage);
-            Tool.print("minutes:" + minutes);
+            Tool.print("minutes:" + (curve.durList[stage] * 60 - minutes));
     
             function saveContinueInfoFromCloud(curve, currentStage, currentStageRunningTime) {
                 const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
@@ -931,7 +931,7 @@ export class RunningHandle {
             this.runningStatus = RunningStatus.PAUSED;
             this.bBakingFinished = false;
     
-            saveContinueInfoFromCloud(curve, stage, curve.durList[stage] * 60 - minutes);
+            saveContinueInfoFromCloud(curve, stage, (curve.durList[stage] * 60 - minutes) * 60);
     
             callback(undefined);
         });

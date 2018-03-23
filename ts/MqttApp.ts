@@ -129,12 +129,12 @@ export class MqttApp {
         });
 
     }
-    public updateReport() {
+    public updateReport(running: boolean) {
         if (this.lost) {
             return;
         }
 
-        let data: IfStructReport;
+        let data: any;
         let info: IInfoCollect;
         const proc = new Promise((resolve, reject) => {
             LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
@@ -159,13 +159,13 @@ export class MqttApp {
             data = {
                 reported: {
                     stage_mode: mode,  // keep, heat
-                    stage: this.appBaking.bakingCurve.indexBakingElement, // 1
+//                    stage: this.stage, // 1
                     dry_bulb_temperature_target: info.RunningCurveInfo.TempCurveDryList[stage][1],
                     wet_bulb_temperature_target: info.RunningCurveInfo.TempCurveWetList[stage][1],
                     control_loc: RunningHandle.bTempForUpperRack === true ? "top" : "bottom",  // top, bottom
                     circulation_speed: ControlPeriph.bWindGateHighSpeed, // 0,低速; 1, 高速
                     moisture_removal: (ControlPeriph.VentAngle > 0.01) ? 1 : 0, // 0 , off; 1, on
-                    stage_remain_min: info.RunningCurveInfo.TempDurationList[stage] * 60 - Math.round(this.appBaking.bakingCurve.getCurrentStageElapsedTime() / 60), // in minutes
+//                    stage_remain_min: this.minutes, // in minutes
                     transducer_communication: (ControlPeriph.temp1 === 0 || ControlPeriph.temp2 === 0 || ControlPeriph.temp3 === 0 || ControlPeriph.temp4 === 0) ? 0 : 1, // 1 norml, 0 abnormal
                     bottom_dry_bulb_temp: ControlPeriph.temp1, //
                     bottom_wet_bulb_temp: ControlPeriph.temp3,
@@ -178,6 +178,11 @@ export class MqttApp {
                     GPS: ControlPeriph.gpsLatitude + "," + ControlPeriph.gpsLongitude, // "xxxx, xxxx"
                 },
             };
+            if (running) {
+                data.reported.stage = this.appBaking.bakingCurve.indexBakingElement;
+                data.reported.stage_remain_min = info.RunningCurveInfo.TempDurationList[stage] * 60 - Math.round(this.appBaking.bakingCurve.getCurrentStageElapsedTime() / 60);
+            }
+
             Tool.print(JSON.stringify(data));
             this.client.publish(this.updateTopic, JSON.stringify(data), { qos: 1, retain: false });
             Tool.printGreen("Update report to cloud");

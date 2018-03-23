@@ -300,9 +300,11 @@ export class ProtobufDecode {
             // 要根据工作状态来决定什么时候上报
             this.mqttTimer = setInterval(() => {
                 console.log("app status: " + this.appBaking.runningStatus);
-//                if (this.appBaking.runningStatus === RunningStatus.RUNNING || this.appBaking.runningStatus === RunningStatus.PAUSED) {
-                    this.mqtt.updateReport();
-//                }
+                if (this.appBaking.runningStatus === RunningStatus.RUNNING || this.appBaking.runningStatus === RunningStatus.PAUSED) {
+                    this.mqtt.updateReport(true);
+                } else {
+                    this.mqtt.updateReport(false);
+                }
             }, 60000);
         })
         .then((d) => {
