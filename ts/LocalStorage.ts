@@ -3,7 +3,7 @@ import * as path from "path";
 import { AppConfig } from "./AppConfig";
 import { Tool } from "./utility";
 
-const APP_VERSION = "1.2.7";
+const APP_VERSION = "1.2.8";
 // require("../package.json").version;
 
 const UI_VERSION = "1.1";
@@ -130,6 +130,7 @@ export class LocalStorage {
             UIVersion: UI_VERSION,
             TobaccoType: appConfig.baking_config.tobacco_type,
             QualityLevel: appConfig.baking_config.quality_level,
+            Sn: Tool.readMachineSNFromRuffd(),
         };
     }
     public static initBaseSetting(): IBaseSetting {

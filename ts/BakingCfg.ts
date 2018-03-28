@@ -51,6 +51,7 @@ export interface ISysInfo {
     UIVersion: string;
     TobaccoType: IfTobaccoType[];
     QualityLevel: IfQualityLevel[];
+    Sn: string;
 }
 export interface IGPSInfo {
     Longitude: number;

@@ -999,5 +999,9 @@ export class ProtobufDecode {
             });
         }
     }
+
+    public getId(): string {
+        return this.info.mqttResponse.dyId === "" ? "NOK" : this.info.mqttResponse.dyId;
+    }
 }
  

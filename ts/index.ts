@@ -356,7 +356,7 @@ function main() {
                     // stop timer
                     clearInterval(commQT.timer);
 
-                    appBaking.ResetToDefault();
+                    // appBaking.ResetToDefault();
 
                     ControlPeriph.TurnOffRunningLED(() => {
                         Tool.print("Turn off LED");
@@ -476,6 +476,12 @@ function main() {
                         commQT.sendGetResp(data.PacketId, data.Obj, d.RunningCurveInfo);
                     });
                 });
+                break;
+            case InfoType.Val_Qrcode:
+                Tool.printRed("Get QRCode.");
+
+                commQT.sendGetResp(data.PacketId, data.Obj, decoder.getId());
+
                 break;
             default:
                 Tool.print("Wrong Get packet obj type:" + data.Obj);

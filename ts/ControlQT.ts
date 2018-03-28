@@ -24,6 +24,7 @@ export enum InfoType {
     Val_UDisk = 22,
     Val_ExpertCurve = 23,
     Val_CloudContinueBaking = 24,
+    Val_Qrcode = 25,
 }
 
 export interface IfPacket {
