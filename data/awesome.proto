@@ -184,3 +184,7 @@ message UpdateRequest {
 	string deviceId = 1;
 	string app_version = 2;
 }
+
+message DeviceQRCodeDetail {
+    string deviceId = 1;
+}

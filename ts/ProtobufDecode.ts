@@ -43,6 +43,7 @@ export class ProtobufDecode {
     public decodeScoredProfile: DecodePB;
     public decodeResume: DecodePB;
     public decodeAlertDetail: DecodePB;
+    public decodeQRCode: DecodePB;
 
     public appBaking: RunningHandle;
     public mqtt: MqttApp; // Mqtt Client
@@ -117,6 +118,11 @@ export class ProtobufDecode {
         this.decodeAlertDetail = new DecodePB({
             path: protoFile,
             className: "awesomepackage.AlertDetail",
+        });
+
+        this.decodeQRCode = new DecodePB({
+            path: protoFile,
+            className: "awesomepackage.DeviceQRCodeDetail",
         });
 
         this.appBaking = option.baking;
@@ -1001,7 +1007,13 @@ export class ProtobufDecode {
     }
 
     public getId(): string {
-        return this.info.mqttResponse.dyId === "" ? "NOK" : this.info.mqttResponse.dyId;
+        if (this.info.mqttResponse.dyId === "")
+            return "NOK";
+        const data = {
+            deviceId: this.info.mqttResponse.dyId,
+        }
+        const bytes: Uint8Array = this.decodeQRCode.encode(data);
+        return new Buffer(bytes).toString("base64");
     }
 }
  
