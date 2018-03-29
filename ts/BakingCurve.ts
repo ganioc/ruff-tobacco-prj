@@ -207,7 +207,7 @@ export class BakingCurve {
 
             try {
                 const log: IElementLog = JSON.parse(data.toString());
-                Tool.print(log);
+                // Tool.print(log);
 
                 log.dryLogs.pop();
                 log.wetLogs.pop();
