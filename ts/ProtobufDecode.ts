@@ -1007,10 +1007,10 @@ export class ProtobufDecode {
     }
 
     public getId(): string {
-        if (this.info.mqttResponse.dyId === "")
+        if (Tool.readMachineSNFromRuffd() === "")
             return "NOK";
         const data = {
-            deviceId: this.info.mqttResponse.dyId,
+            deviceId: Tool.readMachineSNFromRuffd(),
         }
         const bytes: Uint8Array = this.decodeQRCode.encode(data);
         return new Buffer(bytes).toString("base64");
