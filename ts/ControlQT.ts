@@ -284,6 +284,7 @@ export class CommQT {
             case InfoType.Val_CloudContinueBaking:
                 this.emitter.emit("get", data);
                 break;
+            case InfoType.Val_Qrcode:
             default:
                 Tool.print("Wrong packet obj type:" + data.Obj);
                 break;
