@@ -103,22 +103,10 @@ export class MqttApp {
         this.client.on("close", () => {
             this.lost = true;
             Tool.printRed("MQTT to baidu closed");
-
-            // setTimeout(() => {
-            //     this.reconnect();
-            // }, 60000);
-
         });
         this.client.on("error", (err) => {
             Tool.printRed("MQTT baidu, error");
             console.log(err);
-
-            // this.counterError++;
-
-            // if (this.counterError > 100) {
-            //     this.lost = true;
-            //     this.reconnect();
-            // }
         });
         this.client.on("connect", () => {
             this.lost = false;
@@ -159,13 +147,13 @@ export class MqttApp {
             data = {
                 reported: {
                     stage_mode: mode,  // keep, heat
-//                    stage: this.stage, // 1
-                    dry_bulb_temperature_target: info.RunningCurveInfo.TempCurveDryList[stage][1],
-                    wet_bulb_temperature_target: info.RunningCurveInfo.TempCurveWetList[stage][1],
+                    dry_bulb_temperature_target: this.appBaking.bakingCurve.getTempDryTarget(),
+                    wet_bulb_temperature_target: this.appBaking.bakingCurve.getTempWetTarget(),
+                    // dry_bulb_temperature_target: info.RunningCurveInfo.TempCurveDryList[stage][1],
+                    // wet_bulb_temperature_target: info.RunningCurveInfo.TempCurveWetList[stage][1],
                     control_loc: RunningHandle.bTempForUpperRack === true ? "top" : "bottom",  // top, bottom
                     circulation_speed: ControlPeriph.bWindGateHighSpeed, // 0,低速; 1, 高速
                     moisture_removal: (ControlPeriph.VentAngle > 0.01) ? 1 : 0, // 0 , off; 1, on
-//                    stage_remain_min: this.minutes, // in minutes
                     transducer_communication: (ControlPeriph.temp1 === 0 || ControlPeriph.temp2 === 0 || ControlPeriph.temp3 === 0 || ControlPeriph.temp4 === 0) ? 0 : 1, // 1 norml, 0 abnormal
                     bottom_dry_bulb_temp: ControlPeriph.temp1, //
                     bottom_wet_bulb_temp: ControlPeriph.temp3,
@@ -190,13 +178,5 @@ export class MqttApp {
     }
     public downloadCurve() {
         Tool.print("Download cuve from cloud server");
-    }
-    public reconnect() {
-        // const that = this;
-        // this.client.end(() => {
-        //     setTimeout(() => {
-        //         that.start();
-        //     }, 30000);
-        // });
     }
 }

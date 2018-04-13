@@ -262,6 +262,7 @@ function main() {
 
                 if (appBaking.runningStatus === RunningStatus.RUNNING) {
                     appBaking.stop();
+                    decoder.stop();
 
                     clearInterval(appBaking.timerTrap);
 
@@ -284,6 +285,7 @@ function main() {
                     Tool.printBlue("Clear timerTrap");
 
                     appBaking.stop();
+                    decoder.stop();
 
                     Tool.printBlue("App stopped");
 

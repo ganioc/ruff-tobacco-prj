@@ -269,6 +269,7 @@ export class CommQT {
         // this.sendSetResp(data.PacketId, data.Obj, "OK");
     }
     private parseGet(data: IfPacket) {
+        console.log('parseget' + data.Obj);
         switch (data.Obj) {
             case InfoType.Val_SysInfo:
             case InfoType.Val_SettingCurveInfo:

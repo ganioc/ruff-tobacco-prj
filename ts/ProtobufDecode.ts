@@ -31,7 +31,6 @@ const httpoption: IfHttpsApp = {
 };
 
 export class ProtobufDecode {
-    public static bOnline: boolean; // 是否网络在线
     public decodeRegisterResponse: DecodePB;
     public decodeRecoProfile: DecodePB;
     public decodeProfile: DecodePB;
@@ -131,7 +130,6 @@ export class ProtobufDecode {
             this.alarmTags.push(true);
         }
 
-        ProtobufDecode.bOnline = false;
         this.mqtt = undefined;
 
         this.client = new HttpsApp(httpoption);
@@ -158,102 +156,95 @@ export class ProtobufDecode {
         const proc = new Promise((resolve, reject) => {
             Tool.printGreen("Protobu decoder init()==>");     
 
-            // read local storage for machine Info
-            ProtobufDecode.bOnline = true;
-            let bError = false;
+            // register to the server
+            Tool.print("Register to network");
+            this.client.register(Tool.MachineSN, this.TOKEN, (err, buf) => {
+                if (err) {
+                    reject("NOK");
+                } else if (buf.length <= 25) {
+                    Tool.printRed("Wrong register fb length:" + buf.length);
+                    reject("NOK");
+                } else {
+                    let objRegisterResponse: IfMqttResponse;
+                    let bError = false;
+                    try {
+                        objRegisterResponse = this.decodeRegisterResponse.decode(new Uint8Array(buf));
+                    } catch (e) {
+                        Tool.printRed("parse registerresponse data error");
+                        Tool.printRed(e);
 
-            if (fs.existsSync(LocalStorage.getMachineFile())) {
-                Tool.print("Machine Already exist: ");
-                // read out the machine info
-                fs.readFile(LocalStorage.getMachineFile(), (err, data1) => {
-                    if (err) {
-                        Tool.printRed("Read MachineInfo file fail");
-                        reject("NOEXIST");
-
-                    } else {
-                        let obj: any;
-                        try {
-                            obj = JSON.parse(data1.toString());
-                            if (JSON.stringify(obj.mqttResponse) === "{}" || obj.mqttResponse.dyId === "") {
-                                throw new Error("wrong machineinfo format");
-                            }
-                        } catch (e) {
-                            Tool.printRed("parse MachineInfo data error");
-                            Tool.printRed(e);
-                            bError = true;
-                        }
-                        if (bError) {
-                            reject("NOEXIST");
-                        } else {
-                            this.info = JSON.parse(JSON.stringify(obj));
-                            console.log(this.info);
-                            resolve("OK");
-                        }
+                        bError = true;
                     }
-                });
-
-            } else {
-                Tool.print("Machine info Not exist: ");
-                reject("NOEXIST");
-            }
+                    if (bError) {
+                        reject("NOK");
+                    } else {
+                        const objAll: IfMachineInfo = {
+                            mqttResponse: objRegisterResponse,
+                            currentBatchId: 0,
+                        };
+                        // save it to local file
+                        fs.writeFileSync(LocalStorage.getMachineFile(), JSON.stringify(objAll));
+                        Tool.print("Save to machine file");
+                        this.info = JSON.parse(JSON.stringify(objAll));
+                        console.log("objAll");
+                        console.log(objAll);
+                        resolve("OK");
+                    }
+                }
+            });
         }).then((obj: any) => {
             Tool.printBlue("Intermediate OK");
             return Promise.resolve(obj);
         }, (d: any) => {
-            Tool.printBlue("Check if need to register");
             return new Promise((resolve, reject) => {
-                if (d === "NONETWORK") {
-                    Tool.printBlue("NO network here");
-                    reject(d);
-                } else {
-                    // register to the server
-                    Tool.print("Register to network");
-                    this.client.register(Tool.MachineSN, this.TOKEN, (err, buf) => {
-                        if (err) {
-                            reject("NOK");
-                        } else if (buf.length <= 25) {
-                            Tool.printRed("Wrong register fb length:" + buf.length);
-                            reject("NOK");
-                        } else {
-                            let objRegisterResponse: IfMqttResponse;
-                            let bError = false;
-                            try {
-                                objRegisterResponse = this.decodeRegisterResponse.decode(new Uint8Array(buf));
-                            } catch (e) {
-                                Tool.printRed("parse registerresponse data error");
-                                Tool.printRed(e);
+                // read local storage for machine Info
+                let bError = false;
 
+                if (fs.existsSync(LocalStorage.getMachineFile())) {
+                    Tool.print("Machine Already exist: ");
+                    // read out the machine info
+                    fs.readFile(LocalStorage.getMachineFile(), (err, data1) => {
+                        if (err) {
+                            Tool.printRed("Read MachineInfo file fail");
+                            reject("NOEXIST");
+
+                        } else {
+                            let obj: any;
+                            try {
+                                obj = JSON.parse(data1.toString());
+                                if (JSON.stringify(obj.mqttResponse) === "{}" || obj.mqttResponse.dyId === "") {
+                                    throw new Error("wrong machineinfo format");
+                                }
+                            } catch (e) {
+                                Tool.printRed("parse MachineInfo data error");
+                                Tool.printRed(e);
                                 bError = true;
                             }
                             if (bError) {
-                                reject("NOK");
+                                reject("NOEXIST");
                             } else {
-                                const objAll: IfMachineInfo = {
-                                    mqttResponse: objRegisterResponse,
-                                    currentBatchId: 0,
-                                };
-                                // save it to local file
-                                fs.writeFileSync(LocalStorage.getMachineFile(), JSON.stringify(objAll));
-                                Tool.print("Save to machine file");
-                                this.info = JSON.parse(JSON.stringify(objAll));
-                                console.log("objAll");
-                                console.log(objAll);
+                                this.info = JSON.parse(JSON.stringify(obj));
+                                console.log(this.info);
                                 resolve("OK");
                             }
-
                         }
                     });
+                } else {
+                    Tool.print("Machine info Not exist: ");
+                    reject("NOEXIST");
                 }
             });
         }).then((obj: any) => {
             return new Promise((resolve, reject) => {
-                this.client.login(Tool.MachineSN, (err, buf) => {
+                const data = {
+                    id: this.info.mqttResponse.dyId,
+                    password: this.info.mqttResponse.dypassword,
+                };                
+                this.client.login(JSON.stringify(data), Tool.MachineSN, (err, buf) => {
                     if (err) {
                         Tool.printRed("login failure:");
                         console.log(err);
                     } else {
-                        // should I check the content of buf?
-                        console.log(buf.length);
                         this.TOKEN = buf.toString();
                         console.log("TOKEN:");
                         Tool.printBlue(this.TOKEN);
@@ -269,7 +260,6 @@ export class ProtobufDecode {
         }).then((obj: any) => {
 
             Tool.printBlue("Machine info");
-
             console.log(this.info);
             // create the mqtt client
             this.mqtt = new MqttApp({
@@ -288,15 +278,17 @@ export class ProtobufDecode {
         }, (error) => {
             console.log("wrong ending");
         }).then((d) => {
-            // backgorund work
+            // background work
             this.timer = setInterval(() => {
-                this.client.login(Tool.MachineSN, (err, buf) => {
+                const data = {
+                    id: this.info.mqttResponse.dyId,
+                    password: this.info.mqttResponse.dypassword,
+                };     
+                this.client.login(JSON.stringify(data), Tool.MachineSN, (err, buf) => {
                     if (err) {
                         console.log(err);
-                        ProtobufDecode.bOnline = false;
                         return;
                     }
-                    ProtobufDecode.bOnline = true;
                     console.log(buf.length);
                     this.TOKEN = buf.toString();
                     Tool.printBlue(this.TOKEN);
@@ -315,8 +307,7 @@ export class ProtobufDecode {
                     this.mqtt.updateReport(false);
                 }
             }, 60000);
-        })
-        .then((d) => {
+        }).then((d) => {
             return new Promise((resolve, reject) => {
                 LocalStorage.loadBakingStatusAsync((err, o: IInfoCollect) => {
                     if (err) {
@@ -361,10 +352,8 @@ export class ProtobufDecode {
         this.client.updateConfig(this.decodeUpdateRequest.encode(update), this.TOKEN, (err, buf) => {
             if (err) {
                 console.log(err);
-                ProtobufDecode.bOnline = false;
                 return;
             }
-            ProtobufDecode.bOnline = true;
             const config: any = this.decodeConfig.decode(new Uint8Array(buf));
             console.log(config);
 
@@ -424,13 +413,6 @@ export class ProtobufDecode {
             this.data.baking_config.alarm_threshold.wet_temp_alarm_limit = config.alarmThreshold.wetTemperatureAlarmLimit;
             this.data.baking_config.alarm_threshold.wet_temp_alarm_period = config.alarmThreshold.wetTemperatureAlarmPeriod;
             this.data.baking_config.alarm_threshold.alarm_checking_period = config.alarmThreshold.alarmCheckingPeriod;
-            // this.data.baking_config.base_setting.AirFlowPattern = config.baseSetting.airflowPattern;
-            // this.data.baking_config.base_setting.ControllerName = config.baseSetting.controllerName;
-            // this.data.baking_config.base_setting.GPSInfo.Latitude = ControlPeriph.gpsLatitude;
-            // this.data.baking_config.base_setting.GPSInfo.Longitude = ControlPeriph.gpsLongitude;
-            // this.data.baking_config.base_setting.InnerHeight = config.baseSetting.innerHeight;
-            // this.data.baking_config.base_setting.LocName = config.baseSetting.locationName;
-            // this.data.baking_config.base_setting.WallMaterial = config.baseSetting.wallMaterial;
 
             // 默认的参数曲线不能够随便存的。
             AppConfig.setAppConfig(this.data);
@@ -447,11 +429,8 @@ export class ProtobufDecode {
     public update() {
         this.client.updateApp(this.info.mqttResponse.dyId, this.TOKEN, (err, buf) => {
             console.log(err);
-            ProtobufDecode.bOnline = false;
             return;
         });
-
-        ProtobufDecode.bOnline = true;
     }
 
     public saveBatch(): void {
@@ -530,11 +509,9 @@ export class ProtobufDecode {
         this.client.createBatch(this.decodeBatchDetail.encode(this.batchInfo), this.TOKEN, (err, buf) => {
             if (err) {
                 console.log(err);
-                ProtobufDecode.bOnline = false;
                 return;
             }
 
-            ProtobufDecode.bOnline = true;
             const batchSummary = this.decodeBatchSummary.decode(new Uint8Array(buf));
             Tool.printYellow("batchSummary:");
             console.log(batchSummary);
@@ -550,13 +527,8 @@ export class ProtobufDecode {
             this.client.updateProfile(this.decodeBatchProfile.encode(this.batchProfile), this.TOKEN, (err, buf) => {
                 if (err) {
                     console.log(err);
-                    ProtobufDecode.bOnline = false;
-                    return;
                 }
-                ProtobufDecode.bOnline = true;
-
             });
-            return;
         });
     }
 
@@ -638,9 +610,6 @@ export class ProtobufDecode {
             this.client.updateBatch(this.decodeBatchDetail.encode(batch), this.TOKEN, (err, buf) => {
                 if (err) {
                     console.log(err);
-                    ProtobufDecode.bOnline = false;
-                } else {
-                    ProtobufDecode.bOnline = true;
                 }
             });
         });
@@ -729,12 +698,10 @@ export class ProtobufDecode {
             this.client.getRecoProfile(this.decodeRecoProfile.encode(profileRequest), this.TOKEN, (err, buf) => {
                 if (err) {
                     console.log(err);
-                    ProtobufDecode.bOnline = false;
                     callback("network error", null);
                     return;
                 }
 
-                ProtobufDecode.bOnline = true;
                 const profile: any = this.decodeScoredProfile.decode(new Uint8Array(buf));
                 console.log(profile);
                 if (JSON.stringify(profile) === "{}" || profile.series === undefined) {
@@ -817,12 +784,7 @@ export class ProtobufDecode {
         this.client.updateProfile(this.decodeBatchProfile.encode(batchProfile), this.TOKEN, (err, buf) => {
             if (err) {
                 console.log(err);
-                ProtobufDecode.bOnline = false;
-                return;
             }
-
-            ProtobufDecode.bOnline = true;
-            return;
         });
     }
 
@@ -859,12 +821,10 @@ export class ProtobufDecode {
         this.client.resume(this.info.mqttResponse.dyId, this.TOKEN, (err, buf) => {
             if (err) {
                 console.log(err);
-                ProtobufDecode.bOnline = false;
                 callback(err, 0 ,0, null);
                 return;
             }
 
-            ProtobufDecode.bOnline = true;
             const resumeStat = this.decodeResume.decode(new Uint8Array(buf))
             console.log(resumeStat);
             if (JSON.stringify(resumeStat) == "{}" || resumeStat.profile === undefined) {
@@ -896,7 +856,17 @@ export class ProtobufDecode {
             };
 
             callback(null, stage, minutes, curve);
-            return;
+        })
+    }
+
+    public stop() {
+        Tool.printGreen("Cloud stop state");
+
+        this.client.stop(this.info.mqttResponse.dyId, this.TOKEN, (err, buf) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
         })
     }
 
@@ -999,12 +969,7 @@ export class ProtobufDecode {
             this.client.alert(this.decodeAlertDetail.encode(data), this.TOKEN, (err, buf) => {
                 if (err) {
                     console.log(err);
-                    ProtobufDecode.bOnline = false;
-                    return;
                 }
-    
-                ProtobufDecode.bOnline = true;
-                return;
             });
         }
     }

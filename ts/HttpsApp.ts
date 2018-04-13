@@ -52,15 +52,15 @@ export class HttpsApp {
         Tool.printBlue("https app constructor()");
     }
 
-    public login(sn: string, callback: (err, buf) => void) {
-        const data: IfLogin = {
-            imei: sn,
-        };
-        Tool.printYellow(sn);
+    public login(data: string, sn: string, callback: (err, buf) => void) {
+        // const data: IfLogin = {
+        //     imei: sn,
+        // };
+        // Tool.printYellow(sn);
         // console.log(data);
         // console.log(JSON.stringify(data));
 
-        this.post("/login", JSON.stringify(data), callback);
+        this.post("/login", data, callback);
     }
     public register(sn: string, token: string, callback: (err, buf) => void) {
         this.get("/register/" + sn, token, callback);
@@ -92,6 +92,10 @@ export class HttpsApp {
 
     public resume(Id: string, token: string, callback: (err, buf) => void) {
         this.get("/resumePoint/" + Id, token, callback);
+    }
+
+    public stop(Id: string, token: string, callback: (err, buf) => void) {
+        this.put("/device/stop/" + Id, new Uint8Array(0), token, callback);
     }
 
     public alert(arr: Uint8Array, token: string, callback: (err, buf) => void) {

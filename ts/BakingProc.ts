@@ -718,7 +718,7 @@ export class RunningHandle {
             ACAlarmPhaseA: 1,
             ACAlarmPhaseB: 1,
             ACAlarmPhaseC: 1,
-            GPRSAlarm: (ProtobufDecode.bOnline === true) ? 1 : 0,
+            GPRSAlarm: 0,
             GPSAlarm: 1,
 
             // temp value
