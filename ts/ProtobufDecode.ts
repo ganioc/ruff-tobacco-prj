@@ -1,5 +1,3 @@
-/**
- */
 import * as fs from "fs";
 import { Promise } from "promise";
 import { DecodePB } from "./DecodePB";
@@ -154,7 +152,7 @@ export class ProtobufDecode {
     public init(): void {
 
         const proc = new Promise((resolve, reject) => {
-            Tool.printGreen("Protobu decoder init()==>");     
+            Tool.printGreen("Protobu decoder init()==>");
 
             // register to the server
             Tool.print("Register to network");
@@ -239,7 +237,7 @@ export class ProtobufDecode {
                 const data = {
                     id: this.info.mqttResponse.dyId,
                     password: this.info.mqttResponse.dypassword,
-                };                
+                };
                 this.client.login(JSON.stringify(data), Tool.MachineSN, (err, buf) => {
                     if (err) {
                         Tool.printRed("login failure:");
@@ -283,7 +281,7 @@ export class ProtobufDecode {
                 const data = {
                     id: this.info.mqttResponse.dyId,
                     password: this.info.mqttResponse.dypassword,
-                };     
+                };
                 this.client.login(JSON.stringify(data), Tool.MachineSN, (err, buf) => {
                     if (err) {
                         console.log(err);
@@ -330,7 +328,7 @@ export class ProtobufDecode {
                     if (err) {
                         this.updateConfig((err1) => {
                             if (err1) {
-                                this.updateConfig(() => {});
+                                this.updateConfig(() => { });
                             }
                         })
                     }
@@ -519,7 +517,7 @@ export class ProtobufDecode {
 
             // save it to the machine.json, added by Yang
             LocalStorage.saveMachineInfo(this.info);
- 
+
             Tool.printGreen("Create profile");
             this.batchProfile.batchId = this.info.currentBatchId;
             console.log(this.batchProfile);
@@ -615,7 +613,7 @@ export class ProtobufDecode {
         });
     }
 
-    public getRecoProfileRetry(callback: (err, d:any) => void) {
+    public getRecoProfileRetry(callback: (err, d: any) => void) {
         this.getRecoProfile((err, d) => {
             if (err) {
                 this.getRecoProfile((err1, d1) => {
@@ -629,7 +627,7 @@ export class ProtobufDecode {
                         });
                         return;
                     }
-                    callback(null ,d1)
+                    callback(null, d1)
                 });
                 return;
             }
@@ -792,7 +790,7 @@ export class ProtobufDecode {
         console.log("to get the cloud curve");
     }
 
-    public resumeRetry(callback:(err, stage, minutes, curve) => void) {
+    public resumeRetry(callback: (err, stage, minutes, curve) => void) {
         this.resume((err, stage, minutes, curve) => {
             if (err) {
                 this.resume((err1, stage1, minutes1, curve1) => {
@@ -806,7 +804,7 @@ export class ProtobufDecode {
                         });
                         return;
                     }
-                    callback(null ,stage1, minutes1, curve1)
+                    callback(null, stage1, minutes1, curve1)
                 });
                 return;
             }
@@ -821,7 +819,7 @@ export class ProtobufDecode {
         this.client.resume(this.info.mqttResponse.dyId, this.TOKEN, (err, buf) => {
             if (err) {
                 console.log(err);
-                callback(err, 0 ,0, null);
+                callback(err, 0, 0, null);
                 return;
             }
 
@@ -872,7 +870,7 @@ export class ProtobufDecode {
 
     public alarm(type, wet, dry, target, alarmTag) {
         if (this.info.mqttResponse.dyId === "" || this.TOKEN.length < 15) {
-            return ;
+            return;
         }
         let report: boolean;
         let reportType;
@@ -890,7 +888,7 @@ export class ProtobufDecode {
         }
         if (report === true) {
             switch (type) {
-                case 1: 
+                case 1:
                     reportType = "HumidityExceed";
                     detail = {
                         type: "wet_exceed",
@@ -905,7 +903,7 @@ export class ProtobufDecode {
                         actual_temperature: dry,
                     }
                     break;
-                case 3: 
+                case 3:
                     reportType = "Temperature2";
                     detail = {
                         type: "dry_deviation",
@@ -984,4 +982,3 @@ export class ProtobufDecode {
         return new Buffer(bytes).toString("base64");
     }
 }
- 

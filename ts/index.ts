@@ -1,16 +1,11 @@
-
 declare var $: any;
 import * as fs from "fs";
-// import { ControlMcu } from "./ControlMcu";
 import * as Protobuf from "protobufjs";
-import { clearInterval, setInterval, setTimeout } from "timers";
-import * as _ from "underscore";
 import { Alarm } from "./Alarm";
 import { IInfoCollect, RunningStatus } from "./BakingCfg";
 import { RunningHandle } from "./BakingProc";
 import { ControlGPRS } from "./ControlGPRS";
 import { ControlGPS } from "./ControlGPS";
-
 import { ControlMcu } from "./ControlMcu";
 import { ControlPeriph } from "./ControlPeripheral";
 import { CommQT, IfMsgCmd, IfPacket, InfoType } from "./ControlQT";
@@ -542,6 +537,30 @@ function main() {
                         return;
                     }
                     commQT.sendSetResp(data.PacketId, data.Obj, fb);
+                });
+                break;
+            case InfoType.Val_SkipStage:
+                Tool.printGreen("Set stage command:");
+                const obj = JSON.parse(data.Content);
+                console.log(obj);
+
+                LocalStorage.loadCurrentStageAsync((err, infoStage) => {
+                    if (err) {
+                        commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
+                        return;
+                    }
+                    infoStage.CurrentStage = obj.stage;
+                    infoStage.CurrentStageRunningTime = 0;
+
+                    LocalStorage.saveCurrentStageSync(infoStage);
+                    LocalStorage.saveCurrentStageBackupAsync(infoStage, (err1, d) => {
+                        if (err1) {
+                            console.log("Save stage backup fail");
+                            commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
+                            return;
+                        }
+                        commQT.sendSetResp(data.PacketId, data.Obj, "OK");
+                    });
                 });
                 break;
             default:

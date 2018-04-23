@@ -1,10 +1,8 @@
-// Baking curves
 import Spawn = require("child_process");
 import Events = require("events");
 import fs = require("fs");
 import { Promise } from "promise";
 import { clearInterval, setInterval, setTimeout } from "timers";
-import * as _ from "underscore";
 import * as util from "util";
 import { Alarm } from "./Alarm";
 import { AppConfig } from "./AppConfig";
@@ -901,14 +899,14 @@ export class RunningHandle {
     public fetchInfoFromCloudAsync(callback) {
 
         this.decoder.resumeRetry((err, stage, minutes, curve) => {
-            if(err){
+            if (err) {
                 callback("Fail to fetch");
                 return;
             }
             Tool.print("Info from cloud");
             Tool.print("stage:" + stage);
             Tool.print("minutes:" + (curve.durList[stage] * 60 - minutes));
-    
+
             function saveContinueInfoFromCloud(curve, currentStage, currentStageRunningTime) {
                 const info: IInfoCollect = LocalStorage.loadBakingStatusSync();
                 info.RunningCurveInfo.CurrentStage = currentStage;
@@ -916,23 +914,23 @@ export class RunningHandle {
                 info.RunningCurveInfo.TempCurveDryList = curve.dryList;
                 info.RunningCurveInfo.TempCurveWetList = curve.wetList;
                 info.RunningCurveInfo.TempDurationList = curve.durList;
-    
+
                 LocalStorage.saveBakingStatusSync(info);
-    
+
                 const stageInfo = {
                     CurrentStage: currentStage,
                     CurrentStageRunningTime: currentStageRunningTime, // 分钟
                 };
-    
+
                 LocalStorage.saveCurrentStageSync(stageInfo);
                 LocalStorage.saveCurrentStageBackupSync(stageInfo);
             }
-    
+
             this.runningStatus = RunningStatus.PAUSED;
             this.bBakingFinished = false;
-    
+
             saveContinueInfoFromCloud(curve, stage, (curve.durList[stage] * 60 - minutes) * 60);
-    
+
             callback(undefined);
         });
     }
