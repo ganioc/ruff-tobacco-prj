@@ -541,15 +541,17 @@ function main() {
                 break;
             case InfoType.Val_SkipStage:
                 Tool.printGreen("Set stage command:");
-                const obj = JSON.parse(data.Content);
-                console.log(obj);
+                console.log(data);
+
+                // const obj = data.Content;
+                // console.log(obj);
 
                 LocalStorage.loadCurrentStageAsync((err, infoStage) => {
                     if (err) {
                         commQT.sendSetResp(data.PacketId, data.Obj, "NOK");
                         return;
                     }
-                    infoStage.CurrentStage = obj.stage;
+                    infoStage.CurrentStage = data.Content.Stage;
                     infoStage.CurrentStageRunningTime = 0;
 
                     LocalStorage.saveCurrentStageSync(infoStage);

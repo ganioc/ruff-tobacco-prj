@@ -120,6 +120,7 @@ export class CommQT {
 
             try {
                 obj = JSON.parse(data.toString());
+                // console.log(obj);
                 this.parse(obj);
             } catch (e) {
                 Tool.printRed("Wrong parse QT msg");
