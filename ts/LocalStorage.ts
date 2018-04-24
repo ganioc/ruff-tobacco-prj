@@ -303,14 +303,19 @@ export class LocalStorage {
 
         // add 2017-12-26, for currentStage.json file
         Tool.printMagenta(LocalStorage.getCurrentStageDirec() + "---->");
-        if (fs.existsSync(LocalStorage.getCurrentStageDirec())) {
-            Tool.print("Already exist: ");
-        } else {
-            Tool.print("Not exist: ");
-            fs.writeFileSync(LocalStorage.getCurrentStageDirec(),
-                LocalStorage.strInitCurrentStage());
-            fs.writeFileSync(LocalStorage.getCurrentStageBackupDirec(), LocalStorage.strInitCurrentStage());
-        }
+
+        fs.writeFileSync(LocalStorage.getCurrentStageDirec(),
+            LocalStorage.strInitCurrentStage());
+        fs.writeFileSync(LocalStorage.getCurrentStageBackupDirec(), LocalStorage.strInitCurrentStage());
+
+        // if (fs.existsSync(LocalStorage.getCurrentStageDirec())) {
+        //     Tool.print("Already exist: ");
+        // } else {
+        //     Tool.print("Not exist: ");
+        //     fs.writeFileSync(LocalStorage.getCurrentStageDirec(),
+        //         LocalStorage.strInitCurrentStage());
+        //     fs.writeFileSync(LocalStorage.getCurrentStageBackupDirec(), LocalStorage.strInitCurrentStage());
+        // }
 
     }
     public static loadCurrentStageAsync(callback: (err, o: IfCurrentStageInfo) => void) {

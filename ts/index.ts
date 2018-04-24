@@ -541,7 +541,7 @@ function main() {
                 break;
             case InfoType.Val_SkipStage:
                 Tool.printGreen("Set stage command:");
-                console.log(data);
+                console.log(data.Content);
 
                 // const obj = data.Content;
                 // console.log(obj);
